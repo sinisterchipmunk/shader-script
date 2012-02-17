@@ -1,6 +1,6 @@
 fs            = require 'fs'
 path          = require 'path'
-{extend}      = require './src/helpers'
+{extend}      = require './src/shader-script/helpers'
 {spawn, exec} = require 'child_process'
 
 run = (cb, cmd, args...) ->
@@ -13,11 +13,14 @@ run = (cb, cmd, args...) ->
 
 
 task 'build', 'build the language from source', build = (cb) ->
-  build_parser()
-  run cb, 'coffee', '-c', '-o', 'lib/assets/javascripts/shader-script', 'src'
+  run cb, 'coffee', '-c', '-o', 'lib/assets/javascripts', 'src'
 
 task 'build:parser', 'rebuild the Jison parser', build_parser = (cb) ->
   extend global, require('util')
   require 'jison'
-  parser = require('./src/grammar').parser
+  parser = require('./src/shader-script/grammar').parser
   fs.writeFile 'lib/assets/javascripts/shader-script/parser.js', parser.generate()
+  cb() if typeof cb is 'function'
+
+task 'test', 'run the tests', ->
+  build -> run null, 'script/test'
