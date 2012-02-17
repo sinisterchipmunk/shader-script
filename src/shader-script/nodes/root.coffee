@@ -1,4 +1,4 @@
-{ShaderDescriptor} = require 'shader-script/shader_descriptor'
+{Shader} = require 'shader-script/shader'
 
 class exports.Root extends require('./base').Base
   name: "root"
@@ -7,7 +7,7 @@ class exports.Root extends require('./base').Base
     super @block
   
   compile: () ->
-    shader = new ShaderDescriptor()
+    shader = new Shader()
     shader.body = @block.compile shader
     
     shader.to_json()

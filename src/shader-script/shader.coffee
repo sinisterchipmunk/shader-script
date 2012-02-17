@@ -1,4 +1,4 @@
-class exports.ShaderDescriptor
+class exports.Shader
   constructor: ->
     @name = "shader"
     @proxy = 

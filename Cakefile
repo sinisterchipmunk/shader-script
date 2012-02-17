@@ -22,5 +22,9 @@ task 'build:parser', 'rebuild the Jison parser', build_parser = (cb) ->
   fs.writeFile 'lib/assets/javascripts/shader-script/parser.js', parser.generate()
   cb() if typeof cb is 'function'
 
-task 'test', 'run the tests', ->
+task 'test', 'run the tests', test = ->
   build -> run null, 'script/test'
+
+task 'all', 'rebuild the parser, then rebuild the language and run the tests', ->
+  build_parser -> test()
+  
