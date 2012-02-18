@@ -18,7 +18,9 @@ global.json = (script) -> Shader.compile_to_json script
 
 global.glsl = (script) -> Shader.compile_to_glsl script
 
-global.simulate = (glsl, callback) ->
-  sim = new Shader.Simulator glsl
-  sim.start callback if callback
-  sim
+global.simulate = (glsl) ->
+  new Shader.Simulator glsl
+
+global.parse_glsl_tree = (code) ->
+  (new (require('shader-script/glsl/lexer').Lexer)).tokenize code, rewrite: off
+  

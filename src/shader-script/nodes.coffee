@@ -1,10 +1,11 @@
 nodes = 
-  Root:       'nodes/root'
-  Block:      'nodes/block'
-  Literal:    'nodes/literal'
-  Value:      'nodes/value'
-  Call:       'nodes/call'
-  Identifier: 'nodes/identifier'
+  Root:       'root'
+  Block:      'block'
+  Literal:    'literal'
+  Value:      'value'
+  Call:       'call'
+  Identifier: 'identifier'
+  Assign:     'assign'
 
 for node_name, node_file of nodes
-  exports[node_name] = require("./" + node_file)[node_name]
+  exports[node_name] = require("shader-script/nodes/" + node_file)[node_name]

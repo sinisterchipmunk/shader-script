@@ -9,5 +9,4 @@ class exports.Root extends require('./base').Base
   compile: () ->
     shader = new Shader()
     shader.body = @block.compile shader
-    
     shader.to_json()

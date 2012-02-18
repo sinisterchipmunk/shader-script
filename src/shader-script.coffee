@@ -20,6 +20,8 @@ parser.lexer =
     
 parser.yy = require 'shader-script/nodes'
 
+exports.Simulator = Simulator
+
 exports.parse = (code) -> parser.parse(lexer.tokenize code)
 
 exports.compile_to_glsl = (code) ->
