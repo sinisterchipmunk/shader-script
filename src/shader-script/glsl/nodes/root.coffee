@@ -3,5 +3,6 @@ class exports.Root extends require('shader-script/nodes/base').Base
   
   children: -> ['block']
   
-  compile: (program) -> @block.compile(program)
+  compile: (program) ->
+    @block.compile(program)
   

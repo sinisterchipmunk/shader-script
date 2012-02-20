@@ -5,7 +5,6 @@ class exports.Assign extends require('shader-script/nodes/assign').Assign
     left  = @left.compile program
     right = @right.compile program
     
-    return execute: (sim) -> sim.state.variables[left] = right
-    
-    # [ 'assign', @children[0].compile(program), @children[1].compile(program) ]
+    return execute: (sim) ->
+      sim.state.variables[left] = right.execute(sim)
     

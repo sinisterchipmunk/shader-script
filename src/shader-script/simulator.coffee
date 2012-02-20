@@ -12,10 +12,16 @@ exports.Simulator = class Simulator
     @state =
       variables: {}
   
-  start: ->
-    throw new Error("No programs found!") unless @vertex || @fragment
-    @try_run 'vertex',   @vertex
-    @try_run 'fragment', @fragment
+  start: (which = 'both') ->
+    switch which
+      when 'both'
+        throw new Error("No programs found!") unless @vertex || @fragment
+        @start 'vertex'   if @vertex
+        @start 'fragment' if @fragment
+      else
+        source_code = this[which]
+        throw new Error("No #{which} program found!") unless source_code
+        @try_run which, source_code
     
   try_run: (name, source_code) ->
     return unless source_code

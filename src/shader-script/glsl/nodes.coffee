@@ -8,6 +8,7 @@ nodes =
   Assign:     'assign'
   Function:   'function'
   Root:       'root'
+  TypeConstructor: 'type_constructor'
 
 for node_name, node_file of nodes
   exports[node_name] = require("shader-script/glsl/nodes/" + node_file)[node_name]

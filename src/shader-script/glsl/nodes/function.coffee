@@ -8,7 +8,7 @@ class exports.Function extends require('shader-script/nodes/base').Base
     compiled_block = @block.compile program
     
     program.functions[@name.compile program] =
-      return_type: @return_type.compile program
+      return_type: @return_type
       arguments: compiled_arguments
       invoke: (sim) -> line.execute sim for line in compiled_block
     
