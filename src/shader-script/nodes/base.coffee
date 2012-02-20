@@ -1,8 +1,13 @@
 # Base class for all nodes
 exports.Base = class Base
+  glsl_nodes = null
   required_methods = [ 'name', 'compile' ]
   
   root: -> @parent && @parent.root && @parent.root() || this
+  
+  glsl: (node_name, args...) ->
+    glsl_nodes or= require('shader-script/glsl/nodes')
+    new glsl_nodes[node_name] args...
   
   constructor: (children...) ->
     for method_name in required_methods

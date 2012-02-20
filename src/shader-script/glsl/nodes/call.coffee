@@ -1,5 +1,5 @@
 class exports.Call extends require('shader-script/nodes/base').Base
-  name: 'call'
+  name: '_call'
   
   children: -> [ 'name', 'params' ]
   
@@ -12,3 +12,8 @@ class exports.Call extends require('shader-script/nodes/base').Base
         program.functions[name].invoke sim, params...
       else
         throw new Error("function '#{name}' is not defined")
+        
+    toSource: () ->
+      joined_params = (param.toSource() for param in params).join ', '
+      "#{name.toSource()}(#{joined_params})"
+      

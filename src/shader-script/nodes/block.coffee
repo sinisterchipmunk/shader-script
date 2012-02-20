@@ -4,14 +4,7 @@ exports.Block = class Block extends require('./base').Base
   children: -> [ 'lines' ]
   
   compile: (shader) ->
-    return [] unless @lines
-    throw new Error("too many children") if @children.length > 1
-
-    lines = []
-    for child in @lines
-      _result = child.compile shader
-      lines.push _result if _result
-    lines
+    @glsl 'Block', (line.compile shader for line in @lines)
     
   push: (line) ->
     @lines.push line

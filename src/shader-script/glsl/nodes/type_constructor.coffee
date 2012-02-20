@@ -1,5 +1,5 @@
 class exports.TypeConstructor extends require('shader-script/nodes/base').Base
-  name: "type_constructor"
+  name: "_type_constructor"
   
   constructor: (@type, @arguments) -> super()
   
@@ -10,7 +10,7 @@ class exports.TypeConstructor extends require('shader-script/nodes/base').Base
       if compiled_args.length != len
         new Error("Incorrect argument count for #{@type} constructor")
     
-    switch @type
+    switch type = @type
       when 'void' then throw new Error("Can't cast to void")
       when 'bool', 'int', 'float'
         validate_length 1
@@ -24,4 +24,5 @@ class exports.TypeConstructor extends require('shader-script/nodes/base').Base
       else throw new Error "Unexpected type constructor: #{@type}"
       
     execute: (sim) -> arg.execute sim for arg in compiled_args
+    toSource: () -> "#{type}(#{(arg.toSource() for arg in compiled_args).join ', '})"
     

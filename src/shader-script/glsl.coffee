@@ -24,4 +24,4 @@ parser.yy = require 'shader-script/glsl/nodes'
 exports.parse = parse = (code) ->
   parser.parse(lexer.tokenize code, rewrite: off)
 
-exports.compile = (code) -> parse(code)#.compile()
+exports.compile = (code, program) -> parse(code).compile(program)

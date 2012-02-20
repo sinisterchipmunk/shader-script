@@ -7,8 +7,9 @@ exports.Simulator = class Simulator
   #     fragment: "string of glsl fragment shader code "
   #
   constructor: (glsl) ->
-    @vertex   = Glsl.compile glsl.vertex   if glsl.vertex
-    @fragment = Glsl.compile glsl.fragment if glsl.fragment
+    @vertex   = Glsl.compile glsl.vertex,   new Program this if glsl.vertex
+    @fragment = Glsl.compile glsl.fragment, new Program this if glsl.fragment
+    
     @state =
       variables: {}
   
@@ -19,15 +20,12 @@ exports.Simulator = class Simulator
         @start 'vertex'   if @vertex
         @start 'fragment' if @fragment
       else
-        source_code = this[which]
-        throw new Error("No #{which} program found!") unless source_code
-        @try_run which, source_code
+        program = this[which]
+        throw new Error("No #{which} program found!") unless program
+        @run_program which, program
     
-  try_run: (name, source_code) ->
-    return unless source_code
+  run_program: (name, program) ->
     try
-      program = new Program this
-      source_code.compile program
       program.invoke 'main'
     catch err
       err.message = "#{name}: #{err.message}"

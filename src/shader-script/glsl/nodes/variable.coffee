@@ -1,5 +1,5 @@
 class exports.Variable extends require('shader-script/nodes/base').Base
-  name: 'variable'
+  name: '_variable'
   
   children: -> ['type', 'name']
   
@@ -11,5 +11,6 @@ class exports.Variable extends require('shader-script/nodes/base').Base
       name: name
       value: Number.NaN
 
-    execute: => program.current_scope[name].value
+    execute: -> program.current_scope[name].value
+    toSource: -> "#{type} #{name}"
     

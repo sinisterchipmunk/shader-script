@@ -9,7 +9,7 @@ class exports.Call extends require("./base").Base
     
     if typeof shader.proxy[method_name] is 'function'
       shader.proxy[method_name].apply method_name, compiled_params
-      null
     else
-      { call: method_name, params: compiled_params }
+      @glsl 'Call', method_name, compiled_params
+      # { call: method_name, params: compiled_params }
     
