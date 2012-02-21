@@ -15,7 +15,10 @@ class exports.Block extends require('shader-script/nodes/block').Block
     execute: () -> (line.execute() for line in lines)
     toSource: () => 
       indent = if @options and @options.indent then "  " else ""
-      indent + ((line.toSource() for line in lines).join(";\n") + ";").split("\n").join("\n#{indent}") + "\n"
+      result = (line.toSource() for line in lines).join(";\n").trim()
+      if result[result.length-1] != ";"
+        result += ";"
+      indent + result.split("\n").join("\n#{indent}") + "\n"
     
   @wrap: (lines, options) ->
     return lines[0] if lines.length is 1 and lines[0] instanceof Block
