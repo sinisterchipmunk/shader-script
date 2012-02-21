@@ -18,7 +18,7 @@ class exports.Program
     @varyings = []
     @functions = {}
     @state.scope or= {}
-    
+  
   # Produces a string representation of the GLSL code which produced this
   # program.
   toSource: () ->
