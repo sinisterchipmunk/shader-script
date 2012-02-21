@@ -7,4 +7,6 @@ describe 'shader', ->
     console.log(glsl 'calcX = -> ')
   
   it "should produce glsl code the simulator can understand", ->
-    console.log(glsl 'vertex = -> x = 1')
+    code = glsl 'vertex = -> x = 1'
+    sim = simulate(code).start()
+    expect(sim.state.variables.x).toEqual 1

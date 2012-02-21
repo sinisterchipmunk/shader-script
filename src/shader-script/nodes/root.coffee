@@ -6,26 +6,21 @@ class exports.Root extends require('./base').Base
   constructor: (@block) ->
     super @block
   
-  # Accepts a program (shader-script/glsl/program) to compile against.
-  compile: (program) ->
+  # Accepts an optional object representing program state. If omitted,
+  # a new state will be created. The state is shared between the vertex
+  # and fragment programs, where applicable.
+  compile: (state = {}) ->
     shader = new Shader()
-    # shader.body = @block.compile shader
-    # shader.to_json
 
     # First pass - convert shaderscript into GLSL source nodes and 
     # then extract vertex and fragment mains
-    root_node = @block.compile shader
-    # vertex_nodes = (if node instanceof GlslFunction and node.name )
-    # fragment_nodes = 
+    root_node = @glsl 'Root', @block.compile shader
     
     # Second pass - compile GLSL source nodes into executable nodes
-    # (The return value of executable nodes contains two public API
-    #  methods: `execute` which takes a Simulator instance, and
-    #  `toSource` which takes no arguments and produces raw GLSL.)
-    # glsl_nodes =
-    #   vertex:   (node.compile program for node in vertex_nodes)
-    #   fragment: (node.compile program for node in fragment_nodes)
-    compiled_node = root_node.compile program
-    vertex: compiled_node
-    fragment: compiled_node
+    # The compilation phase here returns an instance of
+    # Program (shader-script/glsl/program).
+    program = root_node.compile state
+    
+    vertex:   program.toVertexProgram()
+    fragment: program.toFragmentProgram()
     

@@ -1,5 +1,4 @@
 Glsl = require 'shader-script/glsl'
-{Program} = require 'shader-script/glsl/program'
 
 exports.Simulator = class Simulator
   # glsl is a json object laid out like:
@@ -7,11 +6,10 @@ exports.Simulator = class Simulator
   #     fragment: "string of glsl fragment shader code "
   #
   constructor: (glsl) ->
-    @vertex   = Glsl.compile glsl.vertex,   new Program this if glsl.vertex
-    @fragment = Glsl.compile glsl.fragment, new Program this if glsl.fragment
-    
-    @state =
-      variables: {}
+    @state = variables: {}
+
+    @vertex   = Glsl.compile glsl.vertex,   @state if glsl.vertex
+    @fragment = Glsl.compile glsl.fragment, @state if glsl.fragment
   
   start: (which = 'both') ->
     switch which
@@ -23,6 +21,7 @@ exports.Simulator = class Simulator
         program = this[which]
         throw new Error("No #{which} program found!") unless program
         @run_program which, program
+    this
     
   run_program: (name, program) ->
     try

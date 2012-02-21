@@ -10,8 +10,8 @@ class exports.Block extends require('shader-script/nodes/block').Block
         _result = child.compile program
         lines.push _result if _result
       
-    execute: (sim) -> (line.execute sim for line in lines)
-    toSource: (sim) -> (line.toSource() for line in lines).join(";\n") + ";\n"
+    execute: () -> (line.execute() for line in lines)
+    toSource: () -> (line.toSource() for line in lines).join(";\n") + ";\n"
     
   @wrap: (lines) ->
     return lines[0] if lines.length is 1 and lines[0] instanceof Block

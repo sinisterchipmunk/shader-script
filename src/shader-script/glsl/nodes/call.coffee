@@ -7,9 +7,9 @@ class exports.Call extends require('shader-script/nodes/base').Base
     name = @name.compile program
     params = (param.compile program for param in @params)
     
-    execute: (sim) ->
+    execute: () ->
       if program.functions[name]
-        program.functions[name].invoke sim, params...
+        program.functions[name].invoke params...
       else
         throw new Error("function '#{name}' is not defined")
         

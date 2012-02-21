@@ -23,6 +23,6 @@ class exports.TypeConstructor extends require('shader-script/nodes/base').Base
         validate_length 4
       else throw new Error "Unexpected type constructor: #{@type}"
       
-    execute: (sim) -> arg.execute sim for arg in compiled_args
+    execute: (state) -> arg.execute() for arg in compiled_args
     toSource: () -> "#{type}(#{(arg.toSource() for arg in compiled_args).join ', '})"
     

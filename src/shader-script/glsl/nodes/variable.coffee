@@ -6,11 +6,11 @@ class exports.Variable extends require('shader-script/nodes/base').Base
   compile: (program) ->
     name = @name.compile program
     
-    program.current_scope[name] =
+    program.state.scope[name] =
       type: @type
       name: name
       value: Number.NaN
 
-    execute: -> program.current_scope[name].value
+    execute: -> program.state.scope[name].value
     toSource: -> "#{type} #{name}"
     
