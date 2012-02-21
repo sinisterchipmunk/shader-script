@@ -10,7 +10,8 @@ class exports.Root extends require('./base').Base
   # a new state will be created. The state is shared between the vertex
   # and fragment programs, where applicable.
   compile: (state = {}) ->
-    shader = new Shader()
+    state.scope or= global: {}
+    shader = new Shader state.scope
 
     # First pass - convert shaderscript into GLSL source nodes and 
     # then extract vertex and fragment mains

@@ -1,5 +1,5 @@
 class exports.Shader
-  constructor: ->
+  constructor: (@scope = {}) ->
     @name = "shader"
     @proxy = 
       shader: (name)   => @name = name; null

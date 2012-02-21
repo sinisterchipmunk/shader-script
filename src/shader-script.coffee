@@ -39,4 +39,4 @@ exports.compile_to_glsl = (code) ->
 exports.compile = (code) ->
   unless code instanceof Object and code.compile
     code = exports.parse code
-  code.compile new Program
+  code.compile()

@@ -257,10 +257,10 @@ exports.Lexer = class Lexer
   lineToken: ->
     return 0 unless match = MULTI_DENT.exec @chunk
     indent = match[0]
-    @line += count indent, '\n'
+    @line += count indent, ';'
     @seenFor = no
     prev = last @tokens, 1
-    size = indent.length - 1 - indent.lastIndexOf '\n'
+    size = indent.length - 1 - indent.lastIndexOf ';'
     noNewlines = @unfinished()
     if size - @indebt is @indent
       if noNewlines then @suppressNewlines() else @newlineToken()
@@ -271,9 +271,9 @@ exports.Lexer = class Lexer
         @suppressNewlines()
         return indent.length
       diff = size - @indent + @outdebt
-      @token 'INDENT', diff
-      @indents.push diff
-      @ends.push 'OUTDENT'
+      # @token 'INDENT', diff
+      # @indents.push diff
+      # @ends.push 'OUTDENT'
       @outdebt = @indebt = 0
     else
       @indebt = 0
@@ -302,14 +302,14 @@ exports.Lexer = class Lexer
         @token 'OUTDENT', dent
     @outdebt -= moveOut if dent
     @tokens.pop() while @value() is ';'
-    # @token 'TERMINATOR', '\n' unless @tag() is 'TERMINATOR' or noNewlines
+    @token 'TERMINATOR', ';' unless @tag() is 'TERMINATOR' or noNewlines
     this
 
   # Matches and consumes non-meaningful whitespace. Tag the previous token
   # as being "spaced", because there are some cases where it makes a difference.
   whitespaceToken: ->
     return 0 unless (match = WHITESPACE.exec @chunk) or
-                    (nline = @chunk.charAt(0) is '\n')
+                    (nline = @chunk.charAt(0) is ';')
     prev = last @tokens
     prev[if match then 'spaced' else 'newLine'] = true if prev
     if match then match[0].length else 0
@@ -317,7 +317,7 @@ exports.Lexer = class Lexer
   # Generate a newline token. Consecutive newlines get merged together.
   newlineToken: ->
     @tokens.pop() while @value() is ';'
-    # @token 'TERMINATOR', '\n' unless @tag() is 'TERMINATOR'
+    @token 'TERMINATOR', ';' unless @tag() is 'TERMINATOR'
     this
 
   # Use a `\` at a line-ending to suppress the newline.

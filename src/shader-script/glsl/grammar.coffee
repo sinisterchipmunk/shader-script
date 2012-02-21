@@ -66,6 +66,7 @@ grammar =
     o 'Line',                                   -> Block.wrap [$1]
     o 'Body TERMINATOR Line',                   -> $1.push $3; $1
     o 'Body TERMINATOR'
+    # o 'TERMINATOR TERMINATOR'
   ]
 
   # Block and statements, which make up a line in a body.

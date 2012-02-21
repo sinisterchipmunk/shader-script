@@ -8,6 +8,6 @@ class exports.Assign extends require('shader-script/nodes/assign').Assign
     right = @right.compile program
     
     execute: () -> 
-      program.state.variables[left.execute()] = right.execute()
+      program.state.variables[left.execute()].value = right.execute()
     toSource: () -> "#{left.toSource()} = #{right.toSource()}"
     
