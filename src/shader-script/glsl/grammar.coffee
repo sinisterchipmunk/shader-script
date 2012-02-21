@@ -64,14 +64,12 @@ grammar =
   # Any list of statements and expressions, separated by line breaks or semicolons.
   Body: [
     o 'Line',                                   -> Block.wrap [$1]
-    o 'Body TERMINATOR Line',                   -> $1.push $3; $1
-    o 'Body TERMINATOR'
-    # o 'TERMINATOR TERMINATOR'
+    o 'Body Line',                              -> $1.push $2; $1
   ]
 
   # Block and statements, which make up a line in a body.
   Line: [
-    o 'Expression'
+    o 'Expression TERMINATOR'
     o 'Statement'
   ]
 
@@ -90,12 +88,13 @@ grammar =
   
   # Pure statements which cannot be expressions.
   Statement: [
-    o 'Return'
-    o 'Comment'
-    o 'FunctionDefinition'
-    o 'FunctionDeclaration'
-    o 'VariableDeclaration'
-    o 'STATEMENT',                              -> new Literal $1
+    o 'TERMINATOR', -> new Literal("")
+    o 'Return TERMINATOR'
+    o 'Comment TERMINATOR'
+    o 'FunctionDefinition' # no terminator necessary here because of { ... }
+    o 'FunctionDeclaration TERMINATOR'
+    o 'VariableDeclaration TERMINATOR'
+    o 'STATEMENT TERMINATOR',                              -> new Literal $1
   ]
   
   VariableDeclaration: [

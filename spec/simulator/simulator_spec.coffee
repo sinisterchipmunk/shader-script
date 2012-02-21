@@ -16,9 +16,17 @@ describe "simulator", ->
     
   it "should process a basic assignment", ->
     # console.log parse_glsl_tree("float value; void main() { value = 1; }")
-    sim = simulate vertex: "float value; void main() { value = 1; }"
+    sim = simulate vertex: "float value; void main() { value = 1.0; }"
     sim.start()
-    expect(sim.state.variables.value.value).toEqual 1
+    expect(sim.state.variables.value.value).toEqual 1.0
+    
+  it "should process function calls", ->
+    console.log parse_glsl_tree "float value; void set() { value = 1.0; } void main() { set() }"
+
+    sim = simulate vertex: "float value; void set() { value = 1.0; } void main() { set() }"
+    sim.start()
+    console.log sim.state
+    expect(sim.state.variables.value.value).toEqual 1.0
     
   it "should process a vec4 assignment", ->
     sim = simulate vertex: "vec4 gl_FragCoord; void main() { gl_FragCoord = vec4(1,1,1,1); }"
