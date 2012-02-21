@@ -11,5 +11,3 @@ class exports.Call extends require("./base").Base
       shader.proxy[method_name].apply method_name, compiled_params
     else
       @glsl 'Call', method_name, compiled_params
-      # { call: method_name, params: compiled_params }
-    

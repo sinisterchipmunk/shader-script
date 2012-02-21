@@ -84,17 +84,18 @@ grammar =
     o 'Call'
     o 'Literal'
     o 'TypeConstructor'
+    o 'FunctionCall'
   ]
   
   # Pure statements which cannot be expressions.
   Statement: [
-    o 'TERMINATOR', -> new Literal("")
     o 'Return TERMINATOR'
     o 'Comment TERMINATOR'
     o 'FunctionDefinition' # no terminator necessary here because of { ... }
     o 'FunctionDeclaration TERMINATOR'
     o 'VariableDeclaration TERMINATOR'
     o 'STATEMENT TERMINATOR',                              -> new Literal $1
+    o 'TERMINATOR', -> (compile: -> null)
   ]
   
   VariableDeclaration: [
@@ -113,12 +114,18 @@ grammar =
   
   ArgumentList: [
     o '( Arguments )', -> $2
+    o 'CALL_START Arguments )', -> $2
     o '( )', -> []
+    o 'CALL_START )', -> []
   ]
   
   Arguments: [
     o 'Expression', -> [$1]
     o 'Arguments , Expression', -> $1.concat [$3]
+  ]
+  
+  FunctionCall: [
+    o 'Identifier ArgumentList', -> new Call $1, $2
   ]
   
   Assign: [
