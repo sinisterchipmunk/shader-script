@@ -1,4 +1,4 @@
-class exports.Identifier extends require("./base").Base
+class exports.Identifier extends require("shader-script/glsl/nodes/identifier").Identifier
   name: "identifier"
   
   compile: ->

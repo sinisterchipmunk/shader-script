@@ -1,7 +1,5 @@
-class exports.Value extends require("./base").Base
+class exports.Value extends require("shader-script/glsl/nodes/value").Value
   name: "value"
 
-  type: -> @children[0].type()
-  
   compile: (shader) ->
     @glsl 'Value', @children[0].compile shader

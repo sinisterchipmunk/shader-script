@@ -1,4 +1,4 @@
-class exports.Call extends require("./base").Base
+class exports.Call extends require("shader-script/nodes/base").Base
   name: "call"
   
   children: -> ['method_name', 'params']

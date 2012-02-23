@@ -1,4 +1,4 @@
-class exports.Assign extends require('shader-script/nodes/assign').Assign
+class exports.Assign extends require('shader-script/nodes/base').Base
   name: "_assign"
   
   children: -> ['left', 'right']

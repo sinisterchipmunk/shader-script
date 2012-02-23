@@ -1,8 +1,6 @@
-class exports.Assign extends require("./base").Base
+class exports.Assign extends require("shader-script/glsl/nodes/assign").Assign
   name: "assign"
   
-  children: -> [ 'left', 'right' ]
-
   compile: (shader) ->
     {Function} = require('shader-script/nodes')
     

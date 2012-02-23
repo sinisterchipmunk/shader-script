@@ -1,4 +1,4 @@
-class exports.Identifier extends require('shader-script/nodes/identifier').Identifier
+class exports.Identifier extends require('shader-script/nodes/base').Base
   name: "_identifier"
   
   toVariableName: ->

@@ -1,4 +1,4 @@
-class exports.Block extends require('shader-script/nodes/block').Block
+class exports.Block extends require('shader-script/nodes/base').Base
   name: -> '_block'
   
   constructor: (lines, @options = indent: yes) -> super lines
@@ -19,7 +19,13 @@ class exports.Block extends require('shader-script/nodes/block').Block
       if result[result.length-1] != ";"
         result += ";"
       indent + result.split("\n").join("\n#{indent}") + "\n"
-    
+
+  children: -> [ 'lines' ]
+
+  push: (line) ->
+    @lines.push line
+    this
+
   @wrap: (lines, options) ->
     return lines[0] if lines.length is 1 and lines[0] instanceof Block
     new exports.Block lines, options
