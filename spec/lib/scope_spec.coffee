@@ -7,6 +7,23 @@ describe "scope", ->
   beforeEach -> scope = new Scope('a')
   
   describe "defining objects", ->
+    it "should be looked up from a deeper scope", ->
+      scope.define 'name'
+      scope.push()
+      expect(scope.lookup 'name').toBeTruthy()
+    
+    it "should conflict when redefined in a deeper scope", ->
+      scope.define 'name', type: 'int'
+      scope.push()
+      expect(-> scope.define 'name', type: "float").toThrow()
+      
+    it "should find the higher level variable when redefined in a deeper scope", ->
+      scope.define 'name'
+      scope.push()
+      scope.define 'name', type: 'float'
+      scope.pop()
+      expect(scope.lookup('name').type).toEqual 'float'
+    
     it "should allow type to be undefined", ->
       expect(scope.define('name').type).toBeUndefined()
     

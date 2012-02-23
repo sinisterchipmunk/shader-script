@@ -60,19 +60,24 @@ exports.Scope = class Scope
   define: (name, options = {}) ->
     @delegate ->
       options.name or= name
-      options.qualified_name = @qualifier() + "." + name
       def = @lookup name, true
       if def
         options.type or= def.type
         if def.type and options.type != def.type
           throw new Error "Variable '#{name}' redefined with conflicting type: #{def.type} redefined as #{options.type}"
-      @definitions[name] = options
+
+        options.scope = def.scope
+        options.scope.definitions[name] = options
+      else
+        options.qualified_name = @qualifier() + "." + name
+        options.scope = this
+        @definitions[name] = options
       
   lookup: (name, silent = false) ->
     @delegate ->
       target = this
       while target
-        if @definitions[name] then return @definitions[name]
+        if target.definitions[name] then return target.definitions[name]
         target = target.parent
       if silent then null
       else throw new Error "Variable '#{name}' is not defined in this scope"

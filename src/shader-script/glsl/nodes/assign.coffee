@@ -8,6 +8,9 @@ class exports.Assign extends require('shader-script/nodes/base').Base
     right = @right.compile program
     
     execute: () -> 
-      program.state.variables[left.execute()].value = right.execute()
+      _left = left.execute()
+      if program.state.variables[_left] == undefined
+        throw new Error "undeclared variable #{_left}"
+      program.state.variables[_left].value = right.execute()
     toSource: () -> "#{left.toSource()} = #{right.toSource()}"
     

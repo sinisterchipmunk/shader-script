@@ -1,5 +1,5 @@
 class exports.Block extends require('shader-script/nodes/base').Base
-  name: -> '_block'
+  name: -> 'block'
   
   constructor: (lines, @options = scope: yes) -> super lines
   
@@ -11,7 +11,7 @@ class exports.Block extends require('shader-script/nodes/base').Base
       for child in @lines
         _result = child.compile program
         lines.push _result if _result
-      
+        
     execute: () -> (line.execute() for line in lines)
     toSource: () => 
       indent = if @options and @options.scope then "  " else ""

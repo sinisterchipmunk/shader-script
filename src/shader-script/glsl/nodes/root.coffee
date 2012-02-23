@@ -22,6 +22,12 @@ class exports.Root extends require('shader-script/nodes/base').Base
     # function definitions. It's an important step, or else `main`
     # won't get created.
     block_node.execute()
+  
+    # the GLSL pass isn't smart enough to add the variables detected
+    # in the first pass, so let's do that now
+    if subscope = state.scope.subscopes['1']
+      for name, options of subscope.definitions
+        program.variables.push name: name, type: options.type, value: options.value
     
     # we've been careful not to maintain a reference to the root node
     # itself, because it's important not to execute the root node twice.

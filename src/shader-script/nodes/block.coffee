@@ -8,7 +8,7 @@ exports.Block = class Block extends require('shader-script/glsl/nodes/block').Bl
     # the compiled variable declarations before finally returning the complete
     # GLSL block.
     
-    shader.scope.push('block')
+    shader.scope.push @name
     
     compiled_lines = (line.compile shader for line in @lines)
     for name, options of (shader.scope.delegate -> @definitions)
