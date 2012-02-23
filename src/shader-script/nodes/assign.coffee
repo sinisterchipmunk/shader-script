@@ -17,4 +17,4 @@ class exports.Assign extends require("shader-script/glsl/nodes/assign").Assign
 
       Block = require('shader-script/glsl/nodes/block').Block
       block = Block.wrap [ @glsl('Variable', right.type(), left),
-                           @glsl('Assign', left, right) ], indent: no
+                           @glsl('Assign', left, right) ], scope: no

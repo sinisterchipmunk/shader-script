@@ -1,7 +1,7 @@
 class exports.Block extends require('shader-script/nodes/base').Base
   name: -> '_block'
   
-  constructor: (lines, @options = indent: yes) -> super lines
+  constructor: (lines, @options = scope: yes) -> super lines
   
   compile: (program) ->
     throw new Error("too many children") if @children.length > 1
@@ -14,7 +14,7 @@ class exports.Block extends require('shader-script/nodes/base').Base
       
     execute: () -> (line.execute() for line in lines)
     toSource: () => 
-      indent = if @options and @options.indent then "  " else ""
+      indent = if @options and @options.scope then "  " else ""
       result = (line.toSource() for line in lines).join(";\n").trim()
       if result[result.length-1] != ";"
         result += ";"

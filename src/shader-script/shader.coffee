@@ -1,11 +1,7 @@
+{Scope} = require 'shader-script/scope'
+
 class exports.Shader
-  constructor: (@scope = {}) ->
-    @name = "shader"
-    @proxy = 
-      shader: (name)   => @name = name; null
-      # vertex: (body)   => vertex_main: body
-      # fragment: (body) => fragment_main: body
-    
-  to_json: () ->
-    name: @name
-    body: @body || []
+  constructor: (state) ->
+    @scope = state.scope or= new Scope()
+
+  
