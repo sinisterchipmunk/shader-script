@@ -9,7 +9,7 @@ class exports.Literal extends require('shader-script/nodes/base').Base
     throw new Error "Value type is not recognized: #{@children[0]}"
   
   compile: (program) ->
-    value = eval @children[0]
-    execute: -> value
-    toSource: -> value.toString()
+    value = @children[0]
+    execute: -> eval value
+    toSource: -> value
     

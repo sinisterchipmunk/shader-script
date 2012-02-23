@@ -15,6 +15,9 @@ class exports.Assign extends require("shader-script/glsl/nodes/assign").Assign
       unless left.toVariableName
         throw new Error "Can't use #{JSON.stringify left} as lvalue"
 
-      Block = require('shader-script/glsl/nodes/block').Block
-      block = Block.wrap [ @glsl('Variable', right.type(), left),
-                           @glsl('Assign', left, right) ], scope: no
+      shader.scope.define left.toVariableName(), type: @right.type()
+      @glsl 'Assign', left, right
+      
+      # Block = require('shader-script/glsl/nodes/block').Block
+      # block = Block.wrap [ @glsl('Variable', right.type(), left),
+      #                      @glsl('Assign', left, right) ], scope: no

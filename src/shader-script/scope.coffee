@@ -61,15 +61,21 @@ exports.Scope = class Scope
     @delegate ->
       options.name or= name
       options.qualified_name = @qualifier() + "." + name
+      def = @lookup name, true
+      if def
+        options.type or= def.type
+        if def.type and options.type != def.type
+          throw new Error "Variable '#{name}' redefined with conflicting type: #{def.type} redefined as #{options.type}"
       @definitions[name] = options
       
-  lookup: (name) ->
+  lookup: (name, silent = false) ->
     @delegate ->
       target = this
       while target
         if @definitions[name] then return @definitions[name]
         target = target.parent
-      throw new Error("Variable '#{name}' is not defined in this scope")
+      if silent then null
+      else throw new Error "Variable '#{name}' is not defined in this scope"
       
   # Calls the callback in the context of the current subscope.
   # Meant for internal use only.

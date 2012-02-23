@@ -6,6 +6,32 @@ describe "scope", ->
   scope = null
   beforeEach -> scope = new Scope('a')
   
+  describe "defining objects", ->
+    it "should allow type to be undefined", ->
+      expect(scope.define('name').type).toBeUndefined()
+    
+    it "should allow redefinition with null type", ->
+      scope.define('name')
+      expect(-> scope.define('name')).not.toThrow()
+      
+    it "should allow type to be redefined with null type, inheriting original", ->
+      scope.define 'name', type: 'int'
+      expect(scope.define('name').type).toEqual 'int'
+    
+    it "should allow type to be set when original is undefined", ->
+      scope.define 'name'
+      expect(scope.define('name', type: 'int').type).toEqual 'int'
+      
+    it "should allow redefinition with identical type", ->
+      scope.define 'name', type: 'int'
+      expect(-> scope.define('name', type: 'int')).not.toThrow()
+      
+    it "should raise error when conflicting types specified", ->
+      scope.define 'name', type: 'int'
+      expect(-> scope.define('name', type: 'float')).toThrow(
+        "Variable 'name' redefined with conflicting type: int redefined as float"
+      )
+  
   it "should qualify itself", ->
     expect(scope.qualifier()).toEqual 'a'
     

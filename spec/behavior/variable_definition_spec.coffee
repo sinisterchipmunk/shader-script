@@ -16,5 +16,7 @@ describe 'variable definition', ->
     expect(code.vertex).toMatch /x = 1.0/
 
   it "should complain about mismatched variable types", ->
-    expect(-> console.log(glsl 'vertex = -> x = 1; x = 1.0')).toThrow("")
+    expect(-> console.log(glsl 'vertex = -> x = 1; x = 1.0')).toThrow(
+      "Variable 'x' redefined with conflicting type: int redefined as float"
+    )
     
