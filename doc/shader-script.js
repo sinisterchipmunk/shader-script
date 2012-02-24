@@ -1071,19 +1071,17 @@
 
     Assign.prototype.compile = function(program) {
       var left, right;
-      left = this.left.compile(program);
+      left = this.left.toVariableName();
       right = this.right.compile(program);
       return {
         execute: function() {
-          var _left;
-          _left = left.execute();
-          if (program.state.variables[_left] === void 0) {
-            throw new Error("undeclared variable " + _left);
+          if (program.state.variables[left] === void 0) {
+            throw new Error("undeclared variable " + left);
           }
-          return program.state.variables[_left].value = right.execute();
+          return program.state.variables[left].value = right.execute();
         },
         toSource: function() {
-          return "" + (left.toSource()) + " = " + (right.toSource());
+          return "" + left + " = " + (right.toSource());
         }
       };
     };
@@ -1111,6 +1109,7 @@
     };
 
     function Block(lines, options) {
+      if (lines == null) lines = [];
       this.options = options != null ? options : {
         scope: true
       };
@@ -1201,8 +1200,8 @@
     };
 
     Call.prototype.compile = function(program) {
-      var compiled_name, compiled_params, param;
-      compiled_name = this.name.compile(program);
+      var compiled_params, name, param;
+      name = this.name.toVariableName();
       compiled_params = (function() {
         var _i, _len, _ref, _results;
         _ref = this.params;
@@ -1215,8 +1214,7 @@
       }).call(this);
       return {
         execute: function() {
-          var name, _ref;
-          name = compiled_name.execute();
+          var _ref;
           if (program.functions[name]) {
             return (_ref = program.functions[name]).invoke.apply(_ref, compiled_params);
           } else {
@@ -1234,7 +1232,7 @@
             }
             return _results;
           })()).join(', ');
-          return "" + (compiled_name.toSource()) + "(" + joined_params + ")";
+          return "" + name + "(" + joined_params + ")";
         }
       };
     };
@@ -1251,7 +1249,8 @@
       var exports = {};
       (function() {
   var __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
+    __slice = Array.prototype.slice;
 
   exports.Function = (function(_super) {
 
@@ -1280,19 +1279,19 @@
         return _results;
       }).call(this);
       compiled_block = this.block.compile(program);
-      compiled_name = this.name.compile(program);
+      compiled_name = this.name.toVariableName();
       return_type = this.return_type;
       return {
         execute: function() {
           var arg, args, name,
             _this = this;
-          name = compiled_name.execute();
+          name = compiled_name;
           args = (function() {
             var _i, _len, _results;
             _results = [];
             for (_i = 0, _len = compiled_arguments.length; _i < _len; _i++) {
               arg = compiled_arguments[_i];
-              _results.push(arg.execute());
+              _results.push(arg.variable);
             }
             return _results;
           })();
@@ -1300,6 +1299,14 @@
             return_type: return_type,
             arguments: args,
             invoke: function() {
+              var i, params, _ref;
+              params = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+              if (args.length !== params.length) {
+                throw new Error("Incorrect argument count (" + params.length + " for " + args.length + ")");
+              }
+              for (i = 0, _ref = params.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
+                args[i].value = params[i].execute();
+              }
               return compiled_block.execute();
             },
             toSource: function(overriding_fn_name) {
@@ -1309,7 +1316,7 @@
         },
         toSource: function(fn_name) {
           var arg, arg_list;
-          fn_name || (fn_name = compiled_name.toSource());
+          fn_name || (fn_name = compiled_name);
           arg_list = ((function() {
             var _i, _len, _results;
             _results = [];
@@ -1352,11 +1359,15 @@
       return this.children[0];
     };
 
-    Identifier.prototype.compile = function() {
+    Identifier.prototype.compile = function(program) {
       var _this = this;
       return {
         execute: function() {
-          return _this.children[0];
+          if (program.state.variables[_this.children[0]]) {
+            return program.state.variables[_this.children[0]].value;
+          } else {
+            throw new Error("Undefined variable: " + _this.children[0]);
+          }
         },
         toSource: function() {
           return _this.children[0];
@@ -1390,7 +1401,7 @@
 
     Literal.prototype.type = function() {
       if (this.children[0].match(/^-?[0-9]+\.[0-9]+$/)) return 'float';
-      if (this.children[0].match(/^-?[0-9]+$/)) return 'int';
+      if (this.children[0].match(/^-?[0-9]+$/)) return 'float';
       if (this.children[0].match(/^(true|false)$/)) return 'bool';
       throw new Error("Value type is not recognized: " + this.children[0]);
     };
@@ -1445,13 +1456,13 @@
       program = new Program(state);
       block_node = this.block.compile(program);
       block_node.execute();
-      if (subscope = state.scope.subscopes['1']) {
+      if (subscope = state.scope.subscopes['block']) {
         _ref = subscope.definitions;
         for (name in _ref) {
           options = _ref[name];
           program.variables.push({
             name: name,
-            type: options.type,
+            type: options.type(),
             value: options.value
           });
         }
@@ -1585,8 +1596,8 @@
       }
     }
 
-    Value.prototype.type = function() {
-      return this.children[0].type();
+    Value.prototype.type = function(program) {
+      return this.children[0].type(program);
     };
 
     Value.prototype.compile = function(shader) {
@@ -1611,34 +1622,39 @@
 
     __extends(Variable, _super);
 
-    function Variable() {
-      Variable.__super__.constructor.apply(this, arguments);
-    }
-
     Variable.prototype.name = '_variable';
+
+    function Variable(type, name, qualified_name) {
+      this.qualified_name = qualified_name;
+      Variable.__super__.constructor.call(this, type, name);
+    }
 
     Variable.prototype.children = function() {
       return ['type', 'name'];
     };
 
     Variable.prototype.compile = function(program) {
-      var name, type, _base,
+      var name, variable, _base,
         _this = this;
-      name = this.name.compile(program);
-      type = this.type;
+      name = this.name.toVariableName();
+      if (this.qualified_name) {
+        variable = program.state.scope.lookup(this.qualified_name);
+      } else {
+        variable = program.state.scope.define(name, {
+          type: this.type
+        });
+      }
+      variable.value = Number.NaN;
       (_base = program.state).variables || (_base.variables = {});
-      program.state.variables[name.execute()] = {
-        type: type,
-        name: name.execute(),
-        value: Number.NaN
-      };
+      program.state.variables[name] = variable;
       return {
         execute: function() {
-          return program.state.variables[name.execute()].value;
+          return variable.value;
         },
         toSource: function() {
-          return "" + type + " " + (name.toSource());
-        }
+          return "" + (variable.type()) + " " + variable.name;
+        },
+        variable: variable
       };
     };
 
@@ -2070,7 +2086,8 @@ if (typeof module !== 'undefined' && require.main === module) {
     _require["shader-script/glsl/program"] = function() {
       var exports = {};
       (function() {
-  var Scope;
+  var Scope,
+    __slice = Array.prototype.slice;
 
   Scope = require('shader-script/scope').Scope;
 
@@ -2184,9 +2201,11 @@ if (typeof module !== 'undefined' && require.main === module) {
       return createClone(this, 'fragment', 'vertex');
     };
 
-    Program.prototype.invoke = function(function_name) {
+    Program.prototype.invoke = function() {
+      var function_name, params, _ref;
+      function_name = arguments[0], params = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       if (this.functions[function_name]) {
-        return this.functions[function_name].invoke(this.simulator);
+        return (_ref = this.functions[function_name]).invoke.apply(_ref, params);
       } else {
         throw new Error("no " + function_name + " function found!");
       }
@@ -3624,7 +3643,8 @@ if (typeof module !== 'undefined' && require.main === module) {
     NameRegistry.prototype.define = function(name) {
       var entries;
       entries = this.entries_for(name);
-      return entries.push(mangle(name, entries));
+      entries.push(mangle(name, entries));
+      return entries[entries.length - 1];
     };
 
     return NameRegistry;
@@ -3649,13 +3669,61 @@ if (typeof module !== 'undefined' && require.main === module) {
     Identifier: 'identifier',
     Assign: 'assign',
     Function: 'function',
-    Code: 'function'
+    Code: 'function',
+    Arr: 'arr',
+    Param: 'param'
   };
 
   for (node_name in nodes) {
     node_file = nodes[node_name];
     exports[node_name] = require("shader-script/nodes/" + node_file)[node_name];
   }
+
+}).call(this);
+
+      return exports;
+    };
+    _require["shader-script/nodes/arr"] = function() {
+      var exports = {};
+      (function() {
+  var __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  exports.Arr = (function(_super) {
+
+    __extends(Arr, _super);
+
+    function Arr() {
+      Arr.__super__.constructor.apply(this, arguments);
+    }
+
+    Arr.prototype.name = "arr";
+
+    Arr.prototype.children = function() {
+      return ['elements'];
+    };
+
+    Arr.prototype.type = function() {
+      return 'vec' + this.elements.length.toString();
+    };
+
+    Arr.prototype.compile = function(shader) {
+      var child;
+      return this.glsl('TypeConstructor', this.type(), (function() {
+        var _i, _len, _ref, _results;
+        _ref = this.elements;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          child = _ref[_i];
+          _results.push(child.compile(shader));
+        }
+        return _results;
+      }).call(this));
+    };
+
+    return Arr;
+
+  })(require("shader-script/nodes/base").Base);
 
 }).call(this);
 
@@ -3677,8 +3745,12 @@ if (typeof module !== 'undefined' && require.main === module) {
 
     Assign.prototype.name = "assign";
 
+    Assign.prototype.type = function(shader) {
+      return this.right.type(shader);
+    };
+
     Assign.prototype.compile = function(shader) {
-      var Function, left, right;
+      var Function, dependent, left, right;
       Function = require('shader-script/nodes').Function;
       if (this.right instanceof Function) {
         this.right.func_name = this.left;
@@ -3689,8 +3761,10 @@ if (typeof module !== 'undefined' && require.main === module) {
         if (!left.toVariableName) {
           throw new Error("Can't use " + (JSON.stringify(left)) + " as lvalue");
         }
+        if (this.right.variable) dependent = this.right.variable(shader);
         shader.scope.define(left.toVariableName(), {
-          type: this.right.type()
+          type: this.right.type(shader),
+          dependent: dependent
         });
         return this.glsl('Assign', left, right);
       }
@@ -3767,11 +3841,12 @@ if (typeof module !== 'undefined' && require.main === module) {
 
     __extends(Block, _super);
 
-    function Block() {
-      Block.__super__.constructor.apply(this, arguments);
-    }
-
     Block.prototype.name = "block";
+
+    function Block(lines) {
+      if (lines == null) lines = [];
+      Block.__super__.constructor.call(this, lines);
+    }
 
     Block.prototype.compile = function(shader) {
       var compiled_lines, line, name, options, _ref;
@@ -3791,7 +3866,7 @@ if (typeof module !== 'undefined' && require.main === module) {
       });
       for (name in _ref) {
         options = _ref[name];
-        compiled_lines.unshift(this.glsl('Variable', options.type, this.glsl('Identifier', options.name)));
+        compiled_lines.unshift(this.glsl('Variable', options.type(), this.glsl('Identifier', options.name), options.qualified_name));
       }
       shader.scope.pop();
       return this.glsl('Block', compiled_lines);
@@ -3831,18 +3906,17 @@ if (typeof module !== 'undefined' && require.main === module) {
     };
 
     Call.prototype.compile = function(shader) {
-      var compiled_params, method_name, param;
+      var compiled_params, method_name, param, types, _i, _len, _ref;
       method_name = this.method_name.compile(shader);
-      compiled_params = (function() {
-        var _i, _len, _ref, _results;
-        _ref = this.params;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          param = _ref[_i];
-          _results.push(param.compile(shader));
-        }
-        return _results;
-      }).call(this);
+      compiled_params = [];
+      types = [];
+      _ref = this.params;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        param = _ref[_i];
+        compiled_params.push(param.compile(shader));
+        types.push(param.type());
+      }
+      shader.mark_function(this.method_name.toVariableName(), types);
       return this.glsl('Call', method_name, compiled_params);
     };
 
@@ -3875,12 +3949,14 @@ if (typeof module !== 'undefined' && require.main === module) {
     };
 
     Function.prototype.compile = function(shader) {
-      var compiled_body, compiled_func_name, compiled_params, param, return_type;
+      var compiled_body, compiled_func_name, compiled_params, param, return_type, str_func_name;
       if (!this.func_name) {
         throw new Error("GLSL doesn't support anonymous functions");
       }
       return_type = 'void';
       compiled_func_name = this.func_name.compile(shader);
+      str_func_name = this.func_name.toVariableName();
+      shader.scope.push(str_func_name);
       compiled_params = (function() {
         var _i, _len, _ref, _results;
         _ref = this.params;
@@ -3892,6 +3968,20 @@ if (typeof module !== 'undefined' && require.main === module) {
         return _results;
       }).call(this);
       compiled_body = this.body.compile(shader);
+      shader.define_function(str_func_name, function(types) {
+        var i, type, variable, _ref, _results;
+        if (types.length !== compiled_params.length) {
+          throw new Error("Function " + str_func_name + " called with incorrect argument count (" + types.length + " for " + compiled_params.length + ")");
+        }
+        _results = [];
+        for (i = 0, _ref = types.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
+          type = types[i];
+          variable = compiled_params[i].variable;
+          _results.push(variable.set_type(type));
+        }
+        return _results;
+      });
+      shader.scope.pop();
       return this.glsl('Function', return_type, compiled_func_name, compiled_params, compiled_body);
     };
 
@@ -3919,6 +4009,14 @@ if (typeof module !== 'undefined' && require.main === module) {
     }
 
     Identifier.prototype.name = "identifier";
+
+    Identifier.prototype.variable = function(shader) {
+      return shader.scope.lookup(this.toVariableName());
+    };
+
+    Identifier.prototype.type = function(shader) {
+      return this.variable(shader).type();
+    };
 
     Identifier.prototype.compile = function() {
       return this.glsl.apply(this, ['Identifier'].concat(__slice.call(this.children)));
@@ -3956,6 +4054,47 @@ if (typeof module !== 'undefined' && require.main === module) {
     return Literal;
 
   })(require("shader-script/glsl/nodes/literal").Literal);
+
+}).call(this);
+
+      return exports;
+    };
+    _require["shader-script/nodes/param"] = function() {
+      var exports = {};
+      (function() {
+  var __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  exports.Param = (function(_super) {
+
+    __extends(Param, _super);
+
+    function Param() {
+      Param.__super__.constructor.apply(this, arguments);
+    }
+
+    Param.prototype.name = 'param';
+
+    Param.prototype.children = function() {
+      return ['name', 'default_value'];
+    };
+
+    Param.prototype.toVariableName = function() {
+      return this.name.toVariableName();
+    };
+
+    Param.prototype.compile = function(shader) {
+      var result, variable, varn;
+      varn = this.toVariableName();
+      variable = shader.scope.define(varn);
+      result = this.glsl('Variable', null, this.name.compile(shader), variable.qualified_name);
+      result.variable = variable;
+      return result;
+    };
+
+    return Param;
+
+  })(require('shader-script/nodes/base').Base);
 
 }).call(this);
 
@@ -4019,6 +4158,14 @@ if (typeof module !== 'undefined' && require.main === module) {
 
     Value.prototype.compile = function(shader) {
       return this.glsl('Value', this.children[0].compile(shader));
+    };
+
+    Value.prototype.toVariableName = function() {
+      return this.children[0].toVariableName();
+    };
+
+    Value.prototype.variable = function(shader) {
+      return this.children[0].variable && this.children[0].variable(shader);
     };
 
     return Value;
@@ -5048,6 +5195,33 @@ if (typeof module !== 'undefined' && require.main === module) {
       this.registry = new NameRegistry();
     }
 
+    Scope.prototype.all_qualifiers = function() {
+      var id, result, subscope, _ref;
+      result = [this.qualifier(false)];
+      _ref = this.subscopes;
+      for (id in _ref) {
+        subscope = _ref[id];
+        result = result.concat(subscope.all_qualifiers());
+      }
+      return result;
+    };
+
+    Scope.prototype.all_definitions = function() {
+      var def, id, name, result, subscope, _ref, _ref2;
+      result = [];
+      _ref = this.definitions;
+      for (name in _ref) {
+        def = _ref[name];
+        result.push(def.qualified_name);
+      }
+      _ref2 = this.subscopes;
+      for (id in _ref2) {
+        subscope = _ref2[id];
+        result = result.concat(subscope.all_definitions());
+      }
+      return result;
+    };
+
     Scope.prototype.qualifier = function(delegate_to_subscope) {
       var prefix;
       if (delegate_to_subscope == null) delegate_to_subscope = true;
@@ -5080,31 +5254,75 @@ if (typeof module !== 'undefined' && require.main === module) {
     Scope.prototype.define = function(name, options) {
       if (options == null) options = {};
       return this.delegate(function() {
-        var def;
+        var def, type;
         options.name || (options.name = name);
         def = this.lookup(name, true);
         if (def) {
-          options.type || (options.type = def.type);
-          if (def.type && options.type !== def.type) {
-            throw new Error("Variable '" + name + "' redefined with conflicting type: " + def.type + " redefined as " + options.type);
-          }
+          def.set_type(options.type);
+          options.set_type = def.set_type;
+          options.type = def.type;
           options.scope = def.scope;
-          return options.scope.definitions[name] = options;
+          options.scope.definitions[name] = options;
         } else {
           options.qualified_name = this.qualifier() + "." + name;
           options.scope = this;
-          return this.definitions[name] = options;
+          options.set_type = function(type) {
+            if (type) {
+              if (this.type && this.type() && type !== this.type()) {
+                throw new Error("Variable '" + this.qualified_name + "' redefined with conflicting type: " + (this.type()) + " redefined as " + type);
+              }
+              return this.type = function() {
+                return type;
+              };
+            } else {
+              return this.type || (this.type = function() {
+                if (this.dependent) {
+                  return this.dependent.type();
+                } else {
+                  return;
+                }
+              });
+            }
+          };
+          type = options.type;
+          delete options.type;
+          options.set_type(type);
         }
+        return this.definitions[name] = options;
       });
+    };
+
+    Scope.prototype.find = function(name) {
+      var id, qualifiers, scope_name, subscope, _ref;
+      if (name instanceof Array) {
+        qualifiers = name;
+      } else {
+        qualifiers = name.split(/\./);
+      }
+      if (qualifiers.length === 1) {
+        return this.definitions[qualifiers[0]];
+      } else {
+        scope_name = qualifiers.shift();
+        if (scope_name === ("" + this.name)) {
+          return this.find(qualifiers);
+        } else {
+          _ref = this.subscopes;
+          for (id in _ref) {
+            subscope = _ref[id];
+            if (subscope.name === scope_name) return subscope.find(qualifiers);
+          }
+        }
+      }
+      return null;
     };
 
     Scope.prototype.lookup = function(name, silent) {
       if (silent == null) silent = false;
       return this.delegate(function() {
-        var target;
+        var result, target;
         target = this;
         while (target) {
-          if (target.definitions[name]) return target.definitions[name];
+          if (result = target.find(name)) return result;
           target = target.parent;
         }
         if (silent) {
@@ -5148,7 +5366,34 @@ if (typeof module !== 'undefined' && require.main === module) {
 
     function Shader(state) {
       this.scope = state.scope || (state.scope = new Scope());
+      this.functions = {};
+      this.fn_types = {};
     }
+
+    Shader.prototype.define_function = function(name, callback) {
+      var types, _i, _len, _ref, _results;
+      this.functions[name] = callback;
+      if (this.fn_types[name]) {
+        _ref = this.fn_types[name];
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          types = _ref[_i];
+          _results.push(callback(types));
+        }
+        return _results;
+      }
+    };
+
+    Shader.prototype.mark_function = function(name, types, dependent_variable) {
+      var _base;
+      if (dependent_variable == null) dependent_variable = null;
+      if (this.functions[name]) {
+        return this.functions[name](types);
+      } else {
+        (_base = this.fn_types)[name] || (_base[name] = []);
+        return this.fn_types[name].push(types);
+      }
+    };
 
     return Shader;
 

@@ -48,9 +48,9 @@ class exports.Program
   # to 'main' and removes any 'vertex' function.
   toFragmentProgram: () -> createClone this, 'fragment', 'vertex'
 
-  invoke: (function_name) ->
+  invoke: (function_name, params...) ->
     if @functions[function_name]
-      @functions[function_name].invoke @simulator
+      @functions[function_name].invoke params...
     else
       throw new Error "no #{function_name} function found!"
     

@@ -21,3 +21,4 @@ class exports.NameRegistry
   define: (name) ->
     entries = @entries_for name
     entries.push mangle name, entries
+    entries[entries.length-1]

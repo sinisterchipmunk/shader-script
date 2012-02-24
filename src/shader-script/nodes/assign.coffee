@@ -1,6 +1,8 @@
 class exports.Assign extends require("shader-script/glsl/nodes/assign").Assign
   name: "assign"
   
+  type: (shader) -> @right.type(shader)
+  
   compile: (shader) ->
     {Function} = require('shader-script/nodes')
     
@@ -15,6 +17,8 @@ class exports.Assign extends require("shader-script/glsl/nodes/assign").Assign
       unless left.toVariableName
         throw new Error "Can't use #{JSON.stringify left} as lvalue"
       
-      shader.scope.define left.toVariableName(), type: @right.type()
+      dependent = @right.variable(shader) if @right.variable
+      shader.scope.define left.toVariableName(), type: @right.type(shader), dependent: dependent
+
       @glsl 'Assign', left, right
       

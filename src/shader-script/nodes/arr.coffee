@@ -4,13 +4,9 @@
 class exports.Arr extends require("shader-script/nodes/base").Base
   name: "arr"
   
-  constructor: -> super; @validate()
-  
   children: -> ['elements']
   
   type: -> 'vec' + @elements.length.toString()
 
   compile: (shader) ->
     @glsl 'TypeConstructor', @type(), (child.compile shader for child in @elements)
-    
-  validate: ->

@@ -1,7 +1,9 @@
 require 'spec_helper'
 
 describe 'variable definition', ->
-  it "should infer int type from assignment", ->
+  # all numbers are now inferred as floats. If you want ints, create them
+  # with type constructors.
+  xit "should infer int type from assignment", ->
     code = glsl 'vertex = -> x = 1'
     expect(code.vertex).toMatch /int x/
     simulate(code).start().state.variables.x.type.should == 'int'
@@ -16,7 +18,19 @@ describe 'variable definition', ->
     expect(code.vertex).toMatch /x = 1.0/
 
   it "should complain about mismatched variable types", ->
-    expect(-> console.log(glsl 'vertex = -> x = 1; x = 1.0')).toThrow(
-      "Variable 'x' redefined with conflicting type: int redefined as float"
-    )
+    expect(try
+      glsl 'vertex = -> x = true; x = 1.0'
+    catch e
+      e.toString()
+    ).toMatch(/redefined with conflicting type: bool redefined as float/)
+    
+  it "should infer proper local variable type", ->
+    code = glsl """
+      f = (a) ->
+        b = a
+
+      vertex = ->
+        f(1.0)
+    """
+    expect(code.vertex).toMatch /float b/
     

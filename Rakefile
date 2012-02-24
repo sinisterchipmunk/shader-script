@@ -21,5 +21,15 @@ namespace :build do
   task :js => [ 'build:parser', 'build:main', 'build:browser' ]
 end
 
+namespace :test do
+  desc "run js tests"
+  task :js do
+    exit 1 unless system("cake test")
+  end
+end
+
 desc "build everything"
 task :build => [:js]
+
+desc "build all js files and then run all tests"
+task :default => [ 'build:js', 'test:js' ]

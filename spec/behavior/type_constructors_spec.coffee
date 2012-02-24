@@ -12,5 +12,5 @@ describe 'type constructors', ->
     it "should set type properly", ->
       expect(code.vertex).toMatch /vec4 v/
       sim = simulate(vertex: code.vertex).start()
-      expect(sim.state.variables.v.type).toEqual 'vec4'
+      expect(sim.state.variables.v.type()).toEqual 'vec4'
       

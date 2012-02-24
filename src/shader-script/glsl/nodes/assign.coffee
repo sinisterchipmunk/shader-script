@@ -4,13 +4,12 @@ class exports.Assign extends require('shader-script/nodes/base').Base
   children: -> ['left', 'right']
   
   compile: (program) ->
-    left  = @left.compile program
+    left = @left.toVariableName()
     right = @right.compile program
     
     execute: () -> 
-      _left = left.execute()
-      if program.state.variables[_left] == undefined
-        throw new Error "undeclared variable #{_left}"
-      program.state.variables[_left].value = right.execute()
-    toSource: () -> "#{left.toSource()} = #{right.toSource()}"
+      if program.state.variables[left] == undefined
+        throw new Error "undeclared variable #{left}"
+      program.state.variables[left].value = right.execute()
+    toSource: () -> "#{left} = #{right.toSource()}"
     

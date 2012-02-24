@@ -34,6 +34,19 @@ exports.Scope = class Scope
     @definitions = {}
     @registry = new NameRegistry()
     
+  all_qualifiers: ->
+    result = [@qualifier(false)]
+    for id, subscope of @subscopes
+      result = result.concat subscope.all_qualifiers()
+    result
+    
+  all_definitions: ->
+    result = []
+    result.push def.qualified_name for name, def of @definitions
+    for id, subscope of @subscopes
+      result = result.concat subscope.all_definitions()
+    result
+    
   qualifier: (delegate_to_subscope = true) ->
     if @current_subscope and delegate_to_subscope
       @current_subscope.qualifier()
@@ -62,23 +75,58 @@ exports.Scope = class Scope
       options.name or= name
       def = @lookup name, true
       if def
-        options.type or= def.type
-        if def.type and options.type != def.type
-          throw new Error "Variable '#{name}' redefined with conflicting type: #{def.type} redefined as #{options.type}"
-
+        def.set_type options.type
+        options.set_type = def.set_type
+        options.type = def.type
         options.scope = def.scope
         options.scope.definitions[name] = options
       else
         options.qualified_name = @qualifier() + "." + name
         options.scope = this
-        @definitions[name] = options
+        options.set_type = (type) ->
+          if type
+            if @type and @type() and type != @type()
+              throw new Error "Variable '#{@qualified_name}' redefined with conflicting type: #{@type()} redefined as #{type}"
+            @type = -> type
+          else
+            @type or= ->
+              if @dependent
+                @dependent.type()
+              else
+                undefined
+        type = options.type
+        delete options.type
+        options.set_type type
+
+      @definitions[name] = options
+        
+  # searches for the name within only this scope and its subscopes.
+  # The name must be fully qualified beginning with this scope,
+  # or defined directly within this scope (not its subscopes).
+  # If not found, null is returned.
+  find: (name) ->
+    if name instanceof Array then qualifiers = name
+    else qualifiers = name.split(/\./)
+    
+    if qualifiers.length == 1
+      return @definitions[qualifiers[0]]
+    else
+      scope_name = qualifiers.shift()
+      if scope_name == "#{@name}"
+        return @find qualifiers # search again without this scope's name
+      else
+        for id, subscope of @subscopes
+          if subscope.name == scope_name then return subscope.find(qualifiers)
+    null
       
   lookup: (name, silent = false) ->
     @delegate ->
       target = this
       while target
-        if target.definitions[name] then return target.definitions[name]
+        if result = target.find name
+          return result
         target = target.parent
+
       if silent then null
       else throw new Error "Variable '#{name}' is not defined in this scope"
       

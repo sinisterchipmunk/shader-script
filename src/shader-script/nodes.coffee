@@ -9,6 +9,7 @@ nodes =
   Function:   'function'
   Code:       'function'
   Arr:        'arr'
+  Param:      'param'
 
 for node_name, node_file of nodes
   exports[node_name] = require("shader-script/nodes/" + node_file)[node_name]

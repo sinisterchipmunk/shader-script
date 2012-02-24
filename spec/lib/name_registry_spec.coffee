@@ -11,3 +11,8 @@ describe "name registry", ->
     second = reg.define 'name'
     expect(first).not.toEqual second
     
+  it "should not clash with differring names", ->
+    first = reg.define 'name1'
+    second = reg.define 'name2'
+    expect(first).not.toEqual second
+    
