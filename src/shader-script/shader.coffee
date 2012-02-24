@@ -9,9 +9,14 @@ class exports.Shader
   # Invoked whenever a function is compiled. Receives the name
   # of the function and a callback method. If any args
   # have been noted for the function, they will be passed into
-  # the callback.
-  define_function: (name, callback) ->
-    @functions[name] = callback
+  # the callback. Also makes a note of the return variable so
+  # that callers can hook into it in order to infer type within the
+  # calling context.
+  define_function: (name, return_variable, callback) ->
+    @functions[name] =
+      return_variable: return_variable
+      callback: callback
+      
     if @fn_args[name]
       for args in @fn_args[name]
         callback args
@@ -23,7 +28,9 @@ class exports.Shader
   # sent to the function when it is compiled.
   mark_function: (name, args, dependent_variable = null) ->
     if @functions[name]
-      @functions[name] args
+      @functions[name].callback args
+      if dependent_variable
+        dependent_variable.add_dependent @functions[name].return_variable
     else
       @fn_args[name] or= []
       @fn_args[name].push args

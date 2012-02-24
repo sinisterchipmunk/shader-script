@@ -1,7 +1,7 @@
 {NameRegistry} = require 'shader-script/name_registry'
 
 exports.Definition = class Definition
-  constructor: (options) ->
+  constructor: (options = {}) ->
     @dependents = []
     @assign options
   

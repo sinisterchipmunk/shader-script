@@ -31,5 +31,10 @@ describe "functions", ->
     expect(code.vertex).toMatch(/float m\(/)
 
   it "should infer types from function return value", ->
-    code = glsl "m = -> return 1.0; vertex = -> x = m()"
-    console.log code
+    code = glsl "m = -> return 1.0\nvertex = -> x = m()"
+    expect(code.vertex).toMatch /float x;/
+  
+  it "should return void from main", ->
+    code = glsl "vertex = ->"
+    expect(code.vertex).toMatch /void main\(/
+  

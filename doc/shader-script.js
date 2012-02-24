@@ -3952,8 +3952,11 @@ if (typeof module !== 'undefined' && require.main === module) {
     _require["shader-script/nodes/call"] = function() {
       var exports = {};
       (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
+  var Definition,
+    __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  Definition = require('shader-script/scope').Definition;
 
   exports.Call = (function(_super) {
 
@@ -3969,7 +3972,13 @@ if (typeof module !== 'undefined' && require.main === module) {
       return ['method_name', 'params'];
     };
 
-    Call.prototype.type = function() {};
+    Call.prototype.variable = function(shader) {
+      return this._variable || (this._variable = new Definition);
+    };
+
+    Call.prototype.type = function(shader) {
+      return this.variable(shader).type();
+    };
 
     Call.prototype.compile = function(shader) {
       var arg, args, compiled_params, method_name, param, variable, _i, _len, _ref;
@@ -3988,7 +3997,7 @@ if (typeof module !== 'undefined' && require.main === module) {
           args.push(param.type());
         }
       }
-      shader.mark_function(this.method_name.toVariableName(), args);
+      shader.mark_function(this.method_name.toVariableName(), args, this.variable(shader));
       return this.glsl('Call', method_name, compiled_params);
     };
 
@@ -4003,8 +4012,11 @@ if (typeof module !== 'undefined' && require.main === module) {
     _require["shader-script/nodes/function"] = function() {
       var exports = {};
       (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
+  var Definition,
+    __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  Definition = require('shader-script/scope').Definition;
 
   exports.Code = exports.Function = (function(_super) {
 
@@ -4021,19 +4033,11 @@ if (typeof module !== 'undefined' && require.main === module) {
     };
 
     Function.prototype.variable = function(shader) {
-      return {
-        _type: 'void',
-        type: function() {
-          return this._type;
-        },
-        set_type: function(t) {
-          return this._type = t;
-        }
-      };
+      return this._variable || (this._variable = new Definition);
     };
 
     Function.prototype.type = function(shader) {
-      return this.variable(shader).type();
+      return this.variable(shader).type() || 'void';
     };
 
     Function.prototype.compile = function(shader) {
@@ -4061,7 +4065,7 @@ if (typeof module !== 'undefined' && require.main === module) {
         return _results;
       }).call(this);
       compiled_body = this.body.compile(shader);
-      shader.define_function(str_func_name, function(args) {
+      shader.define_function(str_func_name, this.variable(shader), function(args) {
         var arg, i, variable, _ref, _results;
         if (args.length !== compiled_params.length) {
           throw new Error("Function " + str_func_name + " called with incorrect argument count (" + args.length + " for " + compiled_params.length + ")");
@@ -5332,16 +5336,18 @@ if (typeof module !== 'undefined' && require.main === module) {
   exports.Definition = Definition = (function() {
 
     function Definition(options) {
+      if (options == null) options = {};
+      this.dependents = [];
       this.assign(options);
     }
 
     Definition.prototype.type = function() {
-      return this.options.type || inferred_type();
+      return this.explicit_type || this.inferred_type();
     };
 
     Definition.prototype.inferred_type = function() {
       var dep, type, _i, _len, _ref;
-      _ref = this.options.dependents;
+      _ref = this.dependents;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         dep = _ref[_i];
         type = dep.type();
@@ -5351,17 +5357,24 @@ if (typeof module !== 'undefined' && require.main === module) {
     };
 
     Definition.prototype.set_type = function(type) {
-      if (type) return this.options.type = type;
+      var current_type;
+      if (type) {
+        current_type = this.type();
+        if (current_type && type !== current_type) {
+          throw new Error("Variable '" + this.qualified_name + "' redefined with conflicting type: " + (this.type()) + " redefined as " + type);
+        }
+        if (type) return this.explicit_type = type;
+      }
+    };
+
+    Definition.prototype.add_dependent = function(dep) {
+      return this.dependents.push(dep);
     };
 
     Definition.prototype.assign = function(options) {
       var dependent, _i, _len, _ref;
-      this.options || (this.options = {
-        dependents: []
-      });
-      ({
-        type: null
-      });
+      if (options.name) this.name = options.name;
+      if (options.qualified_name) this.qualified_name = options.qualified_name;
       if (options.type) this.set_type(options.type);
       if (options.dependents) {
         _ref = options.dependents;
@@ -5468,9 +5481,10 @@ if (typeof module !== 'undefined' && require.main === module) {
       if (def) {
         def.assign(options);
       } else {
+        options.qualified_name = this.qualifier() + "." + name;
         def = new Definition(options);
       }
-      return this.definitions[name] = options;
+      return this.definitions[name] = def;
     };
 
     Scope.prototype.find = function(name) {
@@ -5546,9 +5560,12 @@ if (typeof module !== 'undefined' && require.main === module) {
       this.fn_args = {};
     }
 
-    Shader.prototype.define_function = function(name, callback) {
+    Shader.prototype.define_function = function(name, return_variable, callback) {
       var args, _i, _len, _ref, _results;
-      this.functions[name] = callback;
+      this.functions[name] = {
+        return_variable: return_variable,
+        callback: callback
+      };
       if (this.fn_args[name]) {
         _ref = this.fn_args[name];
         _results = [];
@@ -5564,7 +5581,10 @@ if (typeof module !== 'undefined' && require.main === module) {
       var _base;
       if (dependent_variable == null) dependent_variable = null;
       if (this.functions[name]) {
-        return this.functions[name](args);
+        this.functions[name].callback(args);
+        if (dependent_variable) {
+          return dependent_variable.add_dependent(this.functions[name].return_variable);
+        }
       } else {
         (_base = this.fn_args)[name] || (_base[name] = []);
         return this.fn_args[name].push(args);

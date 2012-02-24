@@ -1,10 +1,15 @@
+{Definition} = require 'shader-script/scope'
+
 class exports.Call extends require("shader-script/nodes/base").Base
   name: "call"
   
   children: -> ['method_name', 'params']
   
-  type: ->
-    
+  variable: (shader) ->
+    @_variable or= new Definition
+  
+  type: (shader) ->
+    @variable(shader).type()
   
   compile: (shader) ->
     method_name = @method_name.compile shader
@@ -20,6 +25,6 @@ class exports.Call extends require("shader-script/nodes/base").Base
       else
         args.push param.type()
       
-    shader.mark_function @method_name.toVariableName(), args
+    shader.mark_function @method_name.toVariableName(), args, @variable(shader)
       
     @glsl 'Call', method_name, compiled_params
