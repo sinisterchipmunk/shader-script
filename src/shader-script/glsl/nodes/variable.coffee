@@ -8,6 +8,7 @@ class exports.Variable extends require('shader-script/nodes/base').Base
   
   compile: (program) ->
     name = @name.toVariableName()
+    
     if @qualified_name
       variable = program.state.scope.lookup(@qualified_name)
     else

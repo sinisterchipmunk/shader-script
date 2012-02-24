@@ -6,11 +6,17 @@ class exports.Call extends require("shader-script/nodes/base").Base
   compile: (shader) ->
     method_name = @method_name.compile shader
     compiled_params = []
-    types = []
+    args = []
     for param in @params
-      compiled_params.push param.compile shader
-      types.push param.type()
+      arg = param.compile shader
+      compiled_params.push arg
       
-    shader.mark_function @method_name.toVariableName(), types
+      variable = param.variable shader
+      if variable
+        args.push variable
+      else
+        args.push param.type()
+      
+    shader.mark_function @method_name.toVariableName(), args
       
     @glsl 'Call', method_name, compiled_params

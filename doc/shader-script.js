@@ -3907,17 +3907,23 @@ if (typeof module !== 'undefined' && require.main === module) {
     };
 
     Call.prototype.compile = function(shader) {
-      var compiled_params, method_name, param, types, _i, _len, _ref;
+      var arg, args, compiled_params, method_name, param, variable, _i, _len, _ref;
       method_name = this.method_name.compile(shader);
       compiled_params = [];
-      types = [];
+      args = [];
       _ref = this.params;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         param = _ref[_i];
-        compiled_params.push(param.compile(shader));
-        types.push(param.type());
+        arg = param.compile(shader);
+        compiled_params.push(arg);
+        variable = param.variable(shader);
+        if (variable) {
+          args.push(variable);
+        } else {
+          args.push(param.type());
+        }
       }
-      shader.mark_function(this.method_name.toVariableName(), types);
+      shader.mark_function(this.method_name.toVariableName(), args);
       return this.glsl('Call', method_name, compiled_params);
     };
 
@@ -3969,16 +3975,20 @@ if (typeof module !== 'undefined' && require.main === module) {
         return _results;
       }).call(this);
       compiled_body = this.body.compile(shader);
-      shader.define_function(str_func_name, function(types) {
-        var i, type, variable, _ref, _results;
-        if (types.length !== compiled_params.length) {
-          throw new Error("Function " + str_func_name + " called with incorrect argument count (" + types.length + " for " + compiled_params.length + ")");
+      shader.define_function(str_func_name, function(args) {
+        var arg, i, variable, _ref, _results;
+        if (args.length !== compiled_params.length) {
+          throw new Error("Function " + str_func_name + " called with incorrect argument count (" + args.length + " for " + compiled_params.length + ")");
         }
         _results = [];
-        for (i = 0, _ref = types.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
-          type = types[i];
+        for (i = 0, _ref = args.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
+          arg = args[i];
           variable = compiled_params[i].variable;
-          _results.push(variable.set_type(type));
+          if (arg.type) {
+            _results.push(variable.dependents.push(arg));
+          } else {
+            _results.push(variable.set_type(arg));
+          }
         }
         return _results;
       });
@@ -5255,11 +5265,21 @@ if (typeof module !== 'undefined' && require.main === module) {
     Scope.prototype.define = function(name, options) {
       if (options == null) options = {};
       return this.delegate(function() {
-        var def, type;
+        var def, dep, deps, type, _i, _len, _ref;
         options.name || (options.name = name);
         def = this.lookup(name, true);
         if (def) {
           def.set_type(options.type);
+          deps = def.dependents;
+          if (options.dependents) {
+            _ref = options.dependents;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              dep = _ref[_i];
+              deps.push(dep);
+            }
+          }
+          if (options.dependent) deps.push(options.dependent);
+          options.dependents = deps;
           options.set_type = def.set_type;
           options.type = def.type;
           options.scope = def.scope;
@@ -5267,6 +5287,9 @@ if (typeof module !== 'undefined' && require.main === module) {
         } else {
           options.qualified_name = this.qualifier() + "." + name;
           options.scope = this;
+          deps = options.dependents || [];
+          if (options.dependent) deps.push(options.dependent);
+          options.dependents = deps;
           options.set_type = function(type) {
             if (type) {
               if (this.type && this.type() && type !== this.type()) {
@@ -5277,11 +5300,14 @@ if (typeof module !== 'undefined' && require.main === module) {
               };
             } else {
               return this.type || (this.type = function() {
-                if (this.dependent) {
-                  return this.dependent.type();
-                } else {
-                  return;
+                var dep, _j, _len2, _ref2, _type;
+                _ref2 = this.dependents;
+                for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+                  dep = _ref2[_j];
+                  _type = dep.type();
+                  if (_type) return _type;
                 }
+                return;
               });
             }
           };
@@ -5368,31 +5394,31 @@ if (typeof module !== 'undefined' && require.main === module) {
     function Shader(state) {
       this.scope = state.scope || (state.scope = new Scope());
       this.functions = {};
-      this.fn_types = {};
+      this.fn_args = {};
     }
 
     Shader.prototype.define_function = function(name, callback) {
-      var types, _i, _len, _ref, _results;
+      var args, _i, _len, _ref, _results;
       this.functions[name] = callback;
-      if (this.fn_types[name]) {
-        _ref = this.fn_types[name];
+      if (this.fn_args[name]) {
+        _ref = this.fn_args[name];
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          types = _ref[_i];
-          _results.push(callback(types));
+          args = _ref[_i];
+          _results.push(callback(args));
         }
         return _results;
       }
     };
 
-    Shader.prototype.mark_function = function(name, types, dependent_variable) {
+    Shader.prototype.mark_function = function(name, args, dependent_variable) {
       var _base;
       if (dependent_variable == null) dependent_variable = null;
       if (this.functions[name]) {
-        return this.functions[name](types);
+        return this.functions[name](args);
       } else {
-        (_base = this.fn_types)[name] || (_base[name] = []);
-        return this.fn_types[name].push(types);
+        (_base = this.fn_args)[name] || (_base[name] = []);
+        return this.fn_args[name].push(args);
       }
     };
 

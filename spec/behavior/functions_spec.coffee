@@ -15,3 +15,12 @@ describe "functions", ->
     code = glsl "b = 0\nf = (a) -> b = a\nvertex = -> f 1"
     sim = simulate(vertex: code.vertex).start()
     expect(sim.state.variables.b.value).toEqual 1
+
+  it "should infer params types from other params", ->
+    code = glsl """
+      m = (a) -> 1
+      fpos = (angle) -> m(angle)
+      vertex = -> fpos(1)
+    """
+    expect(code.vertex).toMatch /\(float a\)/
+    

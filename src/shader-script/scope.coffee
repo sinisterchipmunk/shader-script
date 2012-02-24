@@ -71,11 +71,17 @@ exports.Scope = class Scope
     @current_subscope || this
     
   define: (name, options = {}) ->
+    # FIXME this method is getting ugly. Refactor!
     @delegate ->
       options.name or= name
       def = @lookup name, true
       if def
         def.set_type options.type
+        deps = def.dependents
+        deps.push dep for dep in options.dependents if options.dependents
+        deps.push options.dependent if options.dependent
+        
+        options.dependents = deps
         options.set_type = def.set_type
         options.type = def.type
         options.scope = def.scope
@@ -83,6 +89,9 @@ exports.Scope = class Scope
       else
         options.qualified_name = @qualifier() + "." + name
         options.scope = this
+        deps = options.dependents or []
+        deps.push options.dependent if options.dependent
+        options.dependents = deps
         options.set_type = (type) ->
           if type
             if @type and @type() and type != @type()
@@ -90,10 +99,10 @@ exports.Scope = class Scope
             @type = -> type
           else
             @type or= ->
-              if @dependent
-                @dependent.type()
-              else
-                undefined
+              for dep in @dependents
+                _type = dep.type()
+                return _type if _type
+              undefined
         type = options.type
         delete options.type
         options.set_type type
