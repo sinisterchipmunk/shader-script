@@ -201,6 +201,7 @@ grammar =
     o 'ParamVar',                               -> new Param $1
     o 'ParamVar ...',                           -> new Param $1, null, on
     o 'ParamVar = Expression',                  -> new Param $1, $3
+    o 'GlslType Param',                         -> $2.set_type $1; $2
   ]
 
  # Function Parameters
@@ -541,6 +542,43 @@ grammar =
        INDENT Expression OUTDENT',              -> new Assign $1, $4, $2
     o 'SimpleAssignable EXTENDS Expression',    -> new Extends $1, $3
   ]
+  
+  
+  
+  GlslType: [
+    o 'VOID'
+    o 'BOOL'
+    o 'INT'
+    o 'FLOAT'
+    o 'VEC2'
+    o 'VEC3'
+    o "VEC4"
+    o "BVEC2"
+    o "BVEC3"
+    o "BVEC4"
+    o 'IVEC2'
+    o 'IVEC3'
+    o 'IVEC4'
+    o 'MAT2'
+    o "MAT3"
+    o "MAT4"
+    o 'MAT2X2'
+    o 'MAT2X3'
+    o 'MAT2X4'
+    o "MAT3X2"
+    o "MAT3X3"
+    o "MAT3X4"
+    o "MAT4X2"
+    o "MAT4X3"
+    o "MAT4X4"
+    o 'SAMPLER1D'
+    o 'SAMPLER2D'
+    o 'SAMPLER3D'
+    o 'SAMPLERCUBE'
+    o 'SAMPLER1DSHADOW'
+    o 'SAMPLER2DSHADOW'
+  ]
+  
 
 
 # Precedence

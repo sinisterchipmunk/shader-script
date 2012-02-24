@@ -1,6 +1,13 @@
 require 'spec_helper'
 
 describe "functions", ->
+  it "should allow param types to be explicitly specified", ->
+    script = "m = (float x) -> "
+    console.log parse_tree(script)
+    code = glsl script
+    console.log code.vertex
+    expect(code.vertex).toMatch /\(float x\)/
+  
   it "should be able to call functions", ->
     code = glsl "x = 0\ncalcX = -> x = 1\nvertex = -> calcX()"
     # single out the vertex code because there's no fragment main

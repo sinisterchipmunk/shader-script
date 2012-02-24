@@ -549,6 +549,37 @@ exports.Lexer = class Lexer
 
 # Keywords that CoffeeScript shares in common with JavaScript.
 JS_KEYWORDS = [
+  # GLSL keywords added so we can detect types
+  'attribute', 'const', 'uniform', 'varying',
+  'centroid',
+  'break', 'continue', 'do', 'for', 'while',
+  'if', 'else',
+  'in', 'out', 'inout',
+  'float', 'int', 'void', 'bool', 'true', 'false',
+  'invariant',
+  'discard', 'return',
+  'mat2', 'mat3', 'mat4',
+  'mat2x2', 'mat2x3', 'mat2x4',
+  'mat3x2', 'mat3x3', 'mat3x4',
+  'mat4x2', 'mat4x3', 'mat4x4',
+  'vec2', 'vec3', 'vec4', 'ivec2', 'ivec3', 'ivec4', 'bvec2', 'bvec3', 'bvec4',
+  'sampler1D', 'sampler2D', 'sampler3D', 'samplerCube',
+  'sampler1DShadow', 'sampler2DShadow',
+  'struct',
+  
+  'asm',
+  'class', 'union', 'enum', 'typedef', 'template', 'this', 'packed',
+  'goto', 'switch', 'default',
+  'inline', 'noinline', 'volatile', 'public', 'static', 'extern', 'external', 'interface',
+  'long', 'short', 'double', 'half', 'fixed', 'unsigned',
+  'lowp', 'mediump', 'highp', 'precision',
+  'input', 'output',
+  'hvec2', 'hvec3', 'hvec4', 'dvec2', 'dvec3', 'dvec4', 'fvec2', 'fvec3', 'fvec4',
+  'sampler2DRect', 'sampler3DRect', 'sampler2DRectShadow',
+  'sizeof', 'cast',
+  'namespace', 'using',
+
+
   'true', 'false', 'null', 'this'
   'new', 'delete', 'typeof', 'in', 'instanceof'
   'return', 'throw', 'break', 'continue', 'debugger'
@@ -577,7 +608,8 @@ COFFEE_KEYWORDS = COFFEE_KEYWORDS.concat COFFEE_ALIASES
 # used by CoffeeScript internally. We throw an error when these are encountered,
 # to avoid having a JavaScript error at runtime.
 RESERVED = [
-  'case', 'default', 'function', 'var', 'void', 'with'
+  # 'void', 
+  'case', 'default', 'function', 'var', 'with'
   'const', 'let', 'enum', 'export', 'import', 'native'
   '__hasProp', '__extends', '__slice', '__bind', '__indexOf'
   'implements', 'interface', 'let', 'package',
