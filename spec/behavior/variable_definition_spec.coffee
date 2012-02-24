@@ -7,6 +7,10 @@ describe 'variable definition', ->
     code = glsl 'vertex = -> x = 1'
     expect(code.vertex).toMatch /int x/
     simulate(code).start().state.variables.x.type.should == 'int'
+    
+  it "should add decimal to inferred floats", ->
+    code = glsl 'vertex = -> x = 1'
+    expect(code.vertex).toMatch /x = 1\.0;/
 
   it "should infer float type from assignment", ->
     code = glsl 'vertex = -> x = 1.0'
@@ -33,4 +37,3 @@ describe 'variable definition', ->
         f(1.0)
     """
     expect(code.vertex).toMatch /float b/
-    

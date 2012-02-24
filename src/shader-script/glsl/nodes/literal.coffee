@@ -12,6 +12,11 @@ class exports.Literal extends require('shader-script/nodes/base').Base
   
   compile: (program) ->
     value = @children[0]
+    
+    # represent inferred floats (which were input as ints) properly
+    if @type() == 'float' and value.indexOf('.') == -1
+      value += ".0"
+      
     execute: -> eval value
     toSource: -> value
     

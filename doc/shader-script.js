@@ -1409,6 +1409,7 @@
     Literal.prototype.compile = function(program) {
       var value;
       value = this.children[0];
+      if (this.type() === 'float' && value.indexOf('.') === -1) value += ".0";
       return {
         execute: function() {
           return eval(value);
