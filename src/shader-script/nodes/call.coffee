@@ -3,6 +3,9 @@ class exports.Call extends require("shader-script/nodes/base").Base
   
   children: -> ['method_name', 'params']
   
+  type: ->
+    
+  
   compile: (shader) ->
     method_name = @method_name.compile shader
     compiled_params = []

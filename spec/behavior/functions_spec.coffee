@@ -24,3 +24,12 @@ describe "functions", ->
     """
     expect(code.vertex).toMatch /\(float a\)/
     
+  it "should set function type by return value", ->
+    code = glsl """
+      m = -> return 1.0
+    """
+    expect(code.vertex).toMatch(/float m\(/)
+
+  it "should infer types from function return value", ->
+    code = glsl "m = -> return 1.0; vertex = -> x = m()"
+    console.log code

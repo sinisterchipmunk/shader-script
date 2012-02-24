@@ -4,34 +4,51 @@
     <title>ShaderScript</title>
     <script type="text/javascript" src="shader-script.js"></script>
     <script type="text/javascript">
+    function escapeHTML(code) {
+      return code.split("&").join("&amp;").split( "<").join("&lt;").split(">").join("&gt;");
+    }
+    
     function update(sscode) {
       try {
         var glsl = ShaderScript.compile_to_glsl(sscode);
+        document.getElementById('errors').innerHTML = "";
         document.getElementById('vertex').value = glsl.vertex;
         document.getElementById('fragment').value = glsl.fragment;
       } catch(e) {
-        document.getElementById('vertex').value = e.toString();
-        document.getElementById('fragment').value = e.toString();
+        document.getElementById('errors').innerHTML = escapeHTML(e.toString());
       }
+    }
+    
+    function resizev() {
+      var w1 = parseInt(document.getElementById('vertex').style.width);
+      document.getElementById('fragment').style.width = w1 + "px";
+    }
+
+    function resizef() {
+      var w1 = parseInt(document.getElementById('fragment').style.width);
+      document.getElementById('vertex').style.width = w1 + "px";
     }
     </script>
     <style>
       textarea {
-        width: 400px;
+        width: 45%;
         font-size: 12pt;
         font-family: monospace;
         margin: 0;
         padding: 0;
+        margin-right: 3px;
       }
       #src { height: 500px; float: left; }
       #vertex { height: 247px; }
       #fragment { height: 247px; }
+      #errors { clear: both; }
     </style>
   </head>
   
   <body>
     <textarea id="src" onkeyup="update(this.value);"></textarea>
-    <textarea id="vertex"></textarea>
-    <textarea id="fragment"></textarea>
+    <textarea id="vertex" disabled="true" onmousemove="resizev();"></textarea>
+    <textarea id="fragment" disabled="true" onmousemove="resizef();"></textarea>
+    <div id="errors"></div>
   </body>
 </html>
