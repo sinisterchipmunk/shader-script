@@ -1,0 +1,38 @@
+<!DOCTYPE html >
+<html>
+  <head>
+    <title>ShaderScript</title>
+    <script type="text/javascript" src="shader-script.js"></script>
+    <script type="text/javascript">
+    function update(sscode) {
+      try {
+        var glsl = ShaderScript.compile_to_glsl(sscode);
+        document.getElementById('vertex').value = glsl.vertex;
+        document.getElementById('fragment').value = glsl.fragment;
+        document.getElementById('compile-errors').innerHTML = "";
+      } catch(e) {
+        document.getElementById('compile-errors').innerHTML = e.toString();
+      }
+    }
+    </script>
+    <style>
+      textarea {
+        width: 400px;
+        font-size: 12pt;
+        font-family: monospace;
+        margin: 0;
+        padding: 0;
+      }
+      #src { height: 500px; float: left; }
+      #vertex { height: 247px; }
+      #fragment { height: 247px; }
+    </style>
+  </head>
+  
+  <body>
+    <div id="compile-errors"></div>
+    <textarea id="src" onkeyup="update(this.value);"></textarea>
+    <textarea id="vertex"></textarea>
+    <textarea id="fragment"></textarea>
+  </body>
+</html>

@@ -11,3 +11,8 @@ describe 'shader', ->
     code = glsl 'vertex = -> x = 1'
     sim = simulate(code).start()
     expect(sim.state.variables.x.value).toEqual 1
+
+  it "should handle empty mains", ->
+    glsl 'vertex = ->'
+    expect(-> glsl 'vertex = ->').not.toThrow()
+  

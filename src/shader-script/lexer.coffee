@@ -7,10 +7,10 @@
 #
 # Which is a format that can be fed directly into [Jison](http://github.com/zaach/jison).
 
-{Rewriter, INVERSES} = require './rewriter'
+{Rewriter, INVERSES} = require 'shader-script/rewriter'
 
 # Import the helpers we need.
-{count, starts, compact, last} = require './helpers'
+{count, starts, compact, last} = require 'shader-script/helpers'
 
 # The Lexer Class
 # ---------------

@@ -1,6 +1,6 @@
 {Shader} = require 'shader-script/shader'
 
-class exports.Root extends require('./base').Base
+class exports.Root extends require('shader-script/nodes/base').Base
   name: "root"
 
   constructor: (@block) ->

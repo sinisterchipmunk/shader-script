@@ -1,6 +1,6 @@
 {Lexer}     = require "shader-script/glsl/lexer"
 
-if process.env['TEST']
+if typeof(process) != 'undefined' && process.env['TEST']
   {parser}    = require "shader-script/glsl/grammar"
 else
   {parser}    = require "shader-script/glsl/parser"

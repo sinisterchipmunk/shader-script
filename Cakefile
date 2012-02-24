@@ -13,22 +13,22 @@ run = (cb, cmd, args...) ->
 
 
 task 'build', 'build the language from source', build = (cb) ->
-  run cb, 'coffee', '-c', '-o', 'lib/assets/javascripts', 'src'
-
+  run cb, 'coffee', '-c', '-o', 'lib/assets/javascripts/shader-script/src', 'src'
+  
 task 'build:parser', 'rebuild the Jison parser', build_parser = (cb) ->
   with_dir = ->
     extend global, require('util')
     require 'jison'
     shader_parser = require('./src/shader-script/grammar').parser
     glsl_parser = require('./src/shader-script/glsl/grammar').parser
-    fs.writeFile 'lib/assets/javascripts/shader-script/parser.js',      shader_parser.generate()
-    fs.writeFile 'lib/assets/javascripts/shader-script/glsl/parser.js', glsl_parser.generate()
+    fs.writeFile 'lib/assets/javascripts/shader-script/src/shader-script/parser.js',      shader_parser.generate()
+    fs.writeFile 'lib/assets/javascripts/shader-script/src/shader-script/glsl/parser.js', glsl_parser.generate()
     cb() if typeof cb is 'function'
     
   without_dir = ->
-    run with_dir, "mkdir", "-p", "lib/assets/javascripts/shader-script/glsl"
+    run with_dir, "mkdir", "-p", "lib/assets/javascripts/shader-script/src/shader-script/glsl"
     
-  run without_dir, "rm", "-rf", "lib/assets/javascripts"
+  run without_dir, "rm", "-rf", "lib/assets/javascripts/shader-script/src"
 
 task 'test', 'run the tests', test = ->
   process.env['TEST'] = true

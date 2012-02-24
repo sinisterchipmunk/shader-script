@@ -1,7 +1,7 @@
 class exports.Block extends require('shader-script/nodes/base').Base
   name: -> 'block'
   
-  constructor: (lines, @options = scope: yes) -> super lines
+  constructor: (lines = [], @options = scope: yes) -> super lines
   
   compile: (program) ->
     throw new Error("too many children") if @children.length > 1

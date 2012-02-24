@@ -1,0 +1,14 @@
+(function(global) {
+  var _require = {};
+  var require = function(path) { return require[path] = require[path] || (_require[path] && _require[path]()); };
+  
+  <% shader_build_env.each_logical_path do |path| %>
+    _require[<%= raw path.sub(/#{Regexp::escape File.extname(path)}$/, '').inspect %>] = function() {
+      var exports = {};
+      <%= raw shader_build_env[path].to_s %>
+      return exports;
+    };
+  <% end %>
+  
+  global.ShaderScript = require("shader-script");
+})(this);
