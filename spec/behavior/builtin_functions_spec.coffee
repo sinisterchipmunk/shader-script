@@ -12,7 +12,6 @@ describe "built-in functions", ->
     # Converts degrees to radians, i.e. pi/180 * degrees
     describe 'radians', ->
       it "with float", ->
-        code = glsl 'vertex = -> x = radians 180'
-        sim = simulate(code).start()
+        sim = simulate glsl 'vertex = -> x = radians 180'
         expect(sim.state.variables.x.type()).toEqual 'float'
         expect(sim.state.variables.x.value).toEqual Math.PI
