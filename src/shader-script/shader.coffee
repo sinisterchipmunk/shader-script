@@ -1,4 +1,5 @@
 {Scope} = require 'shader-script/scope'
+{Program} = require 'shader-script/glsl/program'
 
 class exports.Shader
   constructor: (state) ->
@@ -31,6 +32,12 @@ class exports.Shader
       @functions[name].callback args
       if dependent_variable
         dependent_variable.add_dependent @functions[name].return_variable
+    else if builtin = Program.prototype.builtins[name]
+      # builtin the functions have explicit types, so we don't need
+      # to worry about the callback. We only need to deal with the
+      # return variable.
+      if dependent_variable
+        dependent_variable.set_type builtin.return_type()
     else
       @fn_args[name] or= []
       @fn_args[name].push args

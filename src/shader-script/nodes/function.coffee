@@ -24,8 +24,9 @@ exports.Code = class exports.Function extends require('shader-script/nodes/base'
     
     compiled_params    = (param.compile shader for param in @params)
     compiled_body      = @body.compile shader
+    return_variable    = @variable shader
     
-    shader.define_function str_func_name, @variable(shader), (args) ->
+    shader.define_function str_func_name, return_variable, (args) ->
       if args.length != compiled_params.length
         throw new Error "Function #{str_func_name} called with incorrect argument count (#{args.length} for #{compiled_params.length})"
       

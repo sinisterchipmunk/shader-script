@@ -9,20 +9,26 @@ class exports.Function extends require('shader-script/nodes/base').Base
     compiled_arguments = (argument.compile program for argument in @arguments)
     compiled_block = @block.compile program
     compiled_name = @name.toVariableName()
+    originator = this
     
     execute: () ->
       name = compiled_name
       args = (arg.variable for arg in compiled_arguments)
       
       program.functions[name] =
-        # return_type: @type()
+        return_type: -> originator.type()
         arguments: args
         invoke: (params...) ->
-          if args.length != params.length
-            throw new Error "Incorrect argument count (#{params.length} for #{args.length})"
-          for i in [0...params.length]
-            args[i].value = params[i].execute()
-          compiled_block.execute()
+          try
+            if args.length != params.length
+              throw new Error "Incorrect argument count (#{params.length} for #{args.length})"
+            for i in [0...params.length]
+              args[i].value = params[i].execute()
+            compiled_block.execute()
+          catch e
+            if e.is_return
+              return e.result
+            else throw e
         toSource: (overriding_fn_name) => @toSource overriding_fn_name
       
     # overriding_fn_name allows us to rename functions as needed. This is mostly

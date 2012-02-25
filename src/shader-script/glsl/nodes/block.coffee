@@ -10,7 +10,7 @@ class exports.Block extends require('shader-script/nodes/base').Base
     if @lines
       for child in @lines
         _result = child.compile program
-        lines.push _result if _result
+        lines.push _result if _result != null
         
     execute: () -> (line.execute() for line in lines)
     toSource: () => 

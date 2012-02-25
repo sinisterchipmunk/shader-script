@@ -37,6 +37,7 @@ exports.compile_to_glsl = (code) ->
 # Compiles the shaderscript code into an object representation of GLSL code
 # to be executed. See also #compile_to_glsl(code)
 exports.compile = (code) ->
+  exports.builtins or= require('shader-script/builtins').builtins
   unless code instanceof Object and code.compile
     code = exports.parse code
   code.compile()

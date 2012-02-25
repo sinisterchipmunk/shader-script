@@ -13,7 +13,6 @@ describe "built-in functions", ->
     describe 'radians', ->
       it "with float", ->
         code = glsl 'vertex = -> x = radians 180'
-        console.log code
-        sim = simulate code
+        sim = simulate(code).start()
         expect(sim.state.variables.x.type()).toEqual 'float'
         expect(sim.state.variables.x.value).toEqual Math.PI

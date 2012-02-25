@@ -13,6 +13,7 @@ class exports.Call extends require("shader-script/nodes/base").Base
   
   compile: (shader) ->
     method_name = @method_name.compile shader
+    
     compiled_params = []
     args = []
     for param in @params

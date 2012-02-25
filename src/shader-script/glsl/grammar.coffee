@@ -85,6 +85,7 @@ grammar =
     o 'Literal'
     o 'TypeConstructor'
     o 'FunctionCall'
+    o 'Operation'
   ]
   
   # Pure statements which cannot be expressions.
