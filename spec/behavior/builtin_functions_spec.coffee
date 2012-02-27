@@ -30,4 +30,19 @@ describe "built-in functions", ->
     it "cos", ->
       assert "cos #{Math.PI} / 2", 'float', Math.cos(Math.PI/2)
       assert "cos 0", 'float', 1.0
-        
+    
+    it "tan", ->
+      assert "tan #{Math.PI} / 2", 'float', Math.tan(Math.PI/2)
+    
+    it "asin", ->
+      assert "asin #{Math.sin Math.PI/2}", 'float', Math.asin Math.sin Math.PI/2
+    
+    it "acos", ->
+      assert "acos #{Math.sin Math.PI/2}", 'float', Math.acos Math.sin Math.PI/2
+    
+    it "atan(y, x)", ->
+      assert "atan 1, 2", 'float', Math.atan2 1, 2
+      
+    it "atan(y_over_x)", ->
+      assert "atan 0.5", 'float', Math.atan 0.5
+      
