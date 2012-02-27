@@ -4,8 +4,15 @@ try
   {Program} = require 'shader-script/glsl/program'
   Program.prototype.builtins = {}
   
-  # now add the builtins we have to hook directly into JS for
   class Extension
+    # If type is null, it will default to the type of the first argument passed into
+    # the extension in the context of its call. Note that this result can vary depending
+    # on context. For example, all of the following can be true within the same program:
+    #
+    #   ext(vec3) => vec3
+    #   ext(float) => float
+    #   ext(vec3, float) => vec3
+    #
     return_type: -> @type
     
     constructor: (@name, @type, @callback) ->
@@ -59,7 +66,35 @@ try
   e 'smoothstep', 'float', (edge0, edge1, x) ->
     t = Extension.invoke('clamp', (x - edge0) / (edge1 - edge0), 0, 1)
     t * t * (3 - 2 * t)
-    
+
+  # Geometric functions, pp68-69
+  e 'length', 'float', (vec) ->
+    l = 0
+    l += Math.pow(x, 2) for x in vec
+    Math.sqrt(l)
+  e 'distance', 'float', (v1, v2) ->
+    v3 = (v1[i] - v2[i] for i of v1)
+    Extension.invoke 'length', v3
+  e 'dot', 'float', (v1, v2) ->
+    dot = 0
+    dot += v1[i] * v2[i] for i of v1
+    dot
+  e 'cross', 'vec3', (x, y) ->
+    throw new Error 'Can only cross vec3 with vec3' if x.length != 3 or y.length != 3
+    [ x[1]*y[2] - y[1]*x[2], x[2]*y[0] - y[2]*x[0], x[0]*y[1] - y[0]*x[1] ]
+  e 'normalize', null, (vec) ->
+    len = Extension.invoke('length', vec)
+    (v / len for v in vec)
+  e 'faceforward', null, (N, I, Nref) ->
+    if Extension.invoke('dot', Nref, I) < 0 then N else I
+  e 'reflect', null, (I, N) ->
+    dot = Extension.invoke('dot', N, I)
+    I[i] - 2 * dot * N[i] for i of I
+  e 'refract', null, (I, N, eta) ->
+    dotNI = Extension.invoke 'dot', N, I
+    k = 1 - eta * eta * (1 - dotNI * dotNI)
+    if k < 0 then (0 for x in I)
+    else eta * I[i] - (eta * dotNI + Math.sqrt(k)) * N[i] for i of I
 catch e
   console.log e
   console.log "WARNING: continuing without builtins..."

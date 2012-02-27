@@ -37,7 +37,16 @@ class exports.Shader
       # to worry about the callback. We only need to deal with the
       # return variable.
       if dependent_variable
-        dependent_variable.set_type builtin.return_type()
+        if builtin.return_type()
+          dependent_variable.set_type builtin.return_type()
+        else
+          # if the extension has no type, its type defaults to the type of
+          # its first parameter.
+          if args.length
+            if typeof(args[0]) == 'string'
+              dependent_variable.set_type args[0]
+            else
+              dependent_variable.add_dependent args[0]
     else
       @fn_args[name] or= []
       @fn_args[name].push args

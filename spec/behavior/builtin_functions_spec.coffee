@@ -7,11 +7,13 @@ describe "built-in functions", ->
   # define some helpers for my fingers' sake
   float = 'float'
   
+  exec = (operation) -> simulate glsl "vertex = -> x = #{operation}"
+  
   assert = (operation, expected_type, expected_value) ->
     if expected_type is undefined then throw new Error "Expected type is undefined"
     if expected_value is undefined then throw new Error "Expected value is undefined"
     
-    sim = simulate glsl "vertex = -> x = #{operation}"
+    sim = exec operation
     expect(sim.state.variables.x.type()).toEqual expected_type
     expect(sim.state.variables.x.value).toEqual expected_value
   
@@ -143,3 +145,38 @@ describe "built-in functions", ->
       assert 'smoothstep 1, 3, 1.25', float, 0.04296875
       assert 'smoothstep 1, 3, 3', float, 1
       assert 'smoothstep 1, 3, 4', float, 1
+
+  # Geometric functions, pp68-69
+  describe 'geometric functions', ->
+    # These operate on vectors as vectors, not component-wise.
+    
+    it 'length', ->
+      assert 'length [5, 5]', float, 7.0710678118654755
+    
+    it 'distance', ->
+      assert 'distance [5, 5], [3, 3]', float, 2.8284271247461903
+    
+    it 'dot', ->
+      assert 'dot [1, 0], [0, 1]', float, 0
+      assert 'dot [0, 1], [0, 1]', float, 1
+    
+    it 'cross', ->
+      # cross only works with vec3
+      expect(-> exec "cross [1, 1], [1, 1]").toThrow()
+      expect(-> exec "cross [1,1,1,1], [1,1,1,1]").toThrow()
+      assert 'cross [1,0,0], [0,1,0]', 'vec3', [0,0,1]
+      
+    it 'normalize', ->
+      assert 'normalize [0, 4]', 'vec2', [0, 1]
+      assert 'normalize [0, 4, 0]', 'vec3', [0, 1, 0]
+      assert 'normalize [0, 4, 0, 0]', 'vec4', [0, 1, 0, 0]
+      
+    it 'faceforward', ->
+      assert 'faceforward [1,0], [-1,0], [ 1, 1]', 'vec2', [1, 0]
+      assert 'faceforward [1,0], [-1,0], [-1, 1]', 'vec2', [-1, 0]
+      
+    it 'reflect', ->
+      assert 'reflect [0,-1,0], [0,1,0]', 'vec3', [0,1,0]
+    
+    it 'refract', ->
+      assert 'refract [0.707107, -0.707107], [0, 1], 0.9', 'vec2', [0.6363963, -0.7713625935017137]
