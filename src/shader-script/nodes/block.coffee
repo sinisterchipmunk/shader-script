@@ -14,6 +14,7 @@ exports.Block = class Block extends require('shader-script/glsl/nodes/block').Bl
     
     compiled_lines = (line.compile shader for line in @lines)
     for name, options of (shader.scope.delegate -> @definitions)
+      continue if options.builtin
       compiled_lines.unshift @glsl 'Variable', options.type(), @glsl('Identifier', options.name), options.qualified_name
       
     shader.scope.pop()

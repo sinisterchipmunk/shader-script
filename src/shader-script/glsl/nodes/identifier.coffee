@@ -6,9 +6,12 @@ class exports.Identifier extends require('shader-script/nodes/base').Base
     
   compile: (program) ->
     execute: =>
-      if program.state.variables[@children[0]]
-        program.state.variables[@children[0]].value
+      name = @children[0]
+      if program.state.variables[name]
+        program.state.variables[name].value
       else
-        throw new Error "Undefined variable: #{@children[0]}"
+        program.state.variables[name] = program.state.scope.lookup(name).as_options()
+        program.state.variables[name].value = Number.NaN if program.state.variables[name].value is undefined
+        program.state.variables[name].value
     toSource: => @children[0]
     

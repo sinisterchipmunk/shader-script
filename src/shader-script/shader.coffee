@@ -7,6 +7,11 @@ class exports.Shader
     @functions = {}
     @fn_args = {}
     
+    # define built-in variables
+    for name, builtins of Program.prototype.builtins._variables
+      for varname, definition of builtins
+        @scope.define_within varname, definition.as_options()
+    
   # Invoked whenever a function is compiled. Receives the name
   # of the function and a callback method. If any args
   # have been noted for the function, they will be passed into

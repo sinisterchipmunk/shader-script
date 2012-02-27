@@ -2,7 +2,28 @@
 
 try
   {Program} = require 'shader-script/glsl/program'
-  Program.prototype.builtins = {}
+  {Definition} = require 'shader-script/scope'
+  
+  d = (type, default_val) -> new Definition type: type, builtin: true, value: default_val
+  Program.prototype.builtins =
+    _variables:
+      common:
+        gl_MaxVertexAttribs: d 'int', 8
+        gl_MaxVertexUniformVectors: d 'int', 128
+        gl_MaxVaryingVectors: d 'int', 8
+        gl_MaxVertexTextureImageUnits: d 'int', 0
+        gl_MaxCombinedTextureImageUnits: d 'int', 8
+        gl_MaxTextureImageUnits: d 'int', 8
+        gl_MaxFragmentUniformVectors: d 'int', 16
+        gl_MaxDrawBuffers: d 'int', 1
+      vertex:
+        gl_Position: d 'vec4'
+        gl_PointSize: d 'float'
+      fragment:
+        gl_FragCoord: d 'vec4'
+        gl_FrontFacing: d 'bool'
+        gl_FragColor: d 'vec4'
+        gl_PointCoord: d 'vec2'
   
   class Extension
     # If type is null, it will default to the type of the first argument passed into

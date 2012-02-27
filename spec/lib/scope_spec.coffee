@@ -6,6 +6,13 @@ describe "scope", ->
   scope = null
   beforeEach -> scope = new Scope('a')
   
+  it "should not rescope outer variables (?)", ->
+    scope = new Scope()
+    outer = scope.define 'gl_Position', type: 'vec4'
+    scope.push('block').push('vertex').push('block')
+    inner = scope.define 'gl_Position'
+    expect(scope.all_definitions()[scope.qualifier(false)]).toContain(inner.qualified_name)
+    
   describe "looking up objects", ->
     it "should be looked up from a deeper scope", ->
       scope.define 'name'
@@ -69,6 +76,11 @@ describe "scope", ->
       scope.define 'name', type: null
       scope.define 'name', dependent: scope.define('other', type: 'int')
       expect(scope.lookup('name').type()).toEqual 'int'
+      
+    it "should not redefine in tighter scopes", ->
+      outer = scope.define 'name', type: 'int'
+      scope.push('b')
+      expect(scope.define('name', type: 'int')).toBe(outer)
       
   it "should not pop back past itself", ->
     b = scope.push('b')

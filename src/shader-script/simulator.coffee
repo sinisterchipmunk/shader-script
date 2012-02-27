@@ -1,14 +1,25 @@
 Glsl = require 'shader-script/glsl'
 
 exports.Simulator = class Simulator
+  assign_builtin_variables = (name, program) ->
+    builtins = program.builtins._variables[name]
+    for name, definition of builtins
+      program.state.scope.define name, definition.as_options()
+
+  compile_program = (type, state, source_code) ->
+    program = Glsl.compile source_code, state
+    assign_builtin_variables 'common', program
+    assign_builtin_variables type, program
+    program
+  
   # glsl is a json object laid out like:
   #     vertex: "string of glsl vertex shader code"
   #     fragment: "string of glsl fragment shader code"
   #
   constructor: (glsl) ->
     @state = {}
-    @vertex   = Glsl.compile glsl.vertex,   @state if glsl.vertex
-    @fragment = Glsl.compile glsl.fragment, @state if glsl.fragment
+    @vertex   = compile_program 'vertex', @state, glsl.vertex if glsl.vertex
+    @fragment = compile_program 'fragment', @state, glsl.fragment if glsl.fragment
     throw new Error("No programs found!") unless @vertex || @fragment
   
   start: (which = 'both') ->
@@ -28,3 +39,4 @@ exports.Simulator = class Simulator
     catch err
       err.message = "#{name}: #{err.message}"
       throw err
+      

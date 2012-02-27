@@ -23,7 +23,7 @@ class exports.Program
     @functions  = {}
     @state.variables or= {}
     @state.scope or= new Scope()
-  
+    
   # Produces a string representation of the GLSL code which produced this
   # program.
   toSource: () ->

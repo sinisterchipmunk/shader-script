@@ -7,6 +7,14 @@ exports.Definition = class Definition
   
   type: -> @explicit_type or @inferred_type()
   
+  as_options: ->
+    type: @type()
+    name: @name
+    qualified_name: @qualified_name
+    builtin: @builtin
+    dependents: @dependents
+    value: @value
+  
   inferred_type: ->
     for dep in @dependents
       type = dep.type()
@@ -28,6 +36,8 @@ exports.Definition = class Definition
   assign: (options) ->
     @name = options.name if options.name
     @qualified_name = options.qualified_name if options.qualified_name
+    @builtin = options.builtin if options.builtin
+    @value = options.value
     
     if options.type
       @set_type options.type
@@ -78,10 +88,11 @@ exports.Scope = class Scope
     result
     
   all_definitions: ->
-    result = []
-    result.push def.qualified_name for name, def of @definitions
+    result = {}
+    arr = result[this.qualifier(false)] = []
+    arr.push def.qualified_name for name, def of @definitions
     for id, subscope of @subscopes
-      result = result.concat subscope.all_definitions()
+      arr = arr.concat subscope.all_definitions()
     result
     
   qualifier: (delegate_to_subscope = true) ->
@@ -119,7 +130,6 @@ exports.Scope = class Scope
     @delegate -> @define_within name, options
     
   define_within: (name, options = {}) ->
-    # FIXME this method is getting ugly. Refactor!
     options.name or= name
     def = @lookup name, true
     if def
