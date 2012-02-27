@@ -15,6 +15,12 @@ try
       params = (param.execute() for param in params)
       @callback params...
       
+    # Invokes the named extension from JS.
+    @invoke: (name, args...) ->
+      if Program.prototype.builtins[name]
+        Program.prototype.builtins[name].callback(args...)
+      else throw new Error "No built-in function named #{name}"
+      
     toSource: -> "#{@return_type()} #{@name}(/* variable args */) { /* native code */ }"
   
   e = (args...) -> new Extension args...
@@ -40,6 +46,20 @@ try
   
   # Common functions, pp66-67
   e 'abs', 'float', Math.abs
+  e 'sign', 'float', (x) -> if x > 0 then 1 else (if x < 0 then -1 else 0)
+  e 'floor', 'float', Math.floor
+  e 'ceil', 'float', Math.ceil
+  e 'fract', 'float', (x) -> x - Math.floor(x)
+  e 'mod', 'float', (x,y) -> x - y * Math.floor(x/y)
+  e 'min', 'float', Math.min
+  e 'max', 'float', Math.max
+  e 'clamp', 'float', (x, min, max) -> Math.min(Math.max(x, min), max)
+  e 'mix', 'float', (min, max, a) -> min * (1 - a) + max * a
+  e 'step', 'float', (edge, x) -> if x < edge then 0 else 1
+  e 'smoothstep', 'float', (edge0, edge1, x) ->
+    t = Extension.invoke('clamp', (x - edge0) / (edge1 - edge0), 0, 1)
+    t * t * (3 - 2 * t)
+    
 catch e
   console.log e
   console.log "WARNING: continuing without builtins..."
