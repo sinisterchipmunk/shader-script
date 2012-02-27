@@ -7,12 +7,16 @@ class exports.Root extends require('shader-script/nodes/base').Base
   
   # Accepts an optional object representing program state. If omitted,
   # a new state will be created. The state is shared between the vertex
-  # and fragment programs, where applicable.
+  # and fragment programs, where applicable. The state can also be an 
+  # instance of Program.
   compile: (state = {}) ->
     # the compiled result will be internally linked to the following
     # Program. This makes it safe to call compile more than once, as it
     # will simply recompile against brand-new programs.
-    program = new Program state
+    if state instanceof Program
+      [program, state] = [state, state.state]
+    else
+      program = new Program state
     
     # build the root block node
     block_node = @block.compile program

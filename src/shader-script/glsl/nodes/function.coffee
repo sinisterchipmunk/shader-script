@@ -6,10 +6,15 @@ class exports.Function extends require('shader-script/nodes/base').Base
   type: -> @return_type
   
   compile: (program) ->
+    compiled_name = @name.toVariableName()
+
+    program.state.scope.push compiled_name
+
     compiled_arguments = (argument.compile program for argument in @arguments)
     compiled_block = @block.compile program
-    compiled_name = @name.toVariableName()
     originator = this
+    
+    program.state.scope.pop()
     
     execute: () ->
       name = compiled_name

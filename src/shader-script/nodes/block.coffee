@@ -4,7 +4,7 @@ exports.Block = class Block extends require('shader-script/glsl/nodes/block').Bl
   constructor: (lines = []) -> super lines
   
   compile: (shader) ->
-    # GLSL is statically typed, but Coffee/JS isn't. We're going to inference
+    # GLSL is statically typed, but Coffee/JS isn't. We're going to infer
     # variable names and types. But, they have to be declared before they can
     # be used in GLSL. So we will go ahead and compile @lines, then insert
     # the compiled variable declarations before finally returning the complete
@@ -13,9 +13,9 @@ exports.Block = class Block extends require('shader-script/glsl/nodes/block').Bl
     shader.scope.push @name
     
     compiled_lines = (line.compile shader for line in @lines)
-    for name, options of (shader.scope.delegate -> @definitions)
-      continue if options.builtin
-      compiled_lines.unshift @glsl 'Variable', options.type(), @glsl('Identifier', options.name), options.qualified_name
+    for name, definition of (shader.scope.delegate -> @definitions)
+      continue if definition.builtin
+      compiled_lines.unshift @glsl 'Variable', definition
       
     shader.scope.pop()
     

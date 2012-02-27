@@ -15,7 +15,7 @@ class exports.Param extends require('shader-script/nodes/base').Base
   compile: (shader) ->
     varn = @toVariableName()
     variable = shader.scope.define(varn, dependent: @variable())
-    result = @glsl 'Variable', null, @name.compile(shader), variable.qualified_name
+    result = @glsl 'Variable', variable
     # functions use this for mapping inferred types
     result.variable = variable
     result

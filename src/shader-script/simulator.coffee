@@ -1,4 +1,5 @@
 Glsl = require 'shader-script/glsl'
+{Program} = require 'shader-script/glsl/program'
 
 exports.Simulator = class Simulator
   assign_builtin_variables = (name, program) ->
@@ -7,9 +8,10 @@ exports.Simulator = class Simulator
       program.state.scope.define name, definition.as_options()
 
   compile_program = (type, state, source_code) ->
-    program = Glsl.compile source_code, state
+    program = new Program state
     assign_builtin_variables 'common', program
-    assign_builtin_variables type, program
+    assign_builtin_variables type,     program
+    program = Glsl.compile source_code, program
     program
   
   # glsl is a json object laid out like:
@@ -18,7 +20,7 @@ exports.Simulator = class Simulator
   #
   constructor: (glsl) ->
     @state = {}
-    @vertex   = compile_program 'vertex', @state, glsl.vertex if glsl.vertex
+    @vertex   = compile_program 'vertex',   @state, glsl.vertex   if glsl.vertex
     @fragment = compile_program 'fragment', @state, glsl.fragment if glsl.fragment
     throw new Error("No programs found!") unless @vertex || @fragment
   

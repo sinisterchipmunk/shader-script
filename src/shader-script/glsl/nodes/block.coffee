@@ -6,11 +6,13 @@ class exports.Block extends require('shader-script/nodes/base').Base
   compile: (program) ->
     throw new Error("too many children") if @children.length > 1
     
+    program.state.scope.push('block')
     lines = []
     if @lines
       for child in @lines
         _result = child.compile program
         lines.push _result if _result != null
+    program.state.scope.pop()
         
     execute: () -> (line.execute() for line in lines)
     toSource: () => 

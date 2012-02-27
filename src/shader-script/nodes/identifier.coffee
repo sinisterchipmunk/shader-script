@@ -5,5 +5,5 @@ class exports.Identifier extends require("shader-script/glsl/nodes/identifier").
   
   type: (shader) -> @variable(shader).type()
   
-  compile: ->
+  compile: (shader) ->
     @glsl 'Identifier', @children...

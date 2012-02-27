@@ -1,51 +1,6 @@
 {NameRegistry} = require 'shader-script/name_registry'
 
-exports.Definition = class Definition
-  constructor: (options = {}) ->
-    @dependents = []
-    @assign options
-  
-  type: -> @explicit_type or @inferred_type()
-  
-  as_options: ->
-    type: @type()
-    name: @name
-    qualified_name: @qualified_name
-    builtin: @builtin
-    dependents: @dependents
-    value: @value
-  
-  inferred_type: ->
-    for dep in @dependents
-      type = dep.type()
-      return type if type
-    undefined
-    
-  set_type: (type) ->
-    if type
-      current_type = @type()
-      if current_type and type != current_type
-        throw new Error(
-          "Variable '#{@qualified_name}' redefined with conflicting type: #{@type()} redefined as #{type}"
-        )
-      @explicit_type = type if type
-    
-  add_dependent: (dep) ->
-    @dependents.push dep
-  
-  assign: (options) ->
-    @name = options.name if options.name
-    @qualified_name = options.qualified_name if options.qualified_name
-    @builtin = options.builtin if options.builtin
-    @value = options.value
-    
-    if options.type
-      @set_type options.type
-    if options.dependents
-      @add_dependent dependent for dependent in options.dependents
-    if options.dependent
-      @add_dependent options.dependent
-    
+exports.Definition = Definition = require('shader-script/definition').Definition
 
 # Basically, just push scopes together / pop them apart, and then define()
 # and lookup() variables within them.
@@ -76,7 +31,7 @@ exports.Definition = class Definition
 #    scope.pop() # at root level this actually does nothing
 #
 exports.Scope = class Scope
-  constructor: (@name = null, @parent = null) ->
+  constructor: (@name = "root", @parent = null) ->
     @subscopes = {}
     @definitions = {}
     @registry = new NameRegistry()
@@ -92,7 +47,9 @@ exports.Scope = class Scope
     arr = result[this.qualifier(false)] = []
     arr.push def.qualified_name for name, def of @definitions
     for id, subscope of @subscopes
-      arr = arr.concat subscope.all_definitions()
+      sub = subscope.all_definitions()
+      for qualifier, array of sub
+        result[qualifier] = array
     result
     
   qualifier: (delegate_to_subscope = true) ->
@@ -139,6 +96,9 @@ exports.Scope = class Scope
       def = new Definition options
 
     @definitions[name] = def
+    
+  # Returns the current scope instance. Equivalent to `scope.delegate -> this`
+  current: -> @delegate -> this
         
   # searches for the name within only this scope and its subscopes.
   # The name must be fully qualified beginning with this scope,

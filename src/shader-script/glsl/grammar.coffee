@@ -145,6 +145,11 @@ grammar =
     o 'Type ArgumentList', -> new TypeConstructor $1, $2
   ]
   
+  Return: [
+    o 'RETURN', -> new Return
+    o 'RETURN Expression', -> new Return $2
+  ]
+  
   Type: [
     o 'VOID'
     o 'BOOL'

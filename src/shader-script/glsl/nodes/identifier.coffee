@@ -1,17 +1,21 @@
+{Definition} = require 'shader-script/scope'
+
 class exports.Identifier extends require('shader-script/nodes/base').Base
   name: "_identifier"
   
   toVariableName: ->
-    @children[0]
+    if @children[0] instanceof Definition
+      @children[0].name
+    else
+      @children[0]
     
   compile: (program) ->
-    execute: =>
-      name = @children[0]
-      if program.state.variables[name]
-        program.state.variables[name].value
-      else
-        program.state.variables[name] = program.state.scope.lookup(name).as_options()
-        program.state.variables[name].value = Number.NaN if program.state.variables[name].value is undefined
-        program.state.variables[name].value
-    toSource: => @children[0]
+    if @children[0] instanceof Definition
+      variable = @children[0]
+    else
+      # console.log @children[0], program.state.scope.all_definitions()
+      variable = program.state.scope.lookup(@toVariableName())
+    
+    execute:  => variable.value
+    toSource: => variable.name
     

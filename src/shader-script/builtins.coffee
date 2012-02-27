@@ -132,5 +132,6 @@ try
   e 'textureCubeLod', 'vec4', -> [1, 1, 1, 1]
 catch e
   console.log e
+  console.log e.stack
   console.log "WARNING: continuing without builtins..."
   
