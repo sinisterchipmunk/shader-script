@@ -17,8 +17,7 @@ describe "built-in functions", ->
     expect(sim.state.variables.x.type()).toEqual expected_type
     expect(sim.state.variables.x.value).toEqual expected_value
   
-  # Trigonometric functions, p65
-  describe 'angle and trigonometry functions', ->
+  describe 'angle and trigonometry functions, p65', ->
     # Function parameters specified as angle are assumed to be in units of radians.  In no case will any of these
     # functions result in a divide by zero error.  If the divisor of a ratio is 0, then results will be undefined.
     # These all operate component-wise.  The description is per component.
@@ -52,8 +51,7 @@ describe "built-in functions", ->
     it "atan(y_over_x)", ->
       assert "atan 0.5", float, Math.atan 0.5
       
-  # Exponential functions, p65
-  describe 'exponential functions', ->
+  describe 'exponential functions, p65', ->
     # These all operate component-wise.  The description is per component.
     
     it 'pow', ->
@@ -78,8 +76,7 @@ describe "built-in functions", ->
       assert 'inversesqrt 4', float, 1 / Math.sqrt 4
       
     
-  # Common functions, pp66-67
-  describe 'common functions', ->
+  describe 'common functions, pp66-67', ->
     # These all operate component-wise.  The description is per component.
     
     it 'abs', ->
@@ -146,8 +143,7 @@ describe "built-in functions", ->
       assert 'smoothstep 1, 3, 3', float, 1
       assert 'smoothstep 1, 3, 4', float, 1
 
-  # Geometric functions, pp68-69
-  describe 'geometric functions', ->
+  describe 'geometric functions, pp68-69', ->
     # These operate on vectors as vectors, not component-wise.
     
     it 'length', ->
@@ -181,10 +177,31 @@ describe "built-in functions", ->
     it 'refract', ->
       assert 'refract [0.707107, -0.707107], [0, 1], 0.9', 'vec2', [0.6363963, -0.7713625935017137]
 
-  # Matrix functions, p69
-  describe 'matrix functions', ->
+  describe 'matrix functions, p69', ->
     it 'matrixCompMult', ->
       # since it works component-wise, it doesn't really matter
       # what we give it as long as the args are arrays
       assert 'matrixCompMult [1,2,3], [3,2,1]', 'vec3', [3, 4, 3]
       
+  describe "texture lookup functions, pp71-72", ->
+    # These are only implemented to prevent error conditions, they
+    # only actually return white.
+    
+    it 'texture2D', ->
+      assert 'texture2D 1, [1,1]', 'vec4', [1, 1, 1, 1]
+      
+    it 'texture2DProj', ->
+      assert 'texture2DProj 1, [1,1,1]', 'vec4', [1, 1, 1, 1]
+      
+    it 'texture2DLod', ->
+      assert 'texture2DLod 1, [1,1], 1', 'vec4', [1, 1, 1, 1]
+      
+    it 'texture2DProjLod', ->
+      assert 'texture2DProjLod 1, [1,1,1], 1', 'vec4', [1, 1, 1, 1]
+      
+    it 'textureCube', ->
+      assert 'textureCube 1, [1,1,1]', 'vec4', [1, 1, 1, 1]
+      
+    it 'textureCubeLod', ->
+      assert 'textureCubeLod 1, [1,1,1], 1', 'vec4', [1, 1, 1, 1]
+  

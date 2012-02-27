@@ -100,6 +100,15 @@ try
   e 'matrixCompMult', null, (x, y) ->
     x[i] * y[i] for i of x
     
+  # Texture lookup functions, pp71-72
+  # These are only implemented to prevent error conditions, they
+  # only actually return white.
+  e 'texture2D', 'vec4', -> [1, 1, 1, 1]
+  e 'texture2DLod', 'vec4', -> [1, 1, 1, 1]
+  e 'texture2DProj', 'vec4', -> [1, 1, 1, 1]
+  e 'texture2DProjLod', 'vec4', -> [1, 1, 1, 1]
+  e 'textureCube', 'vec4', -> [1, 1, 1, 1]
+  e 'textureCubeLod', 'vec4', -> [1, 1, 1, 1]
 catch e
   console.log e
   console.log "WARNING: continuing without builtins..."
