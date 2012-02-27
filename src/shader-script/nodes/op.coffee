@@ -4,6 +4,8 @@ class exports.Op extends require('shader-script/nodes/base').Base
   
   type: (shader) -> @left.type(shader) or @right.type(shader)
   
+  variable: (shader) -> @left.variable(shader) or @right.variable(shader)
+  
   compile: (shader) ->
     left = @left.compile shader
     op = @op
