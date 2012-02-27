@@ -180,3 +180,11 @@ describe "built-in functions", ->
     
     it 'refract', ->
       assert 'refract [0.707107, -0.707107], [0, 1], 0.9', 'vec2', [0.6363963, -0.7713625935017137]
+
+  # Matrix functions, p69
+  describe 'matrix functions', ->
+    it 'matrixCompMult', ->
+      # since it works component-wise, it doesn't really matter
+      # what we give it as long as the args are arrays
+      assert 'matrixCompMult [1,2,3], [3,2,1]', 'vec3', [3, 4, 3]
+      

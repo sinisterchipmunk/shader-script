@@ -95,6 +95,11 @@ try
     k = 1 - eta * eta * (1 - dotNI * dotNI)
     if k < 0 then (0 for x in I)
     else eta * I[i] - (eta * dotNI + Math.sqrt(k)) * N[i] for i of I
+    
+  # Matrix functions, p69
+  e 'matrixCompMult', null, (x, y) ->
+    x[i] * y[i] for i of x
+    
 catch e
   console.log e
   console.log "WARNING: continuing without builtins..."
