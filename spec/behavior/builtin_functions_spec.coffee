@@ -46,3 +46,28 @@ describe "built-in functions", ->
     it "atan(y_over_x)", ->
       assert "atan 0.5", 'float', Math.atan 0.5
       
+  describe 'exponential functions', ->
+    # These all operate component-wise.  The description is per component.
+    
+    it 'pow', ->
+      assert 'pow 2, 2', 'float', Math.pow(2, 2)
+      
+    it 'exp', ->
+      assert 'exp 4', 'float', Math.exp(4)
+      
+    it 'log', ->
+      assert 'log 4', 'float', Math.log 4
+      
+    it 'exp2', ->
+      assert 'exp2 4', 'float', Math.pow 2, 4
+      
+    it 'log2', ->
+      assert 'log2 16', 'float', 4
+      
+    it 'sqrt', ->
+      assert 'sqrt 4', 'float', 2
+      
+    it 'inversesqrt', ->
+      assert 'inversesqrt 4', 'float', 1 / Math.sqrt 4
+      
+    

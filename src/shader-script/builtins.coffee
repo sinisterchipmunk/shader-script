@@ -1,3 +1,5 @@
+# http://www.khronos.org/registry/gles/specs/2.0/GLSL_ES_Specification_1.0.17.pdf
+
 try
   {Program} = require 'shader-script/glsl/program'
   Program.prototype.builtins = {}
@@ -15,15 +17,27 @@ try
       
     toSource: -> "#{@return_type()} #{@name}(/* variable args */) { /* native code */ }"
   
-  # Trigonometric functions
-  new Extension 'radians', 'float', (d) -> d * Math.PI / 180
-  new Extension 'degrees', 'float', (r) -> r / Math.PI * 180
-  new Extension 'sin', 'float', Math.sin
-  new Extension 'cos', 'float', Math.cos
-  new Extension 'tan', 'float', Math.tan
-  new Extension 'asin', 'float', Math.asin
-  new Extension 'acos', 'float', Math.acos
-  new Extension 'atan', 'float', (y, x) -> if x is undefined then Math.atan y else Math.atan2 y, x
+  e = (args...) -> new Extension args...
+
+  # Trigonometric functions, p65
+  e 'radians', 'float', (d) -> d * Math.PI / 180
+  e 'degrees', 'float', (r) -> r / Math.PI * 180
+  e 'sin', 'float', Math.sin
+  e 'cos', 'float', Math.cos
+  e 'tan', 'float', Math.tan
+  e 'asin', 'float', Math.asin
+  e 'acos', 'float', Math.acos
+  e 'atan', 'float', (y, x) -> if x is undefined then Math.atan y else Math.atan2 y, x
+  
+  # Exponential functions, p65
+  e 'pow', 'float', Math.pow
+  e 'exp', 'float', Math.exp
+  e 'log', 'float', Math.log
+  e 'exp2', 'float', (x) -> Math.pow 2, x
+  e 'log2', 'float', (x) -> Math.log(x) / Math.log 2
+  e 'sqrt', 'float', Math.sqrt
+  e 'inversesqrt', 'float', (x) -> 1 / Math.sqrt(x)
+  
 catch e
   console.log e
   console.log "WARNING: continuing without builtins..."
