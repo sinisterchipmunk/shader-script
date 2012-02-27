@@ -38,6 +38,8 @@ try
   e 'sqrt', 'float', Math.sqrt
   e 'inversesqrt', 'float', (x) -> 1 / Math.sqrt(x)
   
+  # Common functions, pp66-67
+  e 'abs', 'float', Math.abs
 catch e
   console.log e
   console.log "WARNING: continuing without builtins..."

@@ -12,6 +12,7 @@ describe "built-in functions", ->
     expect(sim.state.variables.x.type()).toEqual expected_type
     expect(sim.state.variables.x.value).toEqual expected_value
   
+  # Trigonometric functions, p65
   describe 'angle and trigonometry functions', ->
     # Function parameters specified as angle are assumed to be in units of radians.  In no case will any of these
     # functions result in a divide by zero error.  If the divisor of a ratio is 0, then results will be undefined.
@@ -46,6 +47,7 @@ describe "built-in functions", ->
     it "atan(y_over_x)", ->
       assert "atan 0.5", 'float', Math.atan 0.5
       
+  # Exponential functions, p65
   describe 'exponential functions', ->
     # These all operate component-wise.  The description is per component.
     
@@ -70,4 +72,25 @@ describe "built-in functions", ->
     it 'inversesqrt', ->
       assert 'inversesqrt 4', 'float', 1 / Math.sqrt 4
       
+    
+  # Common functions, pp66-67
+  describe 'common functions', ->
+    # These all operate component-wise.  The description is per component.
+    
+    it 'abs', ->
+      assert 'abs  0', 'float', 0
+      assert 'abs -1', 'float', 1
+      assert 'abs  2', 'float', 2
+      
+    it 'sign', ->
+    it 'floor', ->
+    it 'ceil', ->
+    it 'fract', ->
+    it 'mod', ->
+    it 'min', ->
+    it 'max', ->
+    it 'clamp', ->
+    it 'mix', ->
+    it 'step', ->
+    it 'smoothstep', ->
     
