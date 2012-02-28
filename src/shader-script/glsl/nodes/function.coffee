@@ -23,6 +23,7 @@ class exports.Function extends require('shader-script/nodes/base').Base
       program.functions[name] =
         return_type: -> originator.type()
         arguments: args
+        is_function: true
         invoke: (params...) ->
           try
             if args.length != params.length
@@ -36,6 +37,10 @@ class exports.Function extends require('shader-script/nodes/base').Base
             else throw e
         toSource: (overriding_fn_name) => @toSource overriding_fn_name
       
+    is_function: true
+    
+    name: compiled_name
+    
     # overriding_fn_name allows us to rename functions as needed. This is mostly
     # so that fns like 'vertex' and 'fragment' can be easily renamed to 'main'
     # during compilation.

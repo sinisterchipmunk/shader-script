@@ -91,12 +91,16 @@ grammar =
   # Pure statements which cannot be expressions.
   Statement: [
     o 'Return TERMINATOR'
-    o 'Comment TERMINATOR'
     o 'FunctionDefinition' # no terminator necessary here because of { ... }
+    o 'Comment'            # also no terminator for comments
     o 'FunctionDeclaration TERMINATOR'
     o 'VariableDeclaration TERMINATOR'
     o 'STATEMENT TERMINATOR',                              -> new Literal $1
     o 'TERMINATOR', -> (compile: -> null)
+  ]
+  
+  Comment: [
+    o 'HERECOMMENT', -> new Comment $1
   ]
   
   VariableDeclaration: [

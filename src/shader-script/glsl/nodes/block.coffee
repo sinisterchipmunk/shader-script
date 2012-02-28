@@ -8,10 +8,13 @@ class exports.Block extends require('shader-script/nodes/base').Base
     
     program.state.scope.push('block')
     lines = []
+    qual = program.state.scope.qualifier()
     if @lines
       for child in @lines
         _result = child.compile program
-        lines.push _result if _result != null
+        if _result != null
+          lines.push _result
+          program.nodes.push _result if qual == 'root.block'
     program.state.scope.pop()
         
     execute: () -> (line.execute() for line in lines)
