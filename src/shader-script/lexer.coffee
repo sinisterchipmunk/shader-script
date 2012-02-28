@@ -120,7 +120,7 @@ exports.Lexer = class Lexer
         when '!'                                  then 'UNARY'
         when '==', '!='                           then 'COMPARE'
         when '&&', '||'                           then 'LOGIC'
-        when 'true', 'false', 'null', 'undefined' then 'BOOL'
+        when 'true', 'false', 'null', 'undefined' then 'BOOLEAN_VALUE'
         when 'break', 'continue'                  then 'STATEMENT'
         else  tag
 
@@ -724,7 +724,7 @@ BOOL = ['TRUE', 'FALSE', 'NULL', 'UNDEFINED']
 # See: http://www.mozilla.org/js/language/js20-2002-04/rationale/syntax.html#regular-expressions
 #
 # Our list is shorter, due to sans-parentheses method calls.
-NOT_REGEX = ['NUMBER', 'REGEX', 'BOOL', '++', '--', ']']
+NOT_REGEX = ['NUMBER', 'REGEX', 'BOOLEAN_VALUE', '++', '--', ']']
 
 # If the previous token is not spaced, there are more preceding tokens that
 # force a division parse:
@@ -733,8 +733,15 @@ NOT_SPACED_REGEX = NOT_REGEX.concat ')', '}', 'THIS', 'IDENTIFIER', 'STRING'
 # Tokens which could legitimately be invoked or indexed. An opening
 # parentheses or bracket following these tokens will be recorded as the start
 # of a function invocation or indexing operation.
-CALLABLE  = ['IDENTIFIER', 'STRING', 'REGEX', ')', ']', '}', '?', '::', '@', 'THIS', 'SUPER']
-INDEXABLE = CALLABLE.concat 'NUMBER', 'BOOL'
+CALLABLE  = ['IDENTIFIER', 'STRING', 'REGEX', ')', ']', '}', '?', '::', '@', 'THIS', 'SUPER',
+             'FLOAT', 'INT', 'BOOL',
+             'MAT2', 'MAT3', 'MAT4',
+             'MAT2X2', 'MAT2X3', 'MAT2X4',
+             'MAT3X2', 'MAT3X3', 'MAT3X4',
+             'MAT4X2', 'MAT4X3', 'MAT4X4',
+             'VEC2', 'VEC3', 'VEC4', 'IVEC2', 'IVEC3', 'IVEC4', 'BVEC2', 'BVEC3', 'BVEC4',
+            ]
+INDEXABLE = CALLABLE.concat 'NUMBER', 'BOOLEAN_VALUE'
 
 # Tokens that, when immediately preceding a `WHEN`, indicate that the `WHEN`
 # occurs at the start of a line. We disambiguate these from trailing whens to

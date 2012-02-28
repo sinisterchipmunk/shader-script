@@ -98,6 +98,7 @@ grammar =
     o 'Switch'
     o 'Class'
     o 'Throw'
+    o 'GlslTypeConstructor'
   ]
 
   # An indented block of expressions. Note that the [Rewriter](rewriter.html)
@@ -127,7 +128,7 @@ grammar =
     o 'JS',                                     -> new Literal $1
     o 'REGEX',                                  -> new Literal $1
     o 'DEBUGGER',                               -> new Literal $1
-    o 'BOOL',                                   ->
+    o 'BOOLEAN_VALUE',                          ->
       val = new Literal $1
       val.isUndefined = yes if $1 is 'undefined'
       val
@@ -201,7 +202,7 @@ grammar =
     o 'ParamVar',                               -> new Param $1
     o 'ParamVar ...',                           -> new Param $1, null, on
     o 'ParamVar = Expression',                  -> new Param $1, $3
-    o 'GlslType Param',                         -> $2.set_type $1; $2
+    o 'GlslType CALL_START Param CALL_END',     -> $3.set_type $1; $3
   ]
 
  # Function Parameters
@@ -543,8 +544,6 @@ grammar =
     o 'SimpleAssignable EXTENDS Expression',    -> new Extends $1, $3
   ]
   
-  
-  
   GlslType: [
     o 'VOID'
     o 'BOOL'
@@ -579,7 +578,10 @@ grammar =
     o 'SAMPLER2DSHADOW'
   ]
   
-
+  GlslTypeConstructor: [
+    o 'GlslType Arguments', -> new TypeConstructor $1, $2
+  ]
+  
 
 # Precedence
 # ----------

@@ -32,9 +32,12 @@ class exports.Variable extends require('shader-script/nodes/base').Base
 
     qualifier = program.state.scope.qualifier()
     if qualifier == 'root.block' or qualifier == 'root.block.main.block'
+      # provides convenient access to "important" variables
       program.state.variables[name] = variable
 
     execute: => variable.value
-    toSource: => "#{variable.type()} #{variable.name}"
+    toSource: =>
+      "#{variable.type()} #{variable.name}"
+        
     variable: variable
     

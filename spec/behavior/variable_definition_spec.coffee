@@ -8,6 +8,8 @@ describe 'variable definition', ->
     expect(code.vertex).toMatch /int x/
     simulate(code).state.variables.x.type.should == 'int'
     
+  
+    
   it "should allow use of the same variable name in different functions", ->
     code = glsl """
       one = -> x = 1; return x
@@ -15,10 +17,7 @@ describe 'variable definition', ->
       
       vertex = -> x = 0; y = one(); z = two()
     """
-    # console.log code.vertex
     sim = simulate vertex: code.vertex
-    # console.log sim.state.scope.all_definitions()
-    # console.log sim.state.variables
     expect(sim.state.variables.x.value).toEqual 0
     expect(sim.state.variables.y.value).toEqual 1
     expect(sim.state.variables.z.value).toEqual 2

@@ -14,3 +14,9 @@ describe 'type constructors', ->
       sim = simulate vertex: code.vertex
       expect(sim.state.variables.v.type()).toEqual 'vec4'
       
+  describe "explicit assignment", ->
+    it "should generate code properly", ->
+      code = glsl "v = int 1"
+      expect(code.vertex).toMatch /int v/
+      expect(code.vertex).toMatch /v = int\(1(\.0)?\);/
+      
