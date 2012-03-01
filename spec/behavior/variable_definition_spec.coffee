@@ -8,8 +8,6 @@ describe 'variable definition', ->
     expect(code.vertex).toMatch /int x/
     simulate(code).state.variables.x.type.should == 'int'
     
-  
-    
   it "should allow use of the same variable name in different functions", ->
     code = glsl """
       one = -> x = 1; return x
@@ -36,11 +34,7 @@ describe 'variable definition', ->
     expect(code.vertex).toMatch /x = 1.0/
 
   it "should complain about mismatched variable types", ->
-    expect(try
-      glsl 'vertex = -> x = true; x = 1.0'
-    catch e
-      e.toString()
-    ).toMatch(/redefined with conflicting type: bool redefined as float/)
+    expect(-> glsl 'vertex = -> x = true; x = 1.0').toThrow()
     
   it "should infer proper local variable type", ->
     code = glsl """

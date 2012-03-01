@@ -9,13 +9,22 @@ class exports.Identifier extends require('shader-script/nodes/base').Base
     else
       @children[0]
     
-  compile: (program) ->
-    if @children[0] instanceof Definition
-      variable = @children[0]
-    else
-      # console.log @children[0], program.state.scope.all_definitions()
-      variable = program.state.scope.lookup(@toVariableName())
+  cast: (type, program) ->
+    current_type = @type program
+    if type == null or type is undefined then return
+    if type == current_type then return
+    if current_type
+      throw new Error "Cannot implicitly cast #{current_type} to #{type}"
+    @variable(program).set_type type
     
+  variable: (program) ->
+    if @children[0] instanceof Definition then @children[0]
+    else program.state.scope.lookup @toVariableName()
+    
+  type: (program) -> @variable(program).type()
+
+  compile: (program) ->
+    variable = @variable program
     execute:  => variable.value
     toSource: => variable.name
     

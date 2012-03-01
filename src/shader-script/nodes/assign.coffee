@@ -18,7 +18,17 @@ class exports.Assign extends require("shader-script/glsl/nodes/assign").Assign
         throw new Error "Can't use #{JSON.stringify left} as lvalue"
       
       dependent = @right.variable(shader) if @right.variable
-      shader.scope.define left.toVariableName(), type: @right.type(shader), dependent: dependent
+      varname = left.toVariableName()
+      
+      # Try to cast right to compatible type
+      existing = shader.scope.lookup varname, true
+      if existing
+        type = existing.type()
+        right.cast(type, state: shader)
+      else
+        type = @right.type(shader)
+        
+      shader.scope.define left.toVariableName(), type: type, dependent: dependent
 
       @glsl 'Assign', left, right
       

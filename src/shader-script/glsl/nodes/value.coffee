@@ -10,3 +10,5 @@ class exports.Value extends require('shader-script/nodes/base').Base
 
   compile: (shader) ->
     @children[0].compile shader
+
+  cast: (type, program) -> @children[0].cast(type, program)

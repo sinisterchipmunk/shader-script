@@ -20,3 +20,12 @@ describe 'type constructors', ->
       expect(code.vertex).toMatch /int v/
       expect(code.vertex).toMatch /v = int\(1(\.0)?\);/
       
+    it "should not assign float values to known ints", ->
+      code = glsl "v = int 1; v = 2"
+      expect(code.vertex).toMatch /v = 2;/
+      
+    it "should simulate properly", ->
+      sim = simulate vertex: glsl("v = int 1\nvertex = -> v = 2").vertex
+      expect(sim.state.variables.v.value).toEqual 2
+      expect(sim.state.variables.v.type()).toEqual 'int'
+      

@@ -8,4 +8,4 @@ class exports.Value extends require("shader-script/glsl/nodes/value").Value
   
   variable: (shader) ->
     @children[0].variable && @children[0].variable(shader)
-    
+  

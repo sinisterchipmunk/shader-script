@@ -3,6 +3,9 @@ class exports.TypeConstructor extends require('shader-script/nodes/base').Base
   
   children: -> [ 'cast_type', 'arguments' ]
   
+  cast: (type, shader) ->
+    return if !type
+    
   type: (shader) ->
     if typeof(@cast_type) == 'string'
       @cast_type
