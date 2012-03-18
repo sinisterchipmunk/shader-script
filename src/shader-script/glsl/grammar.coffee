@@ -156,8 +156,8 @@ grammar =
   ]
   
   Parenthetical: [
-    o '( Body )',                               -> new Parens $2
-    o '( INDENT Body OUTDENT )',                -> new Parens $3
+    o '( Expression )',                               -> new Parens $2
+    o '( INDENT Expression OUTDENT )',                -> new Parens $3
   ]
   
   Type: [
