@@ -86,6 +86,7 @@ grammar =
     o 'TypeConstructor'
     o 'FunctionCall'
     o 'Operation'
+    o 'Parenthetical'
   ]
   
   # Pure statements which cannot be expressions.
@@ -152,6 +153,11 @@ grammar =
   Return: [
     o 'RETURN', -> new Return
     o 'RETURN Expression', -> new Return $2
+  ]
+  
+  Parenthetical: [
+    o '( Body )',                               -> new Parens $2
+    o '( INDENT Body OUTDENT )',                -> new Parens $3
   ]
   
   Type: [

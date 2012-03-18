@@ -3,6 +3,8 @@ exports.Block = class Block extends require('shader-script/glsl/nodes/block').Bl
   
   constructor: (lines = []) -> super lines
   
+  type: (shader) -> @lines[@lines.length-1].type shader
+  
   compile: (shader) ->
     # GLSL is statically typed, but Coffee/JS isn't. We're going to infer
     # variable names and types. But, they have to be declared before they can
