@@ -14,9 +14,10 @@ class exports.Block extends require('shader-script/nodes/base').Base
         _result = child.compile program
         if _result != null
           lines.push _result
-          program.nodes.push _result if qual == 'root.block'
     program.state.scope.pop() if @options.scope
         
+    lines: lines
+    is_block: true
     execute: () -> (line.execute() for line in lines)
     toSource: () => 
       indent = if @options and @options.scope then "  " else ""

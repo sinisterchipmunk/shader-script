@@ -21,6 +21,9 @@ class exports.Root extends require('shader-script/nodes/base').Base
     # build the root block node
     block_node = @block.compile program
     
+    for line in block_node.lines
+      program.nodes.push line
+    
     # now we need to execute the root block. The only code that this
     # actually executes is meta-code, like variable declarations and
     # function definitions. It's an important step, or else `main`

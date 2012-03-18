@@ -34,6 +34,8 @@ class exports.Program
   # Produces a string representation of the GLSL code which produced this
   # program.
   toSource: () ->
+    # FIXME we should just be able to:
+    # (node.toSource() for node in @nodes).join("\n")
     str = []
     for node in @nodes
       if node.is_function
@@ -41,7 +43,7 @@ class exports.Program
           str.push node.toSource('main')
         else
           str.push node.toSource()
-      else if node.is_comment
+      else if node.is_comment or node.is_block
         str.push node.toSource()
       else
         str.push node.toSource() + ";"

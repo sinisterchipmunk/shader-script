@@ -20,3 +20,7 @@ describe "storage qualifiers", ->
       # console.log code.vertex
       expect(code.vertex).toMatch /gl_Position = mvp \* position;/
       
+    it "should not declare them twice", ->
+      code = glsl 'uniforms = mat4: mv'
+      expect(code.vertex.indexOf('uniform mat4 mv')).toEqual code.vertex.lastIndexOf 'uniform mat4 mv'
+    

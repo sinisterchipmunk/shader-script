@@ -1503,14 +1503,13 @@
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           child = _ref[_i];
           _result = child.compile(program);
-          if (_result !== null) {
-            lines.push(_result);
-            if (qual === 'root.block') program.nodes.push(_result);
-          }
+          if (_result !== null) lines.push(_result);
         }
       }
       if (this.options.scope) program.state.scope.pop();
       return {
+        lines: lines,
+        is_block: true,
         execute: function() {
           var line, _j, _len2, _results;
           _results = [];
@@ -2074,7 +2073,7 @@
     };
 
     Root.prototype.compile = function(state) {
-      var block_node, name, options, program, subscope, _ref, _ref2;
+      var block_node, line, name, options, program, subscope, _i, _len, _ref, _ref2, _ref3;
       if (state == null) state = {};
       if (state instanceof Program) {
         _ref = [state, state.state], program = _ref[0], state = _ref[1];
@@ -2082,11 +2081,16 @@
         program = new Program(state);
       }
       block_node = this.block.compile(program);
+      _ref2 = block_node.lines;
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        line = _ref2[_i];
+        program.nodes.push(line);
+      }
       block_node.execute();
       if (subscope = state.scope.subscopes['block']) {
-        _ref2 = subscope.definitions;
-        for (name in _ref2) {
-          options = _ref2[name];
+        _ref3 = subscope.definitions;
+        for (name in _ref3) {
+          options = _ref3[name];
           program.variables.push({
             name: name,
             type: options.type(),
@@ -2842,7 +2846,7 @@ if (typeof module !== 'undefined' && require.main === module) {
           } else {
             str.push(node.toSource());
           }
-        } else if (node.is_comment) {
+        } else if (node.is_comment || node.is_block) {
           str.push(node.toSource());
         } else {
           str.push(node.toSource() + ";");
