@@ -6,7 +6,7 @@ class exports.Block extends require('shader-script/nodes/base').Base
   compile: (program) ->
     throw new Error("too many children") if @children.length > 1
     
-    program.state.scope.push('block')
+    program.state.scope.push('block') if @options.scope
     lines = []
     qual = program.state.scope.qualifier()
     if @lines
@@ -15,7 +15,7 @@ class exports.Block extends require('shader-script/nodes/base').Base
         if _result != null
           lines.push _result
           program.nodes.push _result if qual == 'root.block'
-    program.state.scope.pop()
+    program.state.scope.pop() if @options.scope
         
     execute: () -> (line.execute() for line in lines)
     toSource: () => 

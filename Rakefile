@@ -29,7 +29,7 @@ namespace :test do
 end
 
 desc "build everything"
-task :build => [:js]
+task :build => ['build:js']
 
 desc "build all js files and then run all tests"
 task :default => [ 'build:js', 'test:js' ]

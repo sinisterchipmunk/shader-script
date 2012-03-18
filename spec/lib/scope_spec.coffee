@@ -1,10 +1,21 @@
 require 'spec_helper'
 
-{Scope} = require 'shader-script/scope'
+{Scope, Definition} = require 'shader-script/scope'
 
 describe "scope", ->
   scope = null
   beforeEach -> scope = new Scope('a')
+  
+  it "should lock and unlock", ->
+    scope.lock()
+    expect(scope.lookup('whatever1')).toBeInstanceOf(Definition)
+    whatever2 = scope.define('whatever2')
+    expect(scope.lookup('whatever2')).not.toBe(whatever2)
+    
+    scope.unlock()
+    expect(-> scope.lookup("whatever_else")).toThrow()
+    whatever_else = scope.define('whatever_else')
+    expect(-> scope.lookup('whatever_else')).not.toThrow()
   
   it "should not rescope outer variables (?)", ->
     scope = new Scope()

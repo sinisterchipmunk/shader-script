@@ -79,6 +79,34 @@ grammar =
     o 'Return'
     o 'Comment'
     o 'STATEMENT',                              -> new Literal $1
+    o 'StorageQualifier = { StorageQualifierAssigns }',   -> new StorageQualifier $1, $4
+    o 'StorageQualifier = INDENT { StorageQualifierAssigns } OUTDENT',  -> new StorageQualifier $1, $5
+  ]
+  
+  StorageQualifier: [
+    o 'UNIFORMS'
+    o 'VARYINGS'
+    o 'CONSTS'
+    o 'ATTRIBUTES'
+  ]
+  
+  StorageQualifierAssigns: [
+    o 'StorageQualifierAssign', -> [ $1 ]
+    o 'StorageQualifierAssigns OptComma TERMINATOR StorageQualifierAssign', -> $1.concat $4
+  ]
+
+  StorageQualifierAssign: [
+    o 'Identifier : StorageQualifierName', -> type: $1, names: [$3]
+    o 'Identifier : [ StorageQualifierNameList ]', -> type: $1, names: $4
+  ]
+  
+  StorageQualifierName: [
+    o 'Identifier', -> $1
+  ]
+  
+  StorageQualifierNameList: [
+    o 'StorageQualifierName', -> [ $1 ]
+    o 'StorageQualifierNameList , StorageQualifierName', -> $1.push $3; $1
   ]
 
   # All the different types of expressions in our language. The basic unit of

@@ -36,6 +36,17 @@ exports.Scope = class Scope
     @definitions = {}
     @registry = new NameRegistry()
     
+  # Causes calls to #define to create a variable instance, but
+  # not save it to this scope; and causes calls to #lookup which
+  # reference variables that are not defined to return new instances
+  # of Definition representing the missing variable, but does not save
+  # those instances to this scope.
+  lock: -> @delegate -> @locked = true
+
+  # Reverts the #lock method, so that errors are once again raised
+  # by #lookup and variables are once again saved by #define.
+  unlock: -> @delegate -> @locked = false
+
   all_qualifiers: ->
     result = [@qualifier(false)]
     for id, subscope of @subscopes
@@ -94,7 +105,8 @@ exports.Scope = class Scope
     else
       options.qualified_name = @qualifier() + "." + name
       def = new Definition options
-
+    
+    return def if @locked
     @definitions[name] = def
     
   # Returns the current scope instance. Equivalent to `scope.delegate -> this`
@@ -136,6 +148,7 @@ exports.Scope = class Scope
           return result
         target = target.parent
 
+      return new Definition name: name if @locked
       if silent then null
       else throw new Error "Variable '#{name}' is not defined in this scope"
       

@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Colin MacKenzie IV"]
   s.email       = ["sinisterchipmunk@gmail.com"]
   s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{Write your WebGL shaders in CoffeeScript!}
+  s.description = %q{Write your WebGL shaders in CoffeeScript!}
 
   s.rubyforge_project = "shader-script"
 

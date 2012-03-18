@@ -550,7 +550,7 @@ exports.Lexer = class Lexer
 # Keywords that CoffeeScript shares in common with JavaScript.
 JS_KEYWORDS = [
   # GLSL keywords added so we can detect types
-  'attribute', 'const', 'uniform', 'varying',
+  # 'attributes', 'consts', 'uniforms', 'varyings',
   'centroid',
   'break', 'continue', 'do', 'for', 'while',
   'if', 'else',
@@ -621,6 +621,8 @@ STRICT_PROSCRIBED = ['arguments', 'eval']
 # The superset of both JavaScript keywords and reserved words, none of which may
 # be used as identifiers or properties.
 JS_FORBIDDEN = JS_KEYWORDS.concat(RESERVED).concat(STRICT_PROSCRIBED)
+
+JS_KEYWORDS.push 'uniforms', 'varyings', 'attributes', 'consts'
 
 exports.RESERVED = RESERVED.concat(JS_KEYWORDS).concat(COFFEE_KEYWORDS).concat(STRICT_PROSCRIBED)
 exports.STRICT_PROSCRIBED = STRICT_PROSCRIBED

@@ -16,7 +16,7 @@ class exports.Assign extends require("shader-script/glsl/nodes/assign").Assign
       
       unless left.toVariableName
         throw new Error "Can't use #{JSON.stringify left} as lvalue"
-      
+        
       dependent = @right.variable(shader) if @right.variable
       varname = left.toVariableName()
       

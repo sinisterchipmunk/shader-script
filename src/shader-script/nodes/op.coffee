@@ -10,5 +10,6 @@ class exports.Op extends require('shader-script/nodes/base').Base
     left = @left.compile shader
     op = @op
     right = @right && @right.compile shader
+    
     @glsl 'Op', op, left, right
     
