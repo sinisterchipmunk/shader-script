@@ -24,3 +24,15 @@ describe "storage qualifiers", ->
       code = glsl 'uniforms = mat4: mv'
       expect(code.vertex.indexOf('uniform mat4 mv')).toEqual code.vertex.lastIndexOf 'uniform mat4 mv'
     
+    it "should not create empty lines with terminators", ->
+      code = glsl 'uniforms = mat4: mv'
+      expect(code.vertex.indexOf('\n;')).toEqual -1
+      
+  describe "attributes", ->
+    it "should not be present in fragment shader", ->
+      script = 'attributes =\n  vec3: position'
+      code = glsl script
+      expect(code.vertex).toMatch /attribute vec3 position/ # sanity check
+      expect(code.fragment).not.toMatch /attribute vec3 position/
+      
+  
