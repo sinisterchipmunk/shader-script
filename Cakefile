@@ -26,8 +26,11 @@ task 'build:parser', 'rebuild the Jison parser', build_parser = (cb) ->
 
 task 'test', 'run the tests', test = ->
   process.env['TEST'] = true
-  build -> run null, 'script/test'
-
+  if process.env['SPEC']
+    build -> run null, 'script/test', process.env['SPEC']
+  else
+    build -> run null, 'script/test'
+    
 task 'all', 'rebuild the parser, then rebuild the language and run the tests', ->
   build_parser -> test()
   

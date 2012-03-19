@@ -25,7 +25,7 @@ try
         gl_FragColor: d 'vec4'
         gl_PointCoord: d 'vec2'
   
-  class Extension
+  exports.Extension = class Extension
     # If type is null, it will default to the type of the first argument passed into
     # the extension in the context of its call. Note that this result can vary depending
     # on context. For example, all of the following can be true within the same program:
@@ -36,12 +36,44 @@ try
     #
     return_type: -> @type
     
-    constructor: (@name, @type, @callback) ->
-      Program.prototype.builtins[@name] = this
+    # @name is the name of the extension, by which it can be invoked from shaderscript.
+    #
+    # @type is the GLSL return type of the extension, or `null` if the parameter type should
+    # be used instead.
+    #
+    # @callback is a function to call when the extension is invoked.
+    #
+    # If `register` is true, the extension will be registered with all Program objects.
+    # Otherwise, the extension effectively can't be invoked from shaderscript.
+    constructor: (@name, @type, @callback, register = true) ->
+      Program.prototype.builtins[@name] = this if register
       
     invoke: (params...) ->
       params = (param.execute() for param in params)
       @callback params...
+      
+    component_wise: (args...) ->
+      # make a shallow copy of arg arrays so that they aren't modified in place
+      (args[i] = args[i].splice(0) if args[i] and args[i].splice) for i of args
+      callback = args.pop()
+      
+      resultset = []
+      again = true
+      while again
+        size = null
+        again = false
+        argset = for arg in args
+          if arg and arg.length
+            if arg.length > 1 then again = true
+            if size and arg.length != size then throw new Error "All vectors must be the same size"
+            size = arg.length
+          if arg and arg.shift then arg.shift()
+          else arg
+        resultset.push callback argset...
+      
+      if resultset.length == 1
+        resultset[0]
+      else resultset
       
     # Invokes the named extension from JS.
     @invoke: (name, args...) ->
@@ -54,38 +86,40 @@ try
   e = (args...) -> new Extension args...
 
   # Trigonometric functions, p65
-  e 'radians', 'float', (d) -> d * Math.PI / 180
-  e 'degrees', 'float', (r) -> r / Math.PI * 180
-  e 'sin', 'float', Math.sin
-  e 'cos', 'float', Math.cos
-  e 'tan', 'float', Math.tan
-  e 'asin', 'float', Math.asin
-  e 'acos', 'float', Math.acos
-  e 'atan', 'float', (y, x) -> if x is undefined then Math.atan y else Math.atan2 y, x
+  e 'radians', null, (x) -> @component_wise x, (y) -> y * Math.PI / 180
+  e 'degrees', null, (x) -> @component_wise x, (y) -> y / Math.PI * 180
+  e 'sin',     null, (x) -> @component_wise x, (y) -> Math.sin(y)
+  e 'cos',     null, (x) -> @component_wise x, (y) -> Math.cos(y)
+  e 'tan',     null, (x) -> @component_wise x, (y) -> Math.tan(y)
+  e 'asin',    null, (x) -> @component_wise x, (y) -> Math.asin(y)
+  e 'acos',    null, (x) -> @component_wise x, (y) -> Math.acos(y)
+  e 'atan',    null, (y, x) -> @component_wise y, x, (_y, _x) ->
+    if _x is undefined then Math.atan(_y) else Math.atan2(_y, _x)
+  # 'float', (y, x) -> if x is undefined then Math.atan y else Math.atan2 y, x
   
   # Exponential functions, p65
-  e 'pow', 'float', Math.pow
-  e 'exp', 'float', Math.exp
-  e 'log', 'float', Math.log
-  e 'exp2', 'float', (x) -> Math.pow 2, x
-  e 'log2', 'float', (x) -> Math.log(x) / Math.log 2
-  e 'sqrt', 'float', Math.sqrt
-  e 'inversesqrt', 'float', (x) -> 1 / Math.sqrt(x)
+  e 'pow',  null, (x, y) -> @component_wise x, y, (_x, _y) -> Math.pow(_x, _y)
+  e 'exp',  null, (x)    -> @component_wise x, (y) -> Math.exp(y)
+  e 'log',  null, (x)    -> @component_wise x, (y) -> Math.log(y)
+  e 'exp2', null, (x)    -> @component_wise x, (y) -> Math.pow(2, y)
+  e 'log2', null, (x)    -> @component_wise x, (y) -> Math.log(y) / Math.log 2
+  e 'sqrt', null, (x)    -> @component_wise x, (y) -> Math.sqrt(y)
+  e 'inversesqrt', null, (x) -> @component_wise x, (y) -> 1 / Math.sqrt(y)
   
   # Common functions, pp66-67
-  e 'abs', 'float', Math.abs
-  e 'sign', 'float', (x) -> if x > 0 then 1 else (if x < 0 then -1 else 0)
-  e 'floor', 'float', Math.floor
-  e 'ceil', 'float', Math.ceil
-  e 'fract', 'float', (x) -> x - Math.floor(x)
-  e 'mod', 'float', (x,y) -> x - y * Math.floor(x/y)
-  e 'min', 'float', Math.min
-  e 'max', 'float', Math.max
-  e 'clamp', 'float', (x, min, max) -> Math.min(Math.max(x, min), max)
-  e 'mix', 'float', (min, max, a) -> min * (1 - a) + max * a
-  e 'step', 'float', (edge, x) -> if x < edge then 0 else 1
-  e 'smoothstep', 'float', (edge0, edge1, x) ->
-    t = Extension.invoke('clamp', (x - edge0) / (edge1 - edge0), 0, 1)
+  e 'abs',   null, (x) -> @component_wise x, (y) -> Math.abs y
+  e 'sign',  null, (x) -> @component_wise x, (y) -> if y > 0 then 1 else (if y < 0 then -1 else 0)
+  e 'floor', null, (x) -> @component_wise x, (y) -> Math.floor(y)
+  e 'ceil',  null, (x) -> @component_wise x, (y) -> Math.ceil(y)
+  e 'fract', null, (x) -> @component_wise x, (y) -> y - Math.floor(y)
+  e 'mod',   null, (x,y) -> @component_wise x,y, (_x,_y) -> _x - _y * Math.floor _x / _y
+  e 'min',   null, (x,y) -> @component_wise x,y, (_x,_y) -> Math.min _x, _y
+  e 'max',   null, (x,y) -> @component_wise x,y, (_x,_y) -> Math.max _x, _y
+  e 'clamp', null, (x,min,max) -> @component_wise x,min,max, (_x,_min,_max) -> Math.min(Math.max(_x, _min), _max)
+  e 'mix',   null, (min,max,a) -> @component_wise min,max,a, (_min,_max,_a) -> _min * (1 - _a) + _max * _a
+  e 'step',  null, (edge, x) -> @component_wise edge, x, (_edge, _x) -> if _x < _edge then 0 else 1
+  e 'smoothstep', null, (edge0, edge1, x) -> @component_wise edge0, edge1, x, (_edge0, _edge1, _x) ->
+    t = Extension.invoke('clamp', (_x - _edge0) / (_edge1 - _edge0), 0, 1)
     t * t * (3 - 2 * t)
 
   # Geometric functions, pp68-69
