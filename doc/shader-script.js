@@ -1497,6 +1497,7 @@
         scope: true
       };
       Block.__super__.constructor.call(this, lines);
+      if (this.options.indent === void 0) this.options.indent = this.options.scope;
     }
 
     Block.prototype.cast = function(type, program) {
@@ -1536,18 +1537,24 @@
           return result[result.length - 1];
         },
         toSource: function() {
-          var indent, line, result;
-          indent = _this.options && _this.options.scope ? "  " : "";
-          result = ((function() {
+          var indent, line, result, src, trimmed;
+          indent = _this.options.indent ? "  " : "";
+          result = (function() {
             var _j, _len2, _results;
             _results = [];
             for (_j = 0, _len2 = lines.length; _j < _len2; _j++) {
               line = lines[_j];
-              _results.push(line.toSource());
+              src = line.toSource();
+              trimmed = src.trim();
+              if (trimmed === "" || trimmed[trimmed.length - 1] === ';' || line.no_terminator) {
+                _results.push(src);
+              } else {
+                _results.push(src + ";");
+              }
             }
             return _results;
-          })()).join(";\n").trim();
-          if (result[result.length - 1] !== ";") result += ";";
+          })();
+          result = result.join("\n").trim();
           return indent + result.split("\n").join("\n" + indent) + "\n";
         }
       };
@@ -1668,6 +1675,7 @@
       return {
         execute: function() {},
         is_comment: true,
+        no_terminator: true,
         toSource: function() {
           if (_this.comment.indexOf("\n") !== -1) {
             return "/*\n  " + (_this.comment.trim().replace(/\n/g, '\n  ')) + "\n*/";
@@ -2138,31 +2146,17 @@
     };
 
     Root.prototype.compile = function(state) {
-      var block_node, line, name, options, program, subscope, _i, _len, _ref, _ref2, _ref3;
+      var block_node, program, _ref;
       if (state == null) state = {};
       if (state instanceof Program) {
         _ref = [state, state.state], program = _ref[0], state = _ref[1];
       } else {
         program = new Program(state);
       }
+      this.block.options.indent = false;
       block_node = this.block.compile(program);
-      _ref2 = block_node.lines;
-      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-        line = _ref2[_i];
-        program.nodes.push(line);
-      }
+      program.root_node = block_node;
       block_node.execute();
-      if (subscope = state.scope.subscopes['block']) {
-        _ref3 = subscope.definitions;
-        for (name in _ref3) {
-          options = _ref3[name];
-          program.variables.push({
-            name: name,
-            type: options.type(),
-            value: options.value
-          });
-        }
-      }
       return program;
     };
 
@@ -2879,91 +2873,17 @@ if (typeof module !== 'undefined' && require.main === module) {
   Scope = require('shader-script/scope').Scope;
 
   exports.Program = (function() {
-    var createClone;
-
-    createClone = function(program, entry_point, omit) {
-      var attribute, clone, func, name, node, uniform, variable, varying, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _m, _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
-      clone = new exports.Program(program.state);
-      _ref = program.uniforms;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        uniform = _ref[_i];
-        clone.uniforms.push(uniform);
-      }
-      _ref2 = program.attributes;
-      for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-        attribute = _ref2[_j];
-        clone.attributes.push(attribute);
-      }
-      _ref3 = program.varyings;
-      for (_k = 0, _len3 = _ref3.length; _k < _len3; _k++) {
-        varying = _ref3[_k];
-        clone.varyings.push(varying);
-      }
-      _ref4 = program.variables;
-      for (_l = 0, _len4 = _ref4.length; _l < _len4; _l++) {
-        variable = _ref4[_l];
-        clone.variables.push(variable);
-      }
-      clone.entry_point = entry_point;
-      _ref5 = program.nodes;
-      for (_m = 0, _len5 = _ref5.length; _m < _len5; _m++) {
-        node = _ref5[_m];
-        if (node.is_function) if (node.name === omit) continue;
-        clone.nodes.push(node);
-      }
-      _ref6 = program.functions;
-      for (name in _ref6) {
-        func = _ref6[name];
-        if (name === omit) {
-          continue;
-        } else if (name === entry_point) {
-          name = 'main';
-        }
-        clone.functions[name] = func;
-      }
-      return clone;
-    };
 
     function Program(state) {
       var _base, _base2;
       this.state = state != null ? state : {};
-      this.nodes = [];
-      this.uniforms = [];
-      this.attributes = [];
-      this.varyings = [];
-      this.variables = [];
       this.functions = {};
       (_base = this.state).variables || (_base.variables = {});
       (_base2 = this.state).scope || (_base2.scope = new Scope());
     }
 
     Program.prototype.toSource = function() {
-      var node, str, _i, _len, _ref;
-      str = [];
-      _ref = this.nodes;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        node = _ref[_i];
-        if (node.is_function) {
-          if (node.name === this.entry_point) {
-            str.push(node.toSource('main'));
-          } else {
-            str.push(node.toSource());
-          }
-        } else if (node.is_comment || node.is_block) {
-          str.push(node.toSource());
-        } else {
-          str.push(node.toSource() + ";");
-        }
-      }
-      return str.join("\n");
-    };
-
-    Program.prototype.toVertexProgram = function() {
-      return createClone(this, 'vertex', 'fragment');
-    };
-
-    Program.prototype.toFragmentProgram = function() {
-      return createClone(this, 'fragment', 'vertex');
+      return this.root_node.toSource().trim();
     };
 
     Program.prototype.invoke = function() {
@@ -4884,6 +4804,24 @@ if (typeof module !== 'undefined' && require.main === module) {
       });
       shader.scope.pop();
       delete shader.current_function;
+      if (str_func_name === 'vertex' || str_func_name === 'fragment') {
+        if (str_func_name === shader.compile_target) {
+          compiled_func_name = this.glsl('Identifier', 'main');
+        } else {
+          return {
+            compile: function() {
+              return {
+                toSource: (function() {
+                  return "";
+                }),
+                execute: (function() {
+                  return "";
+                })
+              };
+            }
+          };
+        }
+      }
       glsl = this.glsl('Function', 'void', compiled_func_name, compiled_params, compiled_body);
       glsl.type = function() {
         return _this.type(shader);
@@ -5231,14 +5169,16 @@ if (typeof module !== 'undefined' && require.main === module) {
     }
 
     Root.prototype.compile = function(state) {
-      var program, root_node, shader;
+      var fragment_root_node, shader, vertex_root_node;
       if (state == null) state = {};
       shader = new Shader(state);
-      root_node = this.glsl('Root', this.block.compile(shader));
-      program = root_node.compile(state);
+      shader.compile_target = 'vertex';
+      vertex_root_node = this.glsl('Root', this.block.compile(shader));
+      shader.compile_target = 'fragment';
+      fragment_root_node = this.glsl('Root', this.block.compile(shader));
       return {
-        vertex: program.toVertexProgram(),
-        fragment: program.toFragmentProgram()
+        vertex: vertex_root_node.compile(state),
+        fragment: fragment_root_node.compile(state)
       };
     };
 

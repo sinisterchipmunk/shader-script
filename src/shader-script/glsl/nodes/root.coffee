@@ -19,10 +19,10 @@ class exports.Root extends require('shader-script/nodes/base').Base
       program = new Program state
     
     # build the root block node
+    @block.options.indent = no
     block_node = @block.compile program
     
-    for line in block_node.lines
-      program.nodes.push line
+    program.root_node = block_node
     
     # now we need to execute the root block. The only code that this
     # actually executes is meta-code, like variable declarations and
@@ -30,12 +30,6 @@ class exports.Root extends require('shader-script/nodes/base').Base
     # won't get created.
     block_node.execute()
   
-    # the GLSL pass isn't smart enough to add the variables detected
-    # in the first pass, so let's do that now
-    if subscope = state.scope.subscopes['block']
-      for name, options of subscope.definitions
-        program.variables.push name: name, type: options.type(), value: options.value
-    
     # we've been careful not to maintain a reference to the root node
     # itself, because it's important not to execute the root node twice.
     # Function nodes don't have this restriction.

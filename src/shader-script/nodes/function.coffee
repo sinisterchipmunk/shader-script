@@ -15,7 +15,7 @@ exports.Code = class exports.Function extends require('shader-script/nodes/base'
     
     compiled_func_name = @func_name.compile shader
     str_func_name = @func_name.toVariableName()
-
+    
     shader.current_function =
       name: str_func_name
       return_variable: return_variable
@@ -42,6 +42,11 @@ exports.Code = class exports.Function extends require('shader-script/nodes/base'
     
     delete shader.current_function
     
+    if str_func_name == 'vertex' or str_func_name == 'fragment'
+      if str_func_name == shader.compile_target then compiled_func_name = @glsl 'Identifier', 'main'
+      else return compile: -> toSource: (-> ""), execute: (-> "")
+
     glsl = @glsl 'Function', 'void', compiled_func_name, compiled_params, compiled_body
     glsl.type = => @type(shader)
     glsl
+    

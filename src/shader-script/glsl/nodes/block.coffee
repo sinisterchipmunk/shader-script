@@ -1,7 +1,9 @@
 class exports.Block extends require('shader-script/nodes/base').Base
   name: -> 'block'
   
-  constructor: (lines = [], @options = scope: yes) -> super lines
+  constructor: (lines = [], @options = scope: yes) ->
+    super lines
+    @options.indent = @options.scope if @options.indent is undefined
   
   cast: (type, program) ->
     @lines[@lines.length-1].cast type, program
@@ -25,10 +27,12 @@ class exports.Block extends require('shader-script/nodes/base').Base
       result = (line.execute() for line in lines)
       result[result.length-1]
     toSource: () => 
-      indent = if @options and @options.scope then "  " else ""
-      result = (line.toSource() for line in lines).join(";\n").trim()
-      if result[result.length-1] != ";"
-        result += ";"
+      indent = if @options.indent then "  " else ""
+      result = for line in lines
+        src = line.toSource()
+        trimmed = src.trim()
+        if trimmed == "" or trimmed[trimmed.length-1] == ';' or line.no_terminator then src else src + ";"
+      result = result.join("\n").trim()
       indent + result.split("\n").join("\n#{indent}") + "\n"
 
   children: -> [ 'lines' ]
