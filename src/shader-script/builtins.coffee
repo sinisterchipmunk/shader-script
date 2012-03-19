@@ -152,8 +152,7 @@ try
     else eta * I[i] - (eta * dotNI + Math.sqrt(k)) * N[i] for i of I
     
   # Matrix functions, p69
-  e 'matrixCompMult', null, (x, y) ->
-    x[i] * y[i] for i of x
+  e 'matrixCompMult', null, (x, y) -> @component_wise x,y, (_x,_y) -> _x * _y
     
   # Texture lookup functions, pp71-72
   # These are only implemented to prevent error conditions, they
