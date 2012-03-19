@@ -25,9 +25,3 @@ class exports.Root extends require('shader-script/nodes/base').Base
     # Program (shader-script/glsl/program).
     vertex:   vertex_root_node.compile   state
     fragment: fragment_root_node.compile state
-
-    # program = root_node.compile state
-    
-    # vertex:   program.toVertexProgram()
-    # fragment: program.toFragmentProgram()
-    

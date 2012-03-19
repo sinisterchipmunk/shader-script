@@ -1515,6 +1515,7 @@
         _ref = this.lines;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           child = _ref[_i];
+          if (!child) continue;
           _result = child.compile(program);
           if (_result !== null) lines.push(_result);
         }
@@ -5212,6 +5213,9 @@ if (typeof module !== 'undefined' && require.main === module) {
 
     StorageQualifier.prototype.compile = function(shader) {
       var assign, lines, name, names, qualifier, type, _i, _len, _ref;
+      if (this.qualifier === 'attributes' && shader.compile_target === 'fragment') {
+        return null;
+      }
       qualifier = this.qualifier.slice(0, -1);
       lines = [];
       _ref = this.assigns;

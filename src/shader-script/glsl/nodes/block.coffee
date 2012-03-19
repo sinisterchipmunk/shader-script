@@ -16,6 +16,7 @@ class exports.Block extends require('shader-script/nodes/base').Base
     qual = program.state.scope.qualifier()
     if @lines
       for child in @lines
+        continue unless child
         _result = child.compile program
         if _result != null
           lines.push _result
