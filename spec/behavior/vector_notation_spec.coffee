@@ -3,7 +3,9 @@ require 'spec_helper'
 describe 'vector notation', ->
   describe "rvalue", ->
     it "should work with xyzw", ->
-      sim = simulate glsl 'vertex = -> x = [1,2,3,4].xyzw'
+      code = glsl 'vertex = -> x = [1,2,3,4].xyzw'
+      # console.log code.vertex
+      sim = simulate code
       expect(sim.state.variables.x.value).toEqual [1, 2, 3, 4]
 
     it "should work with rgba", ->
@@ -26,6 +28,9 @@ describe 'vector notation', ->
       sim = simulate glsl 'vertex = -> x = [1, 2, 3, 4].xx'
       expect(sim.state.variables.x.type()).toEqual 'vec2'
       
+    it "should not allow components which exceed dimensions of vector", ->
+      expect(-> simulate glsl 'vertex = -> x = [1, 2].zw').toThrow()
+      
       
   describe "lvalue", ->
     it "should work with xyzw", ->
@@ -47,7 +52,13 @@ describe 'vector notation', ->
       expect(-> simulate glsl 'vertex = -> x = vec4(); x.xrs = [1, 2, 3, 4]').toThrow()
 
     it "should allow lvalue unequal to vector size", ->
-      sim = simulate glsl 'vertex = -> x = vec4 0; x.xyz = [1, 2, 3]'
+      code = glsl 'vertex = -> x = vec4 0; x.xyz = [1, 2, 3]'
+      sim = simulate code
       expect(sim.state.variables.x.value).toEqual [1, 2, 3, 0]
       
-    
+    it "should cast large vectors to smaller ones", ->
+      code = glsl 'vertex = -> x = vec3 0; x.xy = [1, 2, 3, 4]'
+      sim = simulate code
+      expect(code.vertex).toMatch /xy = vec4\(.*?\).xy;/
+      expect(sim.state.variables.x.value).toEqual [1, 2, 0]
+      

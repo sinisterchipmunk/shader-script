@@ -6,6 +6,8 @@ class exports.Value extends require('shader-script/nodes/base').Base
     if @children[0].toVariableName
       @toVariableName = -> @children[0].toVariableName()
   
+  is_access: -> @children[0].is_access()
+
   type: (program) -> @children[0].type(program)
 
   compile: (shader) ->

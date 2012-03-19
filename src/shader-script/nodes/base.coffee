@@ -3,6 +3,8 @@ exports.Base = class Base
   glsl_nodes = null
   required_methods = [ 'name', 'compile' ]
   
+  is_access: -> false
+  
   glsl: (node_name, args...) ->
     glsl_nodes or= require('shader-script/glsl/nodes')
     new glsl_nodes[node_name] args...

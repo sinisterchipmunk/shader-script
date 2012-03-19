@@ -87,6 +87,7 @@ grammar =
     o 'FunctionCall'
     o 'Operation'
     o 'Parenthetical'
+    o 'Accessor'
   ]
   
   # Pure statements which cannot be expressions.
@@ -96,8 +97,25 @@ grammar =
     o 'Comment'            # also no terminator for comments
     o 'FunctionDeclaration TERMINATOR'
     o 'VariableDeclaration TERMINATOR'
+    o 'StorageDeclaration TERMINATOR'
     o 'STATEMENT TERMINATOR',                              -> new Literal $1
     o 'TERMINATOR', -> (compile: -> null)
+  ]
+  
+  StorageDeclaration: [
+    o 'StorageQualifier Type IdentifierList', -> new StorageQualifier $1, $2, $3
+  ]
+  
+  IdentifierList: [
+    o 'Identifier', -> [ $1 ]
+    o 'IdentifierList , Identifier', -> $1.concat [$3]
+  ]
+  
+  StorageQualifier: [
+    o 'UNIFORM'
+    o 'VARYING'
+    o 'ATTRIBUTE'
+    o 'CONST'
   ]
   
   Comment: [
@@ -136,6 +154,11 @@ grammar =
   
   Assign: [
     o 'Identifier = Expression', -> new Assign $1, $3
+    o 'Accessor = Expression', -> new Assign $1, $3
+  ]
+  
+  Accessor: [
+    o 'Expression . Identifier', -> new Access $3, $1
   ]
   
   Identifier: [
