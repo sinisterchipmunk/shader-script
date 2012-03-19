@@ -35,4 +35,6 @@ describe "storage qualifiers", ->
       expect(code.vertex).toMatch /attribute vec3 position/ # sanity check
       expect(code.fragment).not.toMatch /attribute vec3 position/
       
-  
+    it "should not raise reference errors in fragment shader when used in vertex shader", ->
+      script = 'attributes =\n  vec3: position\nvertex = -> pos = position\nfragment = -> gl_FragColor = vec4 1'
+      expect(-> glsl script).not.toThrow()

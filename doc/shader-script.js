@@ -4769,6 +4769,13 @@ if (typeof module !== 'undefined' && require.main === module) {
       return_variable = this.variable(shader);
       compiled_func_name = this.func_name.compile(shader);
       str_func_name = this.func_name.toVariableName();
+      if (str_func_name === 'vertex' || str_func_name === 'fragment') {
+        if (str_func_name === shader.compile_target) {
+          compiled_func_name = this.glsl('Identifier', 'main');
+        } else {
+          return null;
+        }
+      }
       shader.current_function = {
         name: str_func_name,
         return_variable: return_variable
@@ -4805,24 +4812,6 @@ if (typeof module !== 'undefined' && require.main === module) {
       });
       shader.scope.pop();
       delete shader.current_function;
-      if (str_func_name === 'vertex' || str_func_name === 'fragment') {
-        if (str_func_name === shader.compile_target) {
-          compiled_func_name = this.glsl('Identifier', 'main');
-        } else {
-          return {
-            compile: function() {
-              return {
-                toSource: (function() {
-                  return "";
-                }),
-                execute: (function() {
-                  return "";
-                })
-              };
-            }
-          };
-        }
-      }
       glsl = this.glsl('Function', 'void', compiled_func_name, compiled_params, compiled_body);
       glsl.type = function() {
         return _this.type(shader);

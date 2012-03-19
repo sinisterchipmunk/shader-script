@@ -24,7 +24,7 @@ describe 'vector notation', ->
       
     it "should have type equal to number of components", ->
       sim = simulate glsl 'vertex = -> x = [1, 2, 3, 4].xx'
-      expect(sim.state.variables.x.type).toEqual 'vec2'
+      expect(sim.state.variables.x.type()).toEqual 'vec2'
       
       
   describe "lvalue", ->
