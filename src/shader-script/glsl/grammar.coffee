@@ -79,7 +79,7 @@ grammar =
   ]
 
   Expression: [
-    o 'Identifier'
+    # o 'Identifier'
     o 'Assign'
     o 'Call'
     o 'Literal'
@@ -87,7 +87,8 @@ grammar =
     o 'FunctionCall'
     o 'Operation'
     o 'Parenthetical'
-    o 'Accessor'
+    # o 'Accessor'
+    o 'Assignable'
   ]
   
   # Pure statements which cannot be expressions.
@@ -153,8 +154,7 @@ grammar =
   ]
   
   Assign: [
-    o 'Identifier = Expression', -> new Assign $1, $3
-    o 'Accessor = Expression', -> new Assign $1, $3
+    o 'Assignable = Expression', -> new Assign $1, $3, '='
   ]
   
   Accessor: [
@@ -228,10 +228,10 @@ grammar =
     o '-     Expression',                      (-> new Op '-', $2), prec: 'UNARY'
     o '+     Expression',                      (-> new Op '+', $2), prec: 'UNARY'
 
-    o '-- SimpleAssignable',                    -> new Op '--', $2
-    o '++ SimpleAssignable',                    -> new Op '++', $2
-    o 'SimpleAssignable --',                    -> new Op '--', $1, null, true
-    o 'SimpleAssignable ++',                    -> new Op '++', $1, null, true
+    # o '-- Assignable',                    -> new Op '--', $2
+    # o '++ Assignable',                    -> new Op '++', $2
+    o 'Assignable --',                    -> new Op '--', $1, null, true
+    o 'Assignable ++',                    -> new Op '++', $1, null, true
 
     # [The existential operator](http://jashkenas.github.com/coffee-script/#existence).
     o 'Expression ?',                           -> new Existence $1
@@ -249,11 +249,16 @@ grammar =
       else
         new Op $2, $1, $3
 
-    o 'SimpleAssignable COMPOUND_ASSIGN
+    o 'Assignable COMPOUND_ASSIGN
        Expression',                             -> new Assign $1, $3, $2
-    o 'SimpleAssignable COMPOUND_ASSIGN
+    o 'Assignable COMPOUND_ASSIGN
        INDENT Expression OUTDENT',              -> new Assign $1, $4, $2
-    o 'SimpleAssignable EXTENDS Expression',    -> new Extends $1, $3
+    o 'Assignable EXTENDS Expression',    -> new Extends $1, $3
+  ]
+  
+  Assignable: [
+    o 'Identifier'
+    o 'Accessor'
   ]
 
 

@@ -3,7 +3,14 @@ class exports.Function extends require('shader-script/nodes/base').Base
   
   children: -> ['return_type', 'name', 'arguments', 'block']
   
-  type: -> @return_type
+  type: ->
+    if @return_type and @return_type.type
+      @return_type.type()
+    else @return_type
+    
+  cast: (type) ->
+    if @return_type and @return_type.type
+      @return_type.set_type type
   
   compile: (program) ->
     compiled_name = @name.toVariableName()
@@ -47,7 +54,7 @@ class exports.Function extends require('shader-script/nodes/base').Base
     toSource: (fn_name) =>
       fn_name or= compiled_name
       arg_list = (arg.toSource() for arg in compiled_arguments).join ', '
-      "#{@type()} #{fn_name}(#{arg_list}) {\n" +
+      "#{@type() || 'void'} #{fn_name}(#{arg_list}) {\n" +
       compiled_block.toSource() + 
       "}"
       

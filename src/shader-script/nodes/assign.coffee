@@ -22,17 +22,20 @@ class exports.Assign extends require("shader-script/glsl/nodes/assign").Assign
         
       # Try to cast right to compatible type
       unless @left.is_access()
-        dependent = @right.variable(shader) if @right.variable
+        dependent = @right.variable shader if @right.variable
         varname = left.toVariableName()
       
         existing = shader.scope.lookup varname, true
         if existing
           type = existing.type()
-          right.cast(type, state: shader)
+          if right.cast
+            right.cast type, state: shader
+          else if dependent
+            dependent.set_type type
         else
-          type = @right.type(shader)
+          type = @right.type shader
         
         shader.scope.define left.toVariableName(), type: type, dependent: dependent
 
-      @glsl 'Assign', left, right
+      @glsl 'Assign', left, right, @token
       

@@ -7,7 +7,7 @@ exports.Code = class exports.Function extends require('shader-script/nodes/base'
   variable: (shader) ->
     @_variable or= new Definition
   
-  type: (shader) -> @variable(shader).type() || 'void'
+  type: (shader) -> @variable(shader).type()
   
   compile: (shader) ->
     throw new Error("GLSL doesn't support anonymous functions") unless @func_name
@@ -46,7 +46,7 @@ exports.Code = class exports.Function extends require('shader-script/nodes/base'
     
     delete shader.current_function
     
-    glsl = @glsl 'Function', 'void', compiled_func_name, compiled_params, compiled_body
-    glsl.type = => @type(shader)
+    glsl = @glsl 'Function', @variable(shader), compiled_func_name, compiled_params, compiled_body
+    # glsl.type = => @type(shader)
     glsl
     

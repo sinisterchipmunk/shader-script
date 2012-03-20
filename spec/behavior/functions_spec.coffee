@@ -29,7 +29,7 @@ describe "functions", ->
     """
     expect(code.vertex).toMatch /\(float a\)/
     
-  it "should set function type by return value", ->
+  it "should set return type by return value", ->
     code = glsl """
       m = -> return 1.0
     """

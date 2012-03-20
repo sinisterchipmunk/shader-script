@@ -1,6 +1,11 @@
 require 'spec_helper'
 
 describe 'vector notation', ->
+  it "used in expression", ->
+    code = glsl 'vertex = -> x = vec4 2, 3, 4, 5; x -= x.xxyz * [1,2,3,4]'
+    sim = simulate code
+    expect(sim.state.variables.x.value).toEqual [0, -1, -5, -11]
+  
   describe "rvalue", ->
     it "should work with xyzw", ->
       code = glsl 'vertex = -> x = [1,2,3,4].xyzw'

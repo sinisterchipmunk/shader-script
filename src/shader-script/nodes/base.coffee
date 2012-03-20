@@ -23,3 +23,4 @@ exports.Base = class Base
 
     @children = children
     
+exports.Base.prototype.component_wise = require('shader-script/extension').Extension.prototype.component_wise

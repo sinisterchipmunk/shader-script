@@ -10,7 +10,7 @@ class exports.Call extends require("shader-script/nodes/base").Base
   
   type: (shader) ->
     @variable(shader).type()
-  
+    
   compile: (shader) ->
     method_name = @method_name.compile shader
     
