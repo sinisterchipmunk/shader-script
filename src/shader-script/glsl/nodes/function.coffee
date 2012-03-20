@@ -36,7 +36,7 @@ class exports.Function extends require('shader-script/nodes/base').Base
             if args.length != params.length
               throw new Error "Incorrect argument count (#{params.length} for #{args.length})"
             for i in [0...params.length]
-              args[i].value = params[i].execute()
+              args[i].value = params[i].execute().value
             compiled_block.execute()
           catch e
             if e.is_return

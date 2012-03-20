@@ -3,6 +3,8 @@ exports.Base = class Base
   glsl_nodes = null
   required_methods = [ 'name', 'compile' ]
   
+  definition: (args...) -> new (require('shader-script/definition').Definition) args...
+  
   is_access: -> false
   
   glsl: (node_name, args...) ->

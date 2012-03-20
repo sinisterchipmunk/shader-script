@@ -18,8 +18,8 @@ global.json = (script) -> Shader.compile_to_json script
 
 global.glsl = (script) -> Shader.compile_to_glsl script
 
-global.simulate = (glsl) ->
-  new Shader.Simulator(glsl).start()
+global.simulate = (glsl, variables) ->
+  new Shader.Simulator(glsl, variables).start()
 
 global.parse_glsl_tree = (code) ->
   (new (require('shader-script/glsl/lexer').Lexer)).tokenize code, rewrite: off

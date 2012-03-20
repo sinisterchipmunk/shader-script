@@ -11,6 +11,15 @@
 # can exist in separate scopes.
 #
 exports.Definition = class Definition
+  @operators: require('shader-script/operators')
+  
+  perform: (op, re) ->
+    type = @type()
+    if (handler = Definition.operators[type]) and handler[op]
+      handler[op] this, re
+    else
+      throw new Error "Operator not found for type #{type}, op '#{op}'"
+  
   constructor: (options = {}) ->
     @dependents = []
     @assign options

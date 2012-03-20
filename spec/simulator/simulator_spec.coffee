@@ -32,3 +32,9 @@ describe "simulator", ->
       fragment: "vec4 gl_FragColor; void main() { gl_FragColor = vec4(1,0,0,1); }"
     expect(sim.state.variables.gl_FragCoord.value).toEqual([1, 1, 1, 1]);
     expect(sim.state.variables.gl_FragColor.value).toEqual([1, 0, 0, 1]);
+
+  it "should populate uniforms", ->
+    mv = mv: [1,0,0,0, 0,-1,0,0, 0,0,0,-1, 0,0,0,1] # rotation PI rads about X axis
+    sim = simulate (vertex: glsl('uniforms = mat4: mv\nvertex = -> ').vertex), mv: mv
+    expect(sim.state.variables.mv.value).toEqual mv
+  

@@ -35,9 +35,7 @@ class exports.Variable extends require('shader-script/nodes/base').Base
       # provides convenient access to "important" variables
       program.state.variables[name] = variable
 
-    execute: => variable.value
-    toSource: =>
-      "#{variable.type()} #{variable.name}"
-        
+    execute: => variable
+    toSource: => "#{variable.type()} #{variable.name}"
     variable: variable
     

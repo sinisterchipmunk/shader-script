@@ -25,6 +25,6 @@ class exports.Identifier extends require('shader-script/nodes/base').Base
 
   compile: (program) ->
     variable = @variable program
-    execute:  => variable.value
+    execute:  => variable
     toSource: => variable.name
     

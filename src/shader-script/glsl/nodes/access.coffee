@@ -32,6 +32,7 @@ class exports.Access extends require('shader-script/nodes/base').Base
   compile: (program) ->
     accessor = @accessor_name()
     source = @source.compile program
+    variable = @definition type: @type(program)
     
     iterate_components: (max_length, assignment, callback) ->
       already_iterated = []
@@ -51,15 +52,19 @@ class exports.Access extends require('shader-script/nodes/base').Base
         else throw new Error "Component #{i} equates to vector index #{index}, which exceeds vector length #{max_length}"
     
     filter_assignment: (value) ->
-      source_value = source.execute()
+      source_value = source.execute().value
       result = source_value.slice 0
       @iterate_components source_value.length, true, (index) -> result[index] = value[index]
       result
       
     toSource: -> "#{source.toSource()}.#{accessor}"
     
+    assign: (value) ->
+      source.execute().value = value
+    
     execute: ->
-      source_value = source.execute()
-      result = []
-      @iterate_components source_value.length, false, (index) -> result.push source_value[index]
-      result
+      source_value = source.execute().value
+      variable.value = []
+      @iterate_components source_value.length, false, (index) -> variable.value.push source_value[index]
+      variable
+      

@@ -24,31 +24,10 @@ exports.Extension = class Extension
     Program.prototype.builtins[@name] = this if register
     
   invoke: (params...) ->
-    params = (param.execute() for param in params)
+    params = (param.execute().value for param in params)
     @callback params...
     
-  component_wise: (args...) ->
-    # make a shallow copy of arg arrays so that they aren't modified in place
-    (args[i] = args[i].splice(0) if args[i] and args[i].splice) for i of args
-    callback = args.pop()
-    
-    resultset = []
-    again = true
-    while again
-      size = null
-      again = false
-      argset = for arg in args
-        if arg and arg.length
-          if arg.length > 1 then again = true
-          if size and arg.length != size then throw new Error "All vectors must be the same size"
-          size = arg.length
-        if arg and arg.shift then arg.shift()
-        else arg
-      resultset.push callback argset...
-    
-    if resultset.length == 1
-      resultset[0]
-    else resultset
+  component_wise: (args...) -> require('shader-script/operators').component_wise(args...)
     
   # Invokes the named extension from JS.
   @invoke: (name, args...) ->

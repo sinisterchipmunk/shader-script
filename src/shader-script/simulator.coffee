@@ -3,7 +3,7 @@ Glsl = require 'shader-script/glsl'
 
 exports.Simulator = class Simulator
   assign_builtin_variables = (name, program) ->
-    builtins = program.builtins._variables[name]
+    builtins = program.builtins && program.builtins._variables[name]
     for name, definition of builtins
       program.state.scope.define name, definition.as_options()
 
@@ -18,10 +18,12 @@ exports.Simulator = class Simulator
   #     vertex: "string of glsl vertex shader code"
   #     fragment: "string of glsl fragment shader code"
   #
-  constructor: (glsl) ->
+  constructor: (glsl, variables = {}) ->
     @state = {}
     @vertex   = compile_program 'vertex',   @state, glsl.vertex   if glsl.vertex
     @fragment = compile_program 'fragment', @state, glsl.fragment if glsl.fragment
+    for name, value of variables
+      @state.variables[name].value = value
     throw new Error("No programs found!") unless @vertex || @fragment
   
   start: (which = 'both') ->

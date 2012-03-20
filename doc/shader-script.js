@@ -384,6 +384,18 @@
 
   exports.Definition = Definition = (function() {
 
+    Definition.operators = require('shader-script/operators');
+
+    Definition.prototype.perform = function(op, re) {
+      var handler, type;
+      type = this.type();
+      if ((handler = Definition.operators[type]) && handler[op]) {
+        return handler[op](this, re);
+      } else {
+        throw new Error("Operator not found for type " + type + ", op '" + op + "'");
+      }
+    };
+
     function Definition(options) {
       if (options == null) options = {};
       this.dependents = [];
@@ -486,7 +498,7 @@
         _results = [];
         for (_i = 0, _len = params.length; _i < _len; _i++) {
           param = params[_i];
-          _results.push(param.execute());
+          _results.push(param.execute().value);
         }
         return _results;
       })();
@@ -494,44 +506,9 @@
     };
 
     Extension.prototype.component_wise = function() {
-      var again, arg, args, argset, callback, i, resultset, size;
+      var args, _ref;
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      for (i in args) {
-        if (args[i] && args[i].splice) args[i] = args[i].splice(0);
-      }
-      callback = args.pop();
-      resultset = [];
-      again = true;
-      while (again) {
-        size = null;
-        again = false;
-        argset = (function() {
-          var _i, _len, _results;
-          _results = [];
-          for (_i = 0, _len = args.length; _i < _len; _i++) {
-            arg = args[_i];
-            if (arg && arg.length) {
-              if (arg.length > 1) again = true;
-              if (size && arg.length !== size) {
-                throw new Error("All vectors must be the same size");
-              }
-              size = arg.length;
-            }
-            if (arg && arg.shift) {
-              _results.push(arg.shift());
-            } else {
-              _results.push(arg);
-            }
-          }
-          return _results;
-        })();
-        resultset.push(callback.apply(null, argset));
-      }
-      if (resultset.length === 1) {
-        return resultset[0];
-      } else {
-        return resultset;
-      }
+      return (_ref = require('shader-script/operators')).component_wise.apply(_ref, args);
     };
 
     Extension.invoke = function() {
@@ -1656,9 +1633,12 @@
     };
 
     Access.prototype.compile = function(program) {
-      var accessor, source;
+      var accessor, source, variable;
       accessor = this.accessor_name();
       source = this.source.compile(program);
+      variable = this.definition({
+        type: this.type(program)
+      });
       return {
         iterate_components: function(max_length, assignment, callback) {
           var already_iterated, i, index, _i, _len, _results;
@@ -1702,7 +1682,7 @@
         },
         filter_assignment: function(value) {
           var result, source_value;
-          source_value = source.execute();
+          source_value = source.execute().value;
           result = source_value.slice(0);
           this.iterate_components(source_value.length, true, function(index) {
             return result[index] = value[index];
@@ -1712,14 +1692,17 @@
         toSource: function() {
           return "" + (source.toSource()) + "." + accessor;
         },
+        assign: function(value) {
+          return source.execute().value = value;
+        },
         execute: function() {
-          var result, source_value;
-          source_value = source.execute();
-          result = [];
+          var source_value;
+          source_value = source.execute().value;
+          variable.value = [];
           this.iterate_components(source_value.length, false, function(index) {
-            return result.push(source_value[index]);
+            return variable.value.push(source_value[index]);
           });
-          return result;
+          return variable;
         }
       };
     };
@@ -1757,29 +1740,29 @@
     };
 
     Assign.prototype.compile = function(program) {
-      var compiled_left, match, right, token, variable, variable_name;
+      var left, match, right, token;
       token = this.token;
-      variable_name = this.left.toVariableName();
       if (match = /^(.)=$/.exec(token)) {
         right = this.glsl('Op', match[1], this.left, this.right).compile(program);
       } else {
         right = this.right.compile(program);
       }
-      variable = program.state.scope.lookup(variable_name);
-      if (this.left.is_access()) compiled_left = this.left.compile(program);
+      left = this.left.compile(program);
       return {
         execute: function() {
-          var value;
-          value = right.execute();
-          if (compiled_left) value = compiled_left.filter_assignment(value);
-          return variable.value = value;
+          var lvalue, rvalue;
+          lvalue = left.execute();
+          rvalue = right.execute().value;
+          if (left.filter_assignment) rvalue = left.filter_assignment(rvalue);
+          if (left.assign) {
+            left.assign(rvalue);
+          } else {
+            lvalue.value = rvalue;
+          }
+          return lvalue;
         },
         toSource: function() {
-          if (compiled_left) {
-            return "" + (compiled_left.toSource()) + " = " + (right.toSource());
-          } else {
-            return "" + variable_name + " = " + (right.toSource());
-          }
+          return "" + (left.toSource()) + " = " + (right.toSource());
         }
       };
     };
@@ -1919,7 +1902,8 @@
     };
 
     Call.prototype.compile = function(program) {
-      var compiled_params, name, param;
+      var compiled_params, name, param,
+        _this = this;
       name = this.name.toVariableName();
       compiled_params = (function() {
         var _i, _len, _ref, _results;
@@ -1937,7 +1921,9 @@
           if (program.functions[name]) {
             return (_ref = program.functions[name]).invoke.apply(_ref, compiled_params);
           } else if (program.builtins[name]) {
-            return (_ref2 = program.builtins[name]).invoke.apply(_ref2, compiled_params);
+            return _this.definition({
+              value: (_ref2 = program.builtins[name]).invoke.apply(_ref2, compiled_params)
+            });
           } else {
             throw new Error("function '" + name + "' is not defined");
           }
@@ -2091,7 +2077,7 @@
                   throw new Error("Incorrect argument count (" + params.length + " for " + args.length + ")");
                 }
                 for (i = 0, _ref = params.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
-                  args[i].value = params[i].execute();
+                  args[i].value = params[i].execute().value;
                 }
                 return compiled_block.execute();
               } catch (e) {
@@ -2190,7 +2176,7 @@
       variable = this.variable(program);
       return {
         execute: function() {
-          return variable.value;
+          return variable;
         },
         toSource: function() {
           return variable.name;
@@ -2250,12 +2236,17 @@
     };
 
     Literal.prototype.compile = function(program) {
-      var value;
+      var type, value,
+        _this = this;
       value = this.children[0];
+      type = this.type(program);
       if (this.type() === 'float' && value.indexOf('.') === -1) value += ".0";
       return {
         execute: function() {
-          return eval(value);
+          return _this.definition({
+            type: type,
+            value: eval(value)
+          });
         },
         toSource: function() {
           return value;
@@ -2301,36 +2292,13 @@
       right = this.right && this.right.compile(program);
       return {
         execute: function() {
-          var le, re, _ref;
-          _ref = [left.execute(), right && right.execute()], le = _ref[0], re = _ref[1];
-          switch (op) {
-            case '+':
-              return _this.component_wise(le, re, function(l, r) {
-                if (r) {
-                  return l + r;
-                } else {
-                  return l;
-                }
-              });
-            case '-':
-              return _this.component_wise(le, re, function(l, r) {
-                if (r) {
-                  return l - r;
-                } else {
-                  return -l;
-                }
-              });
-            case '*':
-              return _this.component_wise(le, re, function(l, r) {
-                return l * r;
-              });
-            case '/':
-              return _this.component_wise(le, re, function(l, r) {
-                return l / r;
-              });
-            default:
-              throw new Error("Unsupported operation: " + op);
-          }
+          var le, re;
+          if (right) re = right.execute();
+          le = left.execute();
+          return _this.definition({
+            dependent: le,
+            value: le.perform(op, re)
+          });
         },
         toSource: function() {
           if (right) {
@@ -2659,7 +2627,7 @@
     };
 
     TypeConstructor.prototype.compile = function(program) {
-      var arg, compiled_args,
+      var arg, compiled_args, type,
         _this = this;
       compiled_args = (function() {
         var _i, _len, _ref, _results;
@@ -2671,6 +2639,7 @@
         }
         return _results;
       }).call(this);
+      type = this.type();
       return {
         execute: function(state) {
           var arg, args, vector_length;
@@ -2679,11 +2648,11 @@
             _results = [];
             for (_i = 0, _len = compiled_args.length; _i < _len; _i++) {
               arg = compiled_args[_i];
-              _results.push(arg.execute());
+              _results.push(arg.execute().value);
             }
             return _results;
           })();
-          switch (_this.type()) {
+          switch (type) {
             case 'vec2':
             case 'ivec2':
             case 'bvec2':
@@ -2709,7 +2678,10 @@
               args.push(0);
             }
           }
-          return args;
+          return _this.definition({
+            type: type,
+            value: args
+          });
         },
         toSource: function() {
           var arg;
@@ -2824,7 +2796,7 @@
       }
       return {
         execute: function() {
-          return variable.value;
+          return variable;
         },
         toSource: function() {
           return "" + (variable.type()) + " " + variable.name;
@@ -5022,6 +4994,16 @@ if (typeof module !== 'undefined' && require.main === module) {
 
     required_methods = ['name', 'compile'];
 
+    Base.prototype.definition = function() {
+      var args;
+      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      return (function(func, args, ctor) {
+        ctor.prototype = func.prototype;
+        var child = new ctor, result = func.apply(child, args);
+        return typeof result === "object" ? result : child;
+      })((require('shader-script/definition').Definition), args, function() {});
+    };
+
     Base.prototype.is_access = function() {
       return false;
     };
@@ -5803,6 +5785,186 @@ if (typeof module !== 'undefined' && require.main === module) {
     return Value;
 
   })(require("shader-script/glsl/nodes/value").Value);
+
+}).call(this);
+
+      return exports;
+    };
+    _require["shader-script/operations"] = function() {
+      var exports = {};
+      (function() {
+  var component_wise,
+    __slice = Array.prototype.slice;
+
+  component_wise = function() {
+    var again, arg, args, argset, callback, i, resultset, size;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    for (i in args) {
+      if (args[i] && args[i].splice) args[i] = args[i].splice(0);
+    }
+    callback = args.pop();
+    resultset = [];
+    again = true;
+    while (again) {
+      size = null;
+      again = false;
+      argset = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = args.length; _i < _len; _i++) {
+          arg = args[_i];
+          if (arg && arg.length) {
+            if (arg.length > 1) again = true;
+            if (size && arg.length !== size) {
+              throw new Error("All vectors must be the same size");
+            }
+            size = arg.length;
+          }
+          if (arg && arg.shift) {
+            _results.push(arg.shift());
+          } else {
+            _results.push(arg);
+          }
+        }
+        return _results;
+      })();
+      resultset.push(callback.apply(null, argset));
+    }
+    if (resultset.length === 1) {
+      return resultset[0];
+    } else {
+      return resultset;
+    }
+  };
+
+  exports.float = function(le, op, re) {};
+
+}).call(this);
+
+      return exports;
+    };
+    _require["shader-script/operators"] = function() {
+      var exports = {};
+      (function() {
+  var component_wise, cw_add, cw_divide, cw_mult, cw_subt,
+    __slice = Array.prototype.slice;
+
+  exports.component_wise = component_wise = function() {
+    var again, arg, args, argset, callback, i, resultset, size;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    for (i in args) {
+      if (args[i] && args[i].splice) args[i] = args[i].splice(0);
+    }
+    callback = args.pop();
+    resultset = [];
+    again = true;
+    while (again) {
+      size = null;
+      again = false;
+      argset = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = args.length; _i < _len; _i++) {
+          arg = args[_i];
+          if (arg && arg.length) {
+            if (arg.length > 1) again = true;
+            if (size && arg.length !== size) {
+              throw new Error("All vectors must be the same size");
+            }
+            size = arg.length;
+          }
+          if (arg && arg.shift) {
+            _results.push(arg.shift());
+          } else {
+            _results.push(arg);
+          }
+        }
+        return _results;
+      })();
+      resultset.push(callback.apply(null, argset));
+    }
+    if (resultset.length === 1) {
+      return resultset[0];
+    } else {
+      return resultset;
+    }
+  };
+
+  cw_mult = function(le, re) {
+    return component_wise(le.value, re && re.value, function(l, r) {
+      return l * r;
+    });
+  };
+
+  cw_subt = function(le, re) {
+    return component_wise(le.value, re && re.value, function(l, r) {
+      if (r) {
+        return l - r;
+      } else {
+        return -l;
+      }
+    });
+  };
+
+  cw_add = function(le, re) {
+    return component_wise(le.value, re && re.value, function(l, r) {
+      if (r) {
+        return l + r;
+      } else {
+        return +l;
+      }
+    });
+  };
+
+  cw_divide = function(le, re) {
+    return component_wise(le.value, re && re.value, function(l, r) {
+      return l / r;
+    });
+  };
+
+  exports.mat4 = {
+    '-': cw_subt,
+    '+': cw_add,
+    '/': cw_divide,
+    '*': function(le, re) {
+      var dest, mat, vec, w, x, y, z, _ref;
+      switch (re.type()) {
+        case 'vec4':
+          dest = [];
+          mat = le.value;
+          vec = re.value;
+          _ref = [vec[0], vec[1], vec[2], vec[3]], x = _ref[0], y = _ref[1], z = _ref[2], w = _ref[3];
+          dest[0] = mat[0] * x + mat[4] * y + mat[8] * z + mat[12] * w;
+          dest[1] = mat[1] * x + mat[5] * y + mat[9] * z + mat[13] * w;
+          dest[2] = mat[2] * x + mat[6] * y + mat[10] * z + mat[14] * w;
+          dest[3] = mat[3] * x + mat[7] * y + mat[11] * z + mat[15] * w;
+          return dest;
+        default:
+          return cw_mult(le, re);
+      }
+    }
+  };
+
+  exports.vec4 = {
+    '*': cw_mult,
+    '-': cw_subt,
+    '+': cw_add,
+    '/': cw_divide
+  };
+
+  exports.vec3 = {
+    '*': cw_mult,
+    '-': cw_subt,
+    '+': cw_add,
+    '/': cw_divide
+  };
+
+  exports.float = {
+    '*': cw_mult,
+    '-': cw_subt,
+    '+': cw_add,
+    '/': cw_divide
+  };
 
 }).call(this);
 
@@ -7208,7 +7370,7 @@ if (typeof module !== 'undefined' && require.main === module) {
 
     assign_builtin_variables = function(name, program) {
       var builtins, definition, _results;
-      builtins = program.builtins._variables[name];
+      builtins = program.builtins && program.builtins._variables[name];
       _results = [];
       for (name in builtins) {
         definition = builtins[name];
@@ -7226,13 +7388,19 @@ if (typeof module !== 'undefined' && require.main === module) {
       return program;
     };
 
-    function Simulator(glsl) {
+    function Simulator(glsl, variables) {
+      var name, value;
+      if (variables == null) variables = {};
       this.state = {};
       if (glsl.vertex) {
         this.vertex = compile_program('vertex', this.state, glsl.vertex);
       }
       if (glsl.fragment) {
         this.fragment = compile_program('fragment', this.state, glsl.fragment);
+      }
+      for (name in variables) {
+        value = variables[name];
+        this.state.variables[name].value = value;
       }
       if (!(this.vertex || this.fragment)) throw new Error("No programs found!");
     }

@@ -1,6 +1,11 @@
 require 'spec_helper'
 
 describe 'vector notation', ->
+  it "sanity check", ->
+    code = glsl 'vertex = -> x = vec4 2, 3, 4, 5; x -= [1, 2, 3, 4]'
+    sim = simulate code
+    expect(sim.state.variables.x.value).toEqual [1, 1, 1, 1]
+  
   it "used in expression", ->
     code = glsl 'vertex = -> x = vec4 2, 3, 4, 5; x -= x.xxyz * [1,2,3,4]'
     sim = simulate code
@@ -9,7 +14,6 @@ describe 'vector notation', ->
   describe "rvalue", ->
     it "should work with xyzw", ->
       code = glsl 'vertex = -> x = [1,2,3,4].xyzw'
-      # console.log code.vertex
       sim = simulate code
       expect(sim.state.variables.x.value).toEqual [1, 2, 3, 4]
 
@@ -39,7 +43,8 @@ describe 'vector notation', ->
       
   describe "lvalue", ->
     it "should work with xyzw", ->
-      sim = simulate glsl 'vertex = -> x = vec4(); x.xyzw = [1, 2, 3, 4]'
+      code = glsl 'vertex = -> x = vec4(); x.xyzw = [1, 2, 3, 4]'
+      sim = simulate code
       expect(sim.state.variables.x.value).toEqual [1, 2, 3, 4]
 
     it "should work with rgba", ->

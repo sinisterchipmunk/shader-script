@@ -7,11 +7,11 @@ class exports.Call extends require('shader-script/nodes/base').Base
     name = @name.toVariableName()
     compiled_params = (param.compile program for param in @params)
     
-    execute: () ->
+    execute: () =>
       if program.functions[name]
         program.functions[name].invoke compiled_params...
       else if program.builtins[name]
-        program.builtins[name].invoke compiled_params...
+        @definition value: program.builtins[name].invoke compiled_params...
       else
         throw new Error("function '#{name}' is not defined")
         

@@ -16,14 +16,9 @@ class exports.Op extends require('shader-script/nodes/base').Base
     right = @right && @right.compile program
     
     execute: =>
-      [le, re] = [left.execute(), right && right.execute()]
-
-      switch op
-        when '+' then @component_wise(le, re, (l,r) -> if r then l + r else  l)
-        when '-' then @component_wise(le, re, (l,r) -> if r then l - r else -l)
-        when '*' then @component_wise(le, re, (l,r) -> l * r)
-        when '/' then @component_wise(le, re, (l,r) -> l / r)
-        else throw new Error "Unsupported operation: #{op}"
+      re = right.execute() if right
+      le = left.execute()
+      @definition dependent: le, value: le.perform op, re
     
     toSource: ->
       if right
