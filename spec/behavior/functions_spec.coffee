@@ -4,7 +4,12 @@ describe "functions", ->
   it "should allow param types to be explicitly specified", ->
     script = "m = (float x) -> "
     code = glsl script
-    expect(code.vertex).toMatch /\(float x\)/
+    expect(code.vertex).toMatch /float x\)/
+    
+  it "should handle in, out, and inout params", ->
+    script = "m = (vec3 invec, inout vec3 inoutvec, out vec3 outvec) ->"
+    code = glsl script
+    expect(code.vertex).toMatch /vec3 invec, inout vec3 inoutvec, out vec3 outvec\)/
   
   it "should be able to call functions", ->
     code = glsl "x = 0\ncalcX = -> x = 1\nvertex = -> calcX()"
@@ -27,7 +32,7 @@ describe "functions", ->
       fpos = (angle) -> m(angle)
       vertex = -> fpos(1)
     """
-    expect(code.vertex).toMatch /\(float a\)/
+    expect(code.vertex).toMatch /float a\)/
     
   it "should set return type by return value", ->
     code = glsl """

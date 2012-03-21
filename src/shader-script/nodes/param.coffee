@@ -4,6 +4,8 @@ class exports.Param extends require('shader-script/nodes/base').Base
   name: 'param'
   children: -> ['name', 'default_value']
   
+  constructor: (name, default_value, @param_qualifier = 'in') -> super name, default_value
+  
   toVariableName: -> @name.toVariableName()
   
   variable: -> @_variable or= new Definition
@@ -14,8 +16,5 @@ class exports.Param extends require('shader-script/nodes/base').Base
     
   compile: (shader) ->
     varn = @toVariableName()
-    variable = shader.scope.define(varn, dependent: @variable())
-    result = @glsl 'Variable', variable
-    # functions use this for mapping inferred types
-    result.variable = variable
-    result
+    variable = shader.scope.define varn, dependent: @variable(), param_qualifier: @param_qualifier
+    @glsl 'Variable', variable

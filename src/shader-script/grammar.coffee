@@ -98,6 +98,8 @@ grammar =
   StorageQualifierAssign: [
     o 'Identifier : StorageQualifierName', -> type: $1, names: [$3]
     o 'Identifier : [ StorageQualifierNameList ]', -> type: $1, names: $4
+    o 'Identifier : INDENT StorageQualifierNameList OUTDENT', -> type: $1, names: $4
+    o 'Identifier : [ INDENT StorageQualifierNameList OUTDENT ]', -> type: $1, names: $5
   ]
   
   StorageQualifierName: [
@@ -107,6 +109,8 @@ grammar =
   StorageQualifierNameList: [
     o 'StorageQualifierName', -> [ $1 ]
     o 'StorageQualifierNameList , StorageQualifierName', -> $1.push $3; $1
+    o 'StorageQualifierNameList TERMINATOR StorageQualifierName', -> $1.push $3; $1
+    o 'StorageQualifierNameList , TERMINATOR StorageQualifierName', -> $1.push $4; $1
   ]
 
   # All the different types of expressions in our language. The basic unit of
@@ -220,7 +224,7 @@ grammar =
   # The list of parameters that a function accepts can be of any length.
   ParamList: [
     o '',                                       -> []
-    o 'Param',                                  -> [$1]
+    o 'Param',                                  -> [].concat $1
     o 'ParamList , Param',                      -> $1.concat $3
   ]
 
@@ -230,7 +234,24 @@ grammar =
     o 'ParamVar',                               -> new Param $1
     o 'ParamVar ...',                           -> new Param $1, null, on
     o 'ParamVar = Expression',                  -> new Param $1, $3
+    # v = (inout x) ->
+    o 'ParamQualifier Param',                   ->
+      if $2.length then $2[0].param_qualifier = $1
+      else $2.param_qualifier = $1
+      $2
+    # v = (float x) ->
     o 'GlslType CALL_START Param CALL_END',     -> $3.set_type $1; $3
+    # v = (float x, float y) ->
+    o 'GlslType CALL_START Param , ParamList CALL_END', ->
+      $3.set_type $1
+      $5.unshift $3
+      $5
+  ]
+  
+  ParamQualifier: [
+    # IN is the default and can't be used explicitly because it is also a relation
+    o 'INOUT'
+    o 'OUT'
   ]
 
  # Function Parameters

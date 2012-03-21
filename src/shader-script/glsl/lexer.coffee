@@ -705,7 +705,7 @@ COMPARE = ['==', '!=', '<', '>', '<=', '>=']
 MATH    = ['*', '/', '%']
 
 # Relational tokens that are negatable with `not` prefix.
-RELATION = ['IN', 'OF', 'INSTANCEOF']
+RELATION = ['INSTANCEOF']
 
 # Boolean tokens.
 BOOL = ['TRUE', 'FALSE', 'NULL', 'UNDEFINED']

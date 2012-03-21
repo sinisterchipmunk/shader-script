@@ -12,8 +12,7 @@ class exports.Variable extends require('shader-script/nodes/base').Base
   # where scoped_variable_instance is an instance of `Definition` from
   # `shader-script/scope`.
   #
-  constructor: (type, name, @qualified_name) ->
-    if @qualified_name then throw new Error "don't use qualified name, it's left over from an earlier build"
+  constructor: (type, name, @param_qualifier = null) ->
     if arguments.length == 1
       @variable = arguments[0]
       super()
@@ -26,7 +25,8 @@ class exports.Variable extends require('shader-script/nodes/base').Base
     program.state.variables or= {}
     name = if @variable then @variable.name else @name.toVariableName()
   
-    variable = program.state.scope.define(name, type: if @variable then @variable.type() else @type)
+    variable = program.state.scope.define(name, if @variable then @variable.as_options() else type: @type)
+    variable.param_qualifier or= @param_qualifier
     variable.add_dependent @variable if @variable
     variable.value = Number.NaN if variable.value is undefined
 
@@ -34,8 +34,9 @@ class exports.Variable extends require('shader-script/nodes/base').Base
     if qualifier == 'root.block' or qualifier == 'root.block.main.block'
       # provides convenient access to "important" variables
       program.state.variables[name] = variable
-
+      
     execute: => variable
-    toSource: => "#{variable.type()} #{variable.name}"
+    toSource: => variable.toSource()
+    # functions use this for mapping inferred types
     variable: variable
     

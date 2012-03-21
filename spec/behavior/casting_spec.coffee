@@ -12,3 +12,9 @@ describe 'casting', ->
       expect(code.vertex).toMatch /vRGB.rgb = color.[xrs][ygt][zbp];/
       expect(sim.state.variables.vRGB.value).toEqual [1, 2, 3]
       
+  it "implicitly when lvalue is a vec4 and rvalue is a (mat4 * vec4) operation", ->
+    code = glsl('uniforms = mat4: mv\nvertex = -> x = mv * [1,2,3,4]; gl_Position = x').vertex
+    # console.log code
+    sim = simulate (vertex: code), mv: [1,0,0,0, 0,-1,0,0, 0,0,-1,0, 0,0,0,1] # rotation PI rads about X axis
+    expect(sim.state.variables.x.value).toEqual [1, -2, -3, 4]
+    

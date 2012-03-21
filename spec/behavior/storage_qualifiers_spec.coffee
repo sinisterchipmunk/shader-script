@@ -1,6 +1,19 @@
 require 'spec_helper'
 
 describe "storage qualifiers", ->
+  describe "syntax", ->
+    it "should allow brackets", ->
+      expect(glsl('uniforms = mat4: [mv, p]').vertex).toMatch /uniform mat4 mv, p/
+
+    it "should allow brackets spanning multiple lines", ->
+      expect(glsl('uniforms = mat4: [\n  mv,\n  p\n]').vertex).toMatch /uniform mat4 mv, p/
+
+    it "should allow omission of comma spanning multiple lines", ->
+      expect(glsl('uniforms = mat4:\n  mv\n  p').vertex).toMatch /uniform mat4 mv, p/
+      
+    it "should allow presence of comma spanning multiple lines", ->
+      expect(glsl('uniforms = mat4:\n  mv,\n  p').vertex).toMatch /uniform mat4 mv, p/
+  
   describe "uniforms", ->
     it "should declare them", ->
       script = 'uniforms =\n  vec3: position\n  mat4: [mv, p]'

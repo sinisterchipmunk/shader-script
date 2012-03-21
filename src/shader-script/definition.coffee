@@ -33,6 +33,7 @@ exports.Definition = class Definition
     builtin: @builtin
     dependents: @dependents
     value: @value
+    param_qualifier: @param_qualifier
   
   inferred_type: ->
     for dep in @dependents
@@ -57,6 +58,7 @@ exports.Definition = class Definition
     @qualified_name = options.qualified_name if options.qualified_name
     @builtin = options.builtin if options.builtin
     @value = options.value
+    @param_qualifier = options.param_qualifier if options.param_qualifier
     
     if options.type
       @set_type options.type
@@ -65,4 +67,9 @@ exports.Definition = class Definition
     if options.dependent
       @add_dependent options.dependent
     
-
+  toSource: ->
+    if @param_qualifier
+      "#{@param_qualifier} #{@type()} #{@name}"
+    else
+      "#{@type()} #{@name}"
+    

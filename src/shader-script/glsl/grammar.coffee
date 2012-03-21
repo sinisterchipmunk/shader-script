@@ -135,6 +135,15 @@ grammar =
   ArgumentDefs: [
     o 'Type Identifier', -> [new Variable $1, $2]
     o 'ArgumentDefs , Type Identifier', -> $1.concat [new Variable $3, $4]
+
+    o 'ParamQualifier Type Identifier', -> [new Variable $2, $3, $1]
+    o 'ArgumentDefs , ParamQualifier Type Identifier', -> $1.concat [new Variable $4, $5, $3]
+  ]
+  
+  ParamQualifier: [
+    o 'IN'
+    o 'OUT'
+    o 'INOUT'
   ]
   
   ArgumentList: [

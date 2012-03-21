@@ -23,4 +23,3 @@ describe "operations", ->
       sim = simulate (vertex: glsl('uniforms = mat4: mv\nvertex = -> x = mv * [1,2,3,4]').vertex),
                      mv: [1,0,0,0, 0,-1,0,0, 0,0,-1,0, 0,0,0,1] # rotation PI rads about X axis
       expect(sim.state.variables.x.value).toEqual [1, -2, -3, 4]
-      

@@ -10,12 +10,14 @@ class exports.Identifier extends require('shader-script/nodes/base').Base
       @children[0]
     
   cast: (type, program) ->
-    current_type = @type program
-    if type == null or type is undefined then return
-    if type == current_type then return
-    if current_type
-      throw new Error "Cannot implicitly cast #{current_type} to #{type}"
-    @variable(program).set_type type
+    # Specs currently pass without this so why keep it?
+    #
+    # current_type = @type program
+    # if type == null or type is undefined then return
+    # if type == current_type then return
+    # if current_type
+    #   throw new Error "Cannot implicitly cast #{current_type} to #{type}"
+    # @variable(program).set_type type
     
   variable: (program) ->
     if @children[0] instanceof Definition then @children[0]
