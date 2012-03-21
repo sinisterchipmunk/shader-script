@@ -21,10 +21,10 @@ exports.component_wise = component_wise = (args...) ->
     resultset[0]
   else resultset
 
-cw_mult = (le, re) -> component_wise le.value, re && re.value, (l, r) -> l * r
-cw_subt = (le, re) -> component_wise le.value, re && re.value, (l, r) -> if r then l - r else -l
-cw_add  = (le, re) -> component_wise le.value, re && re.value, (l, r) -> if r then l + r else +l
-cw_divide=(le, re) -> component_wise le.value, re && re.value, (l, r) -> l / r
+cw_subt = (le, re) -> component_wise le.value, re && re.value, (l, r) -> if r is undefined then -l else l - r
+cw_add  = (le, re) -> component_wise le.value, re && re.value, (l, r) -> if r is undefined then +l else l + r
+cw_mult = (le, re) -> component_wise le.value, re.value, (l, r) -> l * r
+cw_divide=(le, re) -> component_wise le.value, re.value, (l, r) -> l / r
 
 exports.mat4 =
   '-': cw_subt

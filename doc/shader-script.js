@@ -2619,6 +2619,8 @@
       return ['cast_type', 'arguments'];
     };
 
+    TypeConstructor.prototype.variable = function() {};
+
     TypeConstructor.prototype.cast = function(type, shader) {
       if (!type) return;
       return this.cast_type = type;
@@ -5932,34 +5934,34 @@ if (typeof module !== 'undefined' && require.main === module) {
     }
   };
 
-  cw_mult = function(le, re) {
-    return component_wise(le.value, re && re.value, function(l, r) {
-      return l * r;
-    });
-  };
-
   cw_subt = function(le, re) {
     return component_wise(le.value, re && re.value, function(l, r) {
-      if (r) {
-        return l - r;
-      } else {
+      if (r === void 0) {
         return -l;
+      } else {
+        return l - r;
       }
     });
   };
 
   cw_add = function(le, re) {
     return component_wise(le.value, re && re.value, function(l, r) {
-      if (r) {
-        return l + r;
-      } else {
+      if (r === void 0) {
         return +l;
+      } else {
+        return l + r;
       }
     });
   };
 
+  cw_mult = function(le, re) {
+    return component_wise(le.value, re.value, function(l, r) {
+      return l * r;
+    });
+  };
+
   cw_divide = function(le, re) {
-    return component_wise(le.value, re && re.value, function(l, r) {
+    return component_wise(le.value, re.value, function(l, r) {
       return l / r;
     });
   };

@@ -1,6 +1,11 @@
 require 'spec_helper'
 
 describe 'type constructors', ->
+  it "should be usable in math", ->
+    code = glsl "vertex = -> v = vec4(1, 2, 3, 4) - [0, 1, 2, 3]"
+    sim = simulate code
+    expect(sim.state.variables.v.value).toEqual [1, 1, 1, 1]
+  
   describe "vec4", ->
     code = null
     beforeEach -> code = glsl "vertex = -> v = [1,2,3,4]"
