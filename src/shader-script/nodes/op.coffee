@@ -1,22 +1,23 @@
+{signatures} = require 'shader-script/operators'
+{Definition} = require 'shader-script/definition'
+
 class exports.Op extends require('shader-script/nodes/base').Base
   name: "op"
   children: -> ['op', 'left', 'right']
   
   type: (shader) ->
+    return @left.type shader unless @right
     ltype = @left.type shader
-    rtype = @right && @right.type shader
-    return ltype unless rtype
-    
-    # if at least one type is a vector,
-    # then both are vectors.
-    if /vec/.test(ltype) || /mat/.test(ltype)
-      ltype
-    else if /vec/.test(rtype) || /mat/.test(rtype)
-      rtype
-    else
-      ltype || rtype
+    rtype = @right.type shader
+    if sig = signatures[ltype]
+      if sig = sig[@op]
+        return sig[rtype]
+    ltype || rtype  
   
-  variable: (shader) -> @left.variable(shader) or @right && @right.variable(shader)
+  variable: (shader) ->
+    @_variable or= new Definition
+    @_variable.set_type @type shader
+    @_variable
   
   compile: (shader) ->
     left = @left.compile shader

@@ -5469,8 +5469,13 @@ if (typeof module !== 'undefined' && require.main === module) {
     _require["shader-script/nodes/op"] = function() {
       var exports = {};
       (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
+  var Definition, signatures,
+    __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  signatures = require('shader-script/operators').signatures;
+
+  Definition = require('shader-script/definition').Definition;
 
   exports.Op = (function(_super) {
 
@@ -5487,21 +5492,18 @@ if (typeof module !== 'undefined' && require.main === module) {
     };
 
     Op.prototype.type = function(shader) {
-      var ltype, rtype;
+      var ltype, rtype, sig;
+      if (!this.right) return this.left.type(shader);
       ltype = this.left.type(shader);
-      rtype = this.right && this.right.type(shader);
-      if (!rtype) return ltype;
-      if (/vec/.test(ltype) || /mat/.test(ltype)) {
-        return ltype;
-      } else if (/vec/.test(rtype) || /mat/.test(rtype)) {
-        return rtype;
-      } else {
-        return ltype || rtype;
-      }
+      rtype = this.right.type(shader);
+      if (sig = signatures[ltype]) if (sig = sig[this.op]) return sig[rtype];
+      return ltype || rtype;
     };
 
     Op.prototype.variable = function(shader) {
-      return this.left.variable(shader) || this.right && this.right.variable(shader);
+      this._variable || (this._variable = new Definition);
+      this._variable.set_type(this.type(shader));
+      return this._variable;
     };
 
     Op.prototype.compile = function(shader) {
@@ -5964,6 +5966,73 @@ if (typeof module !== 'undefined' && require.main === module) {
     return component_wise(le.value, re.value, function(l, r) {
       return l / r;
     });
+  };
+
+  exports.signatures = {
+    vec3: {
+      '-': {
+        vec3: 'vec3'
+      },
+      '+': {
+        vec3: 'vec3'
+      },
+      '/': {
+        vec3: 'vec3'
+      },
+      '*': {
+        vec3: 'vec3',
+        mat3: 'vec3',
+        mat4: 'vec3'
+      }
+    },
+    vec4: {
+      '-': {
+        vec4: 'vec4'
+      },
+      '+': {
+        vec4: 'vec4'
+      },
+      '/': {
+        vec4: 'vec4'
+      },
+      '*': {
+        vec4: 'vec4',
+        mat3: 'vec4',
+        mat4: 'vec4'
+      }
+    },
+    mat3: {
+      '-': {
+        mat3: 'mat3'
+      },
+      '+': {
+        mat3: 'mat3'
+      },
+      '/': {
+        mat3: 'mat3'
+      },
+      '*': {
+        vec3: 'vec3',
+        vec4: 'vec4',
+        mat3: 'mat3'
+      }
+    },
+    mat4: {
+      '-': {
+        mat4: 'mat4'
+      },
+      '+': {
+        mat4: 'mat4'
+      },
+      '/': {
+        mat4: 'mat4'
+      },
+      '*': {
+        vec3: 'vec3',
+        vec4: 'vec4',
+        mat4: 'mat4'
+      }
+    }
   };
 
   exports.mat4 = {

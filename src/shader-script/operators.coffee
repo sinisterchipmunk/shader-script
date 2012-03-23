@@ -26,6 +26,53 @@ cw_add  = (le, re) -> component_wise le.value, re && re.value, (l, r) -> if r is
 cw_mult = (le, re) -> component_wise le.value, re.value, (l, r) -> l * r
 cw_divide=(le, re) -> component_wise le.value, re.value, (l, r) -> l / r
 
+# An object containing lval, operator, and rval types. The lowest
+# level is the object which would be returned by performing the
+# operation with the uppermost type on the left. For example,
+# the resultant type of (mat4 * vec4) is 'vec4'. This is used
+# by the type inferencer when it encounters any operation, to determine
+# the outcome of the operation without actually performing it.
+#
+# If an rval does not exist beneath the operator, that operation
+# can't be performed without first casting the rval to a compatible type.
+#
+# If an lval doesn't exist, no operations can be performed with it.
+#
+exports.signatures =
+  vec3:
+    '-': vec3: 'vec3'
+    '+': vec3: 'vec3'
+    '/': vec3: 'vec3'
+    '*':
+      vec3: 'vec3'
+      mat3: 'vec3'
+      mat4: 'vec3'
+  vec4:
+    '-': vec4: 'vec4'
+    '+': vec4: 'vec4'
+    '/': vec4: 'vec4'
+    '*':
+      vec4: 'vec4'
+      mat3: 'vec4'
+      mat4: 'vec4'
+  mat3:
+    '-': mat3: 'mat3'
+    '+': mat3: 'mat3'
+    '/': mat3: 'mat3'
+    '*':
+      vec3: 'vec3'
+      vec4: 'vec4'
+      mat3: 'mat3'
+  mat4:
+    '-': mat4: 'mat4'
+    '+': mat4: 'mat4'
+    '/': mat4: 'mat4'
+    '*':
+      vec3: 'vec3'
+      vec4: 'vec4'
+      mat4: 'mat4'
+    
+
 exports.mat4 =
   '-': cw_subt
   '+': cw_add

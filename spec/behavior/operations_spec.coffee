@@ -23,3 +23,12 @@ describe "operations", ->
       sim = simulate (vertex: glsl('uniforms = mat4: mv\nvertex = -> x = mv * [1,2,3,4]').vertex),
                      mv: [1,0,0,0, 0,-1,0,0, 0,0,-1,0, 0,0,0,1] # rotation PI rads about X axis
       expect(sim.state.variables.x.value).toEqual [1, -2, -3, 4]
+
+    it "assign function calling mat3 multiply vec3", ->
+      code = glsl """
+      uniforms =
+        mat3: vnMatrix
+        vec3: LIGHT_DIRECTION
+      vertex = -> nLDir = normalize vnMatrix * -normalize LIGHT_DIRECTION
+      """
+      expect(code.vertex).toMatch /vec3 nLDir/
