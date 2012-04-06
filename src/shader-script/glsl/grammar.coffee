@@ -96,11 +96,17 @@ grammar =
     o 'Return TERMINATOR'
     o 'FunctionDefinition' # no terminator necessary here because of { ... }
     o 'Comment'            # also no terminator for comments
+    o 'If'
     o 'FunctionDeclaration TERMINATOR'
     o 'VariableDeclaration TERMINATOR'
     o 'StorageDeclaration TERMINATOR'
     o 'STATEMENT TERMINATOR',                              -> new Literal $1
     o 'TERMINATOR', -> (compile: -> null)
+  ]
+  
+  If: [
+    o 'IF Parenthetical { Body }', -> new If $2, $4, $1
+    o 'If ELSE { Body }', -> $1.addElse $4
   ]
   
   StorageDeclaration: [

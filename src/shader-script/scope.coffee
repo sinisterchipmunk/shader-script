@@ -99,9 +99,9 @@ exports.Scope = class Scope
     
   define_within: (name, options = {}) ->
     options.name or= name
-    def = @lookup name, true
-    if def
+    if def = @lookup name, true
       def.assign options
+      return def
     else
       options.qualified_name = @qualifier() + "." + name
       def = new Definition options

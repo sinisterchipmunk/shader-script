@@ -15,6 +15,7 @@ nodes =
   StorageQualifier: 'storage_qualifier'
   Parens:     'parens'
   Access:     'access'
+  If:         'if'
 
 for node_name, node_file of nodes
   exports[node_name] = require("shader-script/glsl/nodes/" + node_file)[node_name]

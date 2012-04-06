@@ -40,6 +40,7 @@ cw_divide=(le, re) -> component_wise le.value, re.value, (l, r) -> l / r
 #
 exports.signatures =
   vec3:
+    '==': vec3: 'vec3'
     '-': vec3: 'vec3'
     '+': vec3: 'vec3'
     '/': vec3: 'vec3'
@@ -48,6 +49,7 @@ exports.signatures =
       mat3: 'vec3'
       mat4: 'vec3'
   vec4:
+    '==': vec4: 'vec4'
     '-': vec4: 'vec4'
     '+': vec4: 'vec4'
     '/': vec4: 'vec4'
@@ -56,6 +58,7 @@ exports.signatures =
       mat3: 'vec4'
       mat4: 'vec4'
   mat3:
+    '==': mat3: 'mat3'
     '-': mat3: 'mat3'
     '+': mat3: 'mat3'
     '/': mat3: 'mat3'
@@ -64,6 +67,7 @@ exports.signatures =
       vec4: 'vec4'
       mat3: 'mat3'
   mat4:
+    '==': mat4: 'mat4'
     '-': mat4: 'mat4'
     '+': mat4: 'mat4'
     '/': mat4: 'mat4'
@@ -74,6 +78,7 @@ exports.signatures =
     
 
 exports.mat4 =
+  '==': (le, re) -> le.value == re.value
   '-': cw_subt
   '+': cw_add
   '/': cw_divide
@@ -92,18 +97,21 @@ exports.mat4 =
       else cw_mult le, re
 
 exports.vec4 = 
+  '==': (le, re) -> le.value == re.value
   '*': cw_mult
   '-': cw_subt
   '+': cw_add
   '/': cw_divide
 
 exports.vec3 = 
+  '==': (le, re) -> le.value == re.value
   '*': cw_mult
   '-': cw_subt
   '+': cw_add
   '/': cw_divide
 
 exports.float =
+  '==': (le, re) -> le.value == re.value
   '*': cw_mult
   '-': cw_subt
   '+': cw_add
