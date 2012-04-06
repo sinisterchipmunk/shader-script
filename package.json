@@ -1,0 +1,28 @@
+{
+  "name": "shader-script",
+  "version": "0.6.0",
+  "description": "Write your WebGL shaders in CoffeeScript!",
+  "homepage": [
+    ""
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sinisterchipmunk/shader-script"
+  },
+  "keywords": [
+
+  ],
+  "author": "Colin MacKenzie IV <sinisterchipmunk@gmail.com>",
+  "contributors": [
+    "Colin MacKenzie IV <sinisterchipmunk@gmail.com>"
+  ],
+  "licenses": [
+    "MIT"
+  ],
+  "dependencies": {
+  },
+  "bin": [
+
+  ],
+  "main": "doc/shader-script"
+}
