@@ -12,10 +12,7 @@ module ShaderScript::Compiler
       end
     
       def context
-        # FIXME it would be better to memoize this but we can't right now because
-        # views are compiled as part of the original source. We have to pull
-        # views outside of the compile phase before we can memoize the context.
-        @context = ExecJS.compile(content)
+        @context ||= ExecJS.compile(content)
       end
 
       def render(path, base_path = @base_path || File.expand_path("../assets/javascripts", File.dirname(__FILE__)))
