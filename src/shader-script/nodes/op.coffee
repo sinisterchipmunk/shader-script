@@ -12,7 +12,7 @@ class exports.Op extends require('shader-script/nodes/base').Base
     if sig = signatures[ltype]
       if sig = sig[@op]
         return sig[rtype]
-    ltype || rtype  
+    ltype || rtype
   
   variable: (shader) ->
     @_variable or= new Definition

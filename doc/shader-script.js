@@ -6093,7 +6093,8 @@ if (typeof module !== 'undefined' && require.main === module) {
       '*': {
         vec3: 'vec3',
         mat3: 'vec3',
-        mat4: 'vec3'
+        mat4: 'vec3',
+        float: 'vec3'
       }
     },
     vec4: {
@@ -6112,7 +6113,8 @@ if (typeof module !== 'undefined' && require.main === module) {
       '*': {
         vec4: 'vec4',
         mat3: 'vec4',
-        mat4: 'vec4'
+        mat4: 'vec4',
+        float: 'vec4'
       }
     },
     mat3: {
@@ -6131,7 +6133,8 @@ if (typeof module !== 'undefined' && require.main === module) {
       '*': {
         vec3: 'vec3',
         vec4: 'vec4',
-        mat3: 'mat3'
+        mat3: 'mat3',
+        float: 'mat3'
       }
     },
     mat4: {
@@ -6150,7 +6153,8 @@ if (typeof module !== 'undefined' && require.main === module) {
       '*': {
         vec3: 'vec3',
         vec4: 'vec4',
-        mat4: 'mat4'
+        mat4: 'mat4',
+        float: 'mat4'
       }
     }
   };

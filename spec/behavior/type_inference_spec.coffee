@@ -1,6 +1,12 @@
 require 'spec_helper'
 
 describe "type inference", ->
+  it "should infer type of lvalue from operation with vec4/float types", ->
+    code = glsl """
+      vertex = -> diffuse = [1,1,1,1] * 1.0
+    """
+    expect(code.vertex).toMatch /vec4 diffuse/
+  
   it "for function params from function param values", ->
     code = glsl """
       m = (a) -> 1
