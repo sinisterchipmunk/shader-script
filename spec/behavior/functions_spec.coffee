@@ -26,24 +26,6 @@ describe "functions", ->
     sim = simulate vertex: code.vertex
     expect(sim.state.variables.b.value).toEqual 1
 
-  it "should infer params types from other params", ->
-    code = glsl """
-      m = (a) -> 1
-      fpos = (angle) -> m(angle)
-      vertex = -> fpos(1)
-    """
-    expect(code.vertex).toMatch /float a\)/
-    
-  it "should set return type by return value", ->
-    code = glsl """
-      m = -> return 1.0
-    """
-    expect(code.vertex).toMatch(/float m\(/)
-
-  it "should infer types from function return value", ->
-    code = glsl "m = -> return 1.0\nvertex = -> x = m()"
-    expect(code.vertex).toMatch /float x;/
-  
   it "should return void from main", ->
     code = glsl "vertex = ->"
     expect(code.vertex).toMatch /void main\(/

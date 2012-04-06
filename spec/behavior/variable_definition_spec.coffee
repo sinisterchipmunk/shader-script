@@ -20,15 +20,6 @@ describe 'variable definition', ->
     expect(sim.state.variables.y.value).toEqual 1
     expect(sim.state.variables.z.value).toEqual 2
     
-  it "should add decimal to inferred floats", ->
-    code = glsl 'vertex = -> x = 1'
-    expect(code.vertex).toMatch /x = 1\.0;/
-
-  it "should infer float type from assignment", ->
-    code = glsl 'vertex = -> x = 1.0'
-    expect(code.vertex).toMatch /float x/
-    expect(simulate(code).state.variables.x.type()).toEqual 'float'
-    
   it "should not lose floating point values", ->
     code = glsl 'vertex = -> x = 1.0'
     expect(code.vertex).toMatch /x = 1.0/
@@ -36,12 +27,3 @@ describe 'variable definition', ->
   it "should complain about mismatched variable types", ->
     expect(-> glsl 'vertex = -> x = true; x = 1.0').toThrow()
     
-  it "should infer proper local variable type", ->
-    code = glsl """
-      f = (a) ->
-        b = a
-
-      vertex = ->
-        f(1.0)
-    """
-    expect(code.vertex).toMatch /float b/
