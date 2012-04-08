@@ -4,20 +4,19 @@ class ShaderScript::Template < Tilt::Template
   attr_reader :context
 
   def self.default_mime_type
-    "text/tml"
+    "application/json"
   end
 
   def prepare
-    
   end
 
   def evaluate(scope, locals, &block)
     @context = scope
     depend_on_shaderscript
-    compile data
+    compile(data).to_json
   end
   
-  def depend_on_ambrosia
+  def depend_on_shaderscript
     depend_on_env ShaderScript::Compiler::Source.shader_build_env
   end
   

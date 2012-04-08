@@ -20,7 +20,7 @@ module ShaderScript::TestCase
   end
   
   def draw_routes &block
-    RailsTestApp.routes.draw &block
+    RailsTestApp.routes.draw { instance_eval &block if block }
   end
   
   def create_file(filename, contents = nil)
@@ -46,7 +46,7 @@ module ShaderScript::TestCase
   end
   
   def bump_assets!
-    RailsTestApp.config.assets.version = (RailsTestApp.config.assets.version.to_i + 1).to_s
+    RailsTestApp.assets.version = (RailsTestApp.assets.version.to_i + 1).to_s
   end
   
   def cleanup

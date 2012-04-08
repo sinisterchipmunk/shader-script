@@ -52,9 +52,8 @@ Rails:
     vertex = -> gl_Position = mvp * position
     fragment = -> gl_FragColor = [1, 0, 0, 1]
 
-    # in your view, using jquery and coffee:
-    $.get url: '/assets/red.fragment', success: (code) -> setupFragmentShader "red", code
-    $.get url: '/assets/red.fragment', success: (code) -> setupVertexShader "red", code
+    # in your view, using (for example) jQuery:
+    $.getJSON({url: '/assets/red.shader', success: function(code) { shader(code.vertex, code.fragment); } });
 
 Ruby:
     gem install shader-script
@@ -77,7 +76,7 @@ See the [documentation](http://sinisterchipmunk.github.com/shader-script).
 
 ## Improving Shader-Script
 
-It's still early yet, and Shader-Script still has a lot of iterations ahead of it. If you discover any issues, please do report it so we can fix it. If it's something you feel confident enough to go ahead and resolve, fork this project and send me a pull request!
+If you discover any issues, please do report them so they can be fixed. If it's something you feel confident enough to go ahead and resolve, fork this project and send me a pull request!
 
 I only ask that you adhere to a few principles:
 
