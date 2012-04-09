@@ -46,6 +46,8 @@ class exports.Function extends require('shader-script/nodes/base').Base
       
     is_function: true
     
+    no_terminator: true
+    
     name: compiled_name
     
     # overriding_fn_name allows us to rename functions as needed. This is mostly

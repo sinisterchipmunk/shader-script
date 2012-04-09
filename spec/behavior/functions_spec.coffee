@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe "functions", ->
+  it "should not produce trailing terminators", ->
+    code = glsl "m = () ->"
+    expect(code.vertex).not.toMatch /\};/
+  
   it "should allow param types to be explicitly specified", ->
     script = "m = (float x) -> "
     code = glsl script

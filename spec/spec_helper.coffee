@@ -16,7 +16,13 @@ global.build = (script) -> Shader.parse script
 
 global.json = (script) -> Shader.compile_to_json script
 
-global.glsl = (script) -> Shader.compile_to_glsl script
+global.glsl = (script, validate = true) ->
+  glsl = Shader.compile_to_glsl script
+  if validate and typeof(window) != 'undefined'
+    compileVertex glsl.vertex if glsl.vertex
+    compileFragment glsl.fragment if glsl.fragment
+    linkProgram if glsl.vertex and glsl.fragment
+  glsl
 
 global.simulate = (glsl, variables) ->
   new Shader.Simulator(glsl, variables).start()

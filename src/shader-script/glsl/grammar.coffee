@@ -97,7 +97,7 @@ grammar =
     o 'FunctionDefinition' # no terminator necessary here because of { ... }
     o 'Comment'            # also no terminator for comments
     o 'If'
-    o 'FunctionDeclaration TERMINATOR'
+    o 'FunctionDeclaration'
     o 'VariableDeclaration TERMINATOR'
     o 'StorageDeclaration TERMINATOR'
     o 'STATEMENT TERMINATOR',                              -> new Literal $1

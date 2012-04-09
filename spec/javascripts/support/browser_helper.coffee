@@ -3,6 +3,34 @@ if typeof(window) != 'undefined'
   _requires = 
     spec_helper: {}
     fs: {}
+  
+  (->
+    canvas = document.createElement 'canvas'
+    canvas.width = canvas.height = 100
+    gl = canvas.getContext('experimental-webgl') || canvas.getContext('webgl')
+    program = gl.createProgram()
+    program.vertex = gl.createShader gl.VERTEX_SHADER
+    program.fragment = gl.createShader gl.FRAGMENT_SHADER
+    gl.attachShader program, program.vertex
+    gl.attachShader program, program.fragment
+    
+    fail = (which, src) ->
+      throw new Error("#{which} shader failed to compile:\n\n#{gl.getShaderInfoLog program[which]}\n\n#{src}")
+
+    compile = (shader, src, type) ->
+      gl.shaderSource program.vertex, src
+      gl.compileShader program.vertex
+      unless gl.getShaderParameter shader, gl.COMPILE_STATUS
+        fail type, src
+
+    window.compileVertex = (src) -> compile program.vertex, src, 'vertex'
+    window.compileFragment = (src) -> compile program.fragment, src, 'fragment'
+    window.linkProgram = ->
+      gl.linkProgram program
+      unless gl.getProgramParameter program, gl.LINK_STATUS
+        throw new Error("Program failed to link:\n\n#{gl.getProgramInfoLog program}")
+  )()
+    
     
   window.require = (path) ->
     return _requires[path] if _requires[path] isnt undefined

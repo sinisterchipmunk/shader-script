@@ -1,5 +1,16 @@
 beforeEach ->
+  EPSILON = 0.000001
+  
   @addMatchers
+    toEqualish: (expected) ->
+      if @actual.length || expected.length
+        return false if @actual.length != expected.length
+        for i in [0...@actual.length]
+          return false if Math.abs(@actual[i] - expected[i]) > EPSILON
+      else
+        return false if Math.abs(@actual - expected[i]) > EPSILON
+      true
+  
     toBeInstanceOf: (expected) ->
       @actual instanceof expected
 

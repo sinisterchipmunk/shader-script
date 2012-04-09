@@ -15,7 +15,7 @@ describe "built-in functions", ->
     
     sim = exec operation
     expect(sim.state.variables.x.type()).toEqual expected_type
-    expect(sim.state.variables.x.value).toEqual expected_value
+    expect(sim.state.variables.x.value).toEqualish expected_value
     
   describe 'angle and trigonometry functions, p65', ->
     # Function parameters specified as angle are assumed to be in units of radians.  In no case will any of these
