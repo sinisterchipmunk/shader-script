@@ -28,4 +28,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'jasmine'
   s.add_development_dependency 'rspec-rails', ">= 2"
   s.add_development_dependency 'coffee-script'
+  s.add_development_dependency 'rack-asset-compiler'
 end

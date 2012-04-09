@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe "README" do
   include RSpec::Rails::RequestExampleGroup
-
+  
   it "pure ruby examples" do
     code = ShaderScript.compile <<-end_code
       uniforms = mat4: mvp
