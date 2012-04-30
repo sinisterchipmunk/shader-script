@@ -81,6 +81,13 @@ grammar =
     o 'STATEMENT',                              -> new Literal $1
     o 'StorageQualifier = { StorageQualifierAssigns }',   -> new StorageQualifier $1, $4
     o 'StorageQualifier = INDENT { StorageQualifierAssigns } OUTDENT',  -> new StorageQualifier $1, $5
+    o 'PRECISION PrecisionSpecifier GlslType', -> new Precision $2, $3
+  ]
+  
+  PrecisionSpecifier: [
+    o 'HIGHP'
+    o 'MEDIUMP'
+    o 'LOWP'
   ]
   
   StorageQualifier: [

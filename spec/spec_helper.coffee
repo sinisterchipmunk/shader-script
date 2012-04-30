@@ -10,14 +10,14 @@ global.parse_tree = (code) ->
   (new Lexer).tokenize code
 
 global.compile = (code) ->
-  Shader.compile(code).trim()
+  Shader.compile_to_dom(code).trim()
 
 global.build = (script) -> Shader.parse script
 
 global.json = (script) -> Shader.compile_to_json script
 
 global.glsl = (script, validate = true) ->
-  glsl = Shader.compile_to_glsl script
+  glsl = Shader.compile script
   if validate and typeof(window) != 'undefined'
     compileVertex glsl.vertex if glsl.vertex
     compileFragment glsl.fragment if glsl.fragment

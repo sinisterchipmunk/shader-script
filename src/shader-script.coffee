@@ -29,14 +29,14 @@ exports.parse = (code) -> parser.parse(lexer.tokenize code)
 # Compiles the shaderscript code into {vertex: v_source, fragment: f_source}
 # where v_source and f_source are strings containing vertex and fragment shader
 # GLSL code, respectively.
-exports.compile_to_glsl = (code) ->
-  program = exports.compile code
+exports.compile = (code) ->
+  program = exports.compile_to_dom code
   vertex: program.vertex.toSource()
   fragment: program.fragment.toSource()
 
 # Compiles the shaderscript code into an object representation of GLSL code
-# to be executed. See also #compile_to_glsl(code)
-exports.compile = (code) ->
+# to be executed. See also #compile(code)
+exports.compile_to_dom = (code) ->
   exports.builtins or= require('shader-script/builtins').builtins
   unless code instanceof Object and code.compile
     code = exports.parse code

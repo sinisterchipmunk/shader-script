@@ -35,6 +35,6 @@ module ShaderScript::Compiler
   end
   
   def compile(script)
-    Source.context.call "ShaderScript.compile_to_glsl", script
+    Source.context.call "ShaderScript.compile", script
   end
 end
