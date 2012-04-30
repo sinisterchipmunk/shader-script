@@ -18,3 +18,10 @@ describe 'casting', ->
     sim = simulate (vertex: code), mv: [1,0,0,0, 0,-1,0,0, 0,0,-1,0, 0,0,0,1] # rotation PI rads about X axis
     expect(sim.state.variables.x.value).toEqual [1, -2, -3, 4]
     
+  it "with explicit parentheses around another cast", ->
+    # console.log parse_tree 'vertex = -> x = sampler2D(int 2)'
+    code = glsl 'vertex = -> x = sampler2D(int 2)'
+    sim = simulate code
+    
+    expect(sim.state.variables.x.value).toEqual 2
+    

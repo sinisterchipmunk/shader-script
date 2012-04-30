@@ -209,27 +209,27 @@ describe "built-in functions", ->
     it 'matrixCompMult', ->
       # since it works component-wise, it doesn't really matter
       # what we give it as long as the args are arrays
-      assert 'matrixCompMult [1,2,3], [3,2,1]', 'vec3', [3, 4, 3]
+      assert 'matrixCompMult mat2(1,2,3,4), mat2(3,2,1,0)', 'mat2', [3, 4, 3, 0]
       
   describe "texture lookup functions, pp71-72", ->
     # These are only implemented to prevent error conditions, they
     # only actually return white.
     
     it 'texture2D', ->
-      assert 'texture2D 1, [1,1]', 'vec4', [1, 1, 1, 1]
+      assert 'texture2D sampler2D(1), [1,1]', 'vec4', [1, 1, 1, 1]
       
     it 'texture2DProj', ->
-      assert 'texture2DProj 1, [1,1,1]', 'vec4', [1, 1, 1, 1]
+      assert 'texture2DProj sampler2D(1), [1,1,1]', 'vec4', [1, 1, 1, 1]
       
     it 'texture2DLod', ->
-      assert 'texture2DLod 1, [1,1], 1', 'vec4', [1, 1, 1, 1]
+      assert 'texture2DLod sampler2D(1), [1,1], 1', 'vec4', [1, 1, 1, 1]
       
     it 'texture2DProjLod', ->
-      assert 'texture2DProjLod 1, [1,1,1], 1', 'vec4', [1, 1, 1, 1]
+      assert 'texture2DProjLod sampler2D(1), [1,1,1], 1', 'vec4', [1, 1, 1, 1]
       
     it 'textureCube', ->
-      assert 'textureCube 1, [1,1,1]', 'vec4', [1, 1, 1, 1]
+      assert 'textureCube sampler2D(1), [1,1,1]', 'vec4', [1, 1, 1, 1]
       
     it 'textureCubeLod', ->
-      assert 'textureCubeLod 1, [1,1,1], 1', 'vec4', [1, 1, 1, 1]
+      assert 'textureCubeLod sampler2D(1), [1,1,1], 1', 'vec4', [1, 1, 1, 1]
   

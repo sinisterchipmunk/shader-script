@@ -24,11 +24,14 @@ class exports.TypeConstructor extends require('shader-script/nodes/base').Base
         when 'vec2', 'ivec2', 'bvec2' then vector_length = 2
         when 'vec3', 'ivec3', 'bvec3' then vector_length = 3
         when 'vec4', 'ivec4', 'bvec4' then vector_length = 4
-        else return args
+        else
+          if args.length == 1 then return @definition type: type, value: args[0]
+          else return @definition type: type, value: args
         
       if args.length >= vector_length then args = args[0...vector_length]
       else args.push 0 while args.length < vector_length
       @definition type: type, value: args
       
-    toSource: () => "#{@type()}(#{(arg.toSource() for arg in compiled_args).join ', '})"
+    toSource: () =>
+      "#{@type()}(#{(arg.toSource() for arg in compiled_args).join ', '})"
     

@@ -178,7 +178,8 @@ class exports.Rewriter
       token.call  = yes if prev and not prev.spaced and tag is '?'
       return 1 if token.fromThen
       return 1 unless callObject or
-        prev?.spaced and (prev.call or prev[0] in IMPLICIT_FUNC) and
+        #prev?.spaced and
+        prev and (prev.call or prev[0] in IMPLICIT_FUNC) and
         (tag in IMPLICIT_CALL or not (token.spaced or token.newLine) and tag in IMPLICIT_UNSPACED_CALL)
       tokens.splice i, 0, @generate 'CALL_START', '(', token[2]
       @detectEnd i + 1, condition, action
@@ -294,13 +295,21 @@ IMPLICIT_FUNC    = ['IDENTIFIER', 'SUPER', ')', 'CALL_END', ']', 'INDEX_END', '@
                     'MAT3X2', 'MAT3X3', 'MAT3X4',
                     'MAT4X2', 'MAT4X3', 'MAT4X4',
                     'VEC2', 'VEC3', 'VEC4', 'IVEC2', 'IVEC3', 'IVEC4', 'BVEC2', 'BVEC3', 'BVEC4',
+                    'SAMPLER2D', 'SAMPLERCUBE'
                    ]
 
 # If preceded by an `IMPLICIT_FUNC`, indicates a function invocation.
 IMPLICIT_CALL    = [
   'IDENTIFIER', 'NUMBER', 'STRING', 'JS', 'REGEX', 'NEW', 'PARAM_START', 'CLASS'
   'IF', 'TRY', 'SWITCH', 'THIS', 'BOOLEAN_VALUE', 'UNARY', 'SUPER'
-  '@', '->', '=>', '[', '(', '{', '--', '++'
+  '@', '->', '=>', '[', '(', '{', '--', '++',
+  'FLOAT', 'INT', 'BOOL',
+  'MAT2', 'MAT3', 'MAT4',
+  'MAT2X2', 'MAT2X3', 'MAT2X4',
+  'MAT3X2', 'MAT3X3', 'MAT3X4',
+  'MAT4X2', 'MAT4X3', 'MAT4X4',
+  'VEC2', 'VEC3', 'VEC4', 'IVEC2', 'IVEC3', 'IVEC4', 'BVEC2', 'BVEC3', 'BVEC4',
+  'SAMPLER2D', 'SAMPLERCUBE'
 ]
 
 IMPLICIT_UNSPACED_CALL = ['+', '-']
