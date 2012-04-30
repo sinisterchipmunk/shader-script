@@ -1,0 +1,23 @@
+To run all the tests, you'll need node.js and ruby.
+
+* `cake test` is the fastest. It rebuilds the GLSL parser but not the ShaderScript one,
+  so changes to the ShaderScript grammar will not take effect. Run this constantly.
+  
+* `cake all` will rebuild all JS sources including both parsers, so it takes a bit longer
+  but is more thorough. Run this at least once before committing.
+  
+* `rake test:js` is equivalent to running `cake test` with Ruby. It takes a little longer
+  since there's added overhead from starting Ruby, but is useful in integrated environments.
+  
+* `rake test:rb` will run the Ruby tests without rebuilding any JavaScripts or running
+  any JavaScript tests. Run this whenever you make a change Ruby-side that does not affect
+  the JavaScripts. Equivalent to `rspec spec`.
+
+* `rake jasmine` will start the spec server for testing ShaderScript within a browser.
+
+* `rake jasmine:ci` will run the ShaderScript tests in a browser, and then report the results
+  to the console. It's designed for continuous integration, and is also invoked by `rake`.
+
+* `rake` will rebuild all of the JavaScripts, and then run all tests. This takes the longest
+  but is the most thorough. Continuous integration environments should run this, and you
+  should run it prior to releasing or pushing commits.

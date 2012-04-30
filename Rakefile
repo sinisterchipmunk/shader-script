@@ -1,6 +1,8 @@
 require "bundler/gem_tasks"
 Bundler.setup
 
+require 'shader-script/version'
+
 namespace :build do
   desc "build shader-script"
   task :main do
@@ -25,7 +27,7 @@ namespace :build do
     spec = spec.shift
     manifest = {
       :name => spec.name,
-      :version => spec.version,
+      :version => ShaderScript::VERSION,
       :description => spec.description,
       :homepage => [ spec.homepage ],
       :repository => { :type => 'git', :url => 'https://github.com/sinisterchipmunk/shader-script' },
@@ -51,13 +53,17 @@ namespace :test do
   task :js do
     exit 1 unless system("cake test")
   end
+
+  require 'rspec/core/rake_task'
+  desc "Run specs"
+  RSpec::Core::RakeTask.new :rb
 end
 
 desc "build everything"
 task :build => ['build:js', 'build:npm']
 
 desc "build all js files and then run all tests"
-task :default => [ 'build:js', 'test:js' ]
+task :default => [ 'build:js', 'test:js', 'test:rb' ]
 
 begin
   require 'jasmine'
