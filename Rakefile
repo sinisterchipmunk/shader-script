@@ -63,7 +63,7 @@ desc "build everything"
 task :build => ['build:js', 'build:npm']
 
 desc "build all js files and then run all tests"
-task :default => [ 'build:js', 'test:js', 'test:rb' ]
+task :default => [ 'build:js', 'test:js', 'test:rb', 'jasmine:ci' ]
 
 begin
   require 'jasmine'
