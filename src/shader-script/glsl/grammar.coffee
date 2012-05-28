@@ -100,8 +100,19 @@ grammar =
     o 'FunctionDeclaration'
     o 'VariableDeclaration TERMINATOR'
     o 'StorageDeclaration TERMINATOR'
+    o 'PrecisionSpecifier TERMINATOR'
     o 'STATEMENT TERMINATOR',                              -> new Literal $1
     o 'TERMINATOR', -> (compile: -> null)
+  ]
+  
+  PrecisionSpecifier: [
+    o 'PRECISION PrecisionLevel Type', -> new Precision $2, $3
+  ]
+  
+  PrecisionLevel: [
+    o 'HIGHP'
+    o 'MEDIUMP'
+    o 'LOWP'
   ]
   
   If: [
