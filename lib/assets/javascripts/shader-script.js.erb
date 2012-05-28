@@ -2,10 +2,10 @@
   var _require = {};
   var require = function(path) { return require[path] = require[path] || (_require[path] && _require[path]()); };
   
-  <% shader_build_env.each_logical_path do |path| %>
-    _require[<%= raw path.sub(/#{Regexp::escape File.extname(path)}$/, '').inspect %>] = function() {
+  <% ShaderScript::Compiler::Source.shader_build_env.each_logical_path do |path| %>
+    _require[<%= path.sub(/#{Regexp::escape File.extname(path)}$/, '').inspect.html_safe %>] = function() {
       var exports = {};
-      <%= raw shader_build_env[path].to_s %>
+      <%= ShaderScript::Compiler::Source.shader_build_env[path].to_s.html_safe %>
       return exports;
     };
   <% end %>
