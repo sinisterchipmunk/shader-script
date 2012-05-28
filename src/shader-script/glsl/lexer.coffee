@@ -257,7 +257,7 @@ exports.Lexer = class Lexer
   lineToken: ->
     return 0 unless match = MULTI_DENT.exec @chunk
     indent = match[0]
-    @line += count indent, ';'
+    @line += count indent, '\n'
     @seenFor = no
     prev = last @tokens, 1
     size = indent.length - 1 - indent.lastIndexOf ';'
