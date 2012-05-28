@@ -32,7 +32,7 @@ Node:
     npm install shader-script
 
     > var ss = require('shader-script').ShaderScript;
-    > ss.compile_to_glsl("\
+    > ss.compile("\
     >   uniforms = mat4: mvp\n\
     >   attributes = vec4: position\n\
     >   vertex = -> gl_Position = mvp * position\n\
