@@ -10,7 +10,17 @@ describe 'vector notation', ->
     code = glsl 'vertex = -> x = vec4 2, 3, 4, 5; x -= x.xxyz * [1,2,3,4]'
     sim = simulate code
     expect(sim.state.variables.x.value).toEqual [0, -1, -5, -11]
+    
+  it "should construct vectors from single component accessors in XYZW", ->
+    sim = simulate glsl "fragment = -> gl_FragColor = [[4,5,6,7].x, [4,5,6,7].y, [4,5,6,7].z, [4,5,6,7].w]"
+    sim.start()
+    expect(sim.state.variables.gl_FragColor.value).toEqual [4, 5, 6, 7]
   
+  it "should construct vectors from single component accessors in RGBA", ->
+    sim = simulate glsl "fragment = -> gl_FragColor = [[4,5,6,7].r, [4,5,6,7].g, [4,5,6,7].b, [4,5,6,7].a]"
+    sim.start()
+    expect(sim.state.variables.gl_FragColor.value).toEqual [4, 5, 6, 7]
+
   describe "rvalue", ->
     it "should work with xyzw", ->
       code = glsl 'vertex = -> x = [1,2,3,4].xyzw'

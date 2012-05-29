@@ -1718,34 +1718,38 @@
       });
       length = this.vector_length();
       return {
+        component_index: function(component) {
+          var index;
+          return index = (function() {
+            switch (component) {
+              case 'x':
+              case 'r':
+              case 's':
+                return 0;
+              case 'y':
+              case 'g':
+              case 't':
+                return 1;
+              case 'z':
+              case 'b':
+              case 'p':
+                return 2;
+              case 'w':
+              case 'a':
+              case 'q':
+                return 3;
+              default:
+                throw new Error("Unrecognized vector component: " + i);
+            }
+          })();
+        },
         iterate_components: function(max_length, assignment, callback) {
           var already_iterated, i, index, _i, _len, _results;
           already_iterated = [];
           _results = [];
           for (_i = 0, _len = accessor.length; _i < _len; _i++) {
             i = accessor[_i];
-            index = (function() {
-              switch (i) {
-                case 'x':
-                case 'r':
-                case 's':
-                  return 0;
-                case 'y':
-                case 'g':
-                case 't':
-                  return 1;
-                case 'z':
-                case 'b':
-                case 'p':
-                  return 2;
-                case 'w':
-                case 'a':
-                case 'q':
-                  return 3;
-                default:
-                  throw new Error("Unrecognized vector component: " + i);
-              }
-            })();
+            index = this.component_index(i);
             if (assignment && already_iterated.indexOf(index) !== -1) {
               throw new Error("Can't specify the same component twice in the same assignment");
             }
@@ -1777,7 +1781,7 @@
           var source_value;
           source_value = source.execute().value;
           if (length === 1) {
-            variable.value = source_value[0];
+            variable.value = source_value[this.component_index(accessor)];
           } else {
             variable.value = [];
             this.iterate_components(source_value.length, false, function(index) {

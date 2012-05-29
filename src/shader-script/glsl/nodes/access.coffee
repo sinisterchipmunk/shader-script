@@ -45,20 +45,21 @@ class exports.Access extends require('shader-script/nodes/base').Base
     variable = @definition type: @type(program)
     length = @vector_length()
     
+    component_index: (component) ->
+      index = switch component
+        when 'x', 'r', 's' then 0
+        when 'y', 'g', 't' then 1
+        when 'z', 'b', 'p' then 2
+        when 'w', 'a', 'q' then 3
+        else throw new Error "Unrecognized vector component: #{i}"
+    
     iterate_components: (max_length, assignment, callback) ->
       already_iterated = []
       for i in accessor
-        index = switch i
-          when 'x', 'r', 's' then 0
-          when 'y', 'g', 't' then 1
-          when 'z', 'b', 'p' then 2
-          when 'w', 'a', 'q' then 3
-          else throw new Error "Unrecognized vector component: #{i}"
-
+        index = @component_index i
         if assignment and already_iterated.indexOf(index) != -1
           throw new Error "Can't specify the same component twice in the same assignment"
         already_iterated.push index
-
         if index <= max_length then callback index
         else throw new Error "Component #{i} equates to vector index #{index}, which exceeds vector length #{max_length}"
     
@@ -76,7 +77,7 @@ class exports.Access extends require('shader-script/nodes/base').Base
     execute: ->
       source_value = source.execute().value
       if length == 1
-        variable.value = source_value[0]
+        variable.value = source_value[@component_index accessor]
       else
         variable.value = []
         @iterate_components source_value.length, false, (index) -> variable.value.push source_value[index]
