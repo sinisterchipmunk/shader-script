@@ -4,7 +4,7 @@
 before_script:
   - nvm install v0.6.14
   - nvm use v0.6.14
-  - npm install jasmine-node
+  # - npm install jasmine-node
 
 # Specify which versions of Ruby to run the tests on; each version will be used
 rvm:
