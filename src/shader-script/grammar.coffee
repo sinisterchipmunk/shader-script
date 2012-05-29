@@ -137,7 +137,6 @@ grammar =
     o 'Switch'
     o 'Class'
     o 'Throw'
-    o 'GlslTypeConstructor'
   ]
 
   # An indented block of expressions. Note that the [Rewriter](rewriter.html)
@@ -296,6 +295,7 @@ grammar =
     o 'Literal',                                -> new Value $1
     o 'Parenthetical',                          -> new Value $1
     o 'Range',                                  -> new Value $1
+    o 'GlslTypeConstructor',                    -> new Value $1
     o 'This'
   ]
 

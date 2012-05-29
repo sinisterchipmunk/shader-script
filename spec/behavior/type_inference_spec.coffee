@@ -1,6 +1,22 @@
 require 'spec_helper'
 
 describe "type inference", ->
+  it "should infer single-component accessors from type constructor as the base type instead of a vec1 of base type", ->
+    code = glsl 'vertex = -> x = vec4(1).x'
+    expect(code.vertex).toMatch /float x/
+    
+    sim = simulate code
+    sim.start()
+    expect(sim.state.variables.x.value).toEqual 1
+  
+  it "should infer single-component accessors from [] as the base type instead of a vec1 of base type", ->
+    code = glsl 'vertex = -> x = [1,1,1,1].x'
+    expect(code.vertex).toMatch /float x/
+
+    sim = simulate code
+    sim.start()
+    expect(sim.state.variables.x.value).toEqual 1
+
   it "should infer type of lvalue from operation with vec4/float types", ->
     code = glsl """
       vertex = -> diffuse = [1,1,1,1] * 1.0

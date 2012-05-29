@@ -184,6 +184,8 @@ grammar =
     o 'CALL_START Arguments )', -> $2
     o '( )', -> []
     o 'CALL_START )', -> []
+    o 'CALL_START CALL_END', -> []
+    o 'CALL_START Arguments CALL_END', -> $2
   ]
   
   Arguments: [

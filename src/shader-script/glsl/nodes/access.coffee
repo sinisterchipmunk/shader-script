@@ -13,19 +13,29 @@ class exports.Access extends require('shader-script/nodes/base').Base
     # do nothing, since the type is already set
   
   type: (program) ->
-    base_type = @base_type program
-    base_type and "#{base_type}#{@vector_length()}"
+    if (length = @vector_length()) == 1
+      @base_type program
+    else
+      vector_type = @vector_type program
+      vector_type and "#{vector_type}#{vector_length}"
     
   base_type: (program) ->
-    base_type = @source.type program
+    switch vector_type = @vector_type(program)
+      when 'ivec' then 'int'
+      when 'vec'  then 'float'
+      when 'bvec' then 'bool'
+      else throw new Error "Unexpected vector type: #{vector_type}"
+    
+  vector_type: (program) ->
+    vector_type = @source.type program
     name = @accessor_name()
     
-    return null unless base_type
-    switch base_type
+    return null unless vector_type
+    switch vector_type
       when 'int',   'ivec2', 'ivec3', 'ivec4' then "ivec"
       when 'float', 'vec2',  'vec3',  'vec4'  then "vec"
       when 'bool',  'bvec2', 'bvec3', 'bvec4' then "bvec"
-      else throw new Error "Cannot use component accessors for type #{base_type}"
+      else throw new Error "Cannot use component accessors for type #{vector_type}"
     
   vector_length: -> @accessor_name().length
   
@@ -33,6 +43,7 @@ class exports.Access extends require('shader-script/nodes/base').Base
     accessor = @accessor_name()
     source = @source.compile program
     variable = @definition type: @type(program)
+    length = @vector_length()
     
     iterate_components: (max_length, assignment, callback) ->
       already_iterated = []
@@ -64,7 +75,10 @@ class exports.Access extends require('shader-script/nodes/base').Base
     
     execute: ->
       source_value = source.execute().value
-      variable.value = []
-      @iterate_components source_value.length, false, (index) -> variable.value.push source_value[index]
+      if length == 1
+        variable.value = source_value[0]
+      else
+        variable.value = []
+        @iterate_components source_value.length, false, (index) -> variable.value.push source_value[index]
       variable
       
