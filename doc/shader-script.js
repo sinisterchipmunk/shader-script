@@ -1661,7 +1661,7 @@
         return this.base_type(program);
       } else {
         vector_type = this.vector_type(program);
-        return vector_type && ("" + vector_type + vector_length);
+        return vector_type && ("" + vector_type + length);
       }
     };
 

@@ -17,7 +17,7 @@ class exports.Access extends require('shader-script/nodes/base').Base
       @base_type program
     else
       vector_type = @vector_type program
-      vector_type and "#{vector_type}#{vector_length}"
+      vector_type and "#{vector_type}#{length}"
     
   base_type: (program) ->
     switch vector_type = @vector_type(program)
