@@ -3,6 +3,7 @@ fs   = require 'fs'
 {Simulator} = require "shader-script/simulator"
 {parser}    = require "shader-script/parser"
 {Program} = require 'shader-script/glsl/program'
+exports.builtins or= require('shader-script/builtins').builtins
 
 # require "extensions"
 
@@ -37,7 +38,6 @@ exports.compile = (code) ->
 # Compiles the shaderscript code into an object representation of GLSL code
 # to be executed. See also #compile(code)
 exports.compile_to_dom = (code) ->
-  exports.builtins or= require('shader-script/builtins').builtins
   unless code instanceof Object and code.compile
     code = exports.parse code
   code.compile()

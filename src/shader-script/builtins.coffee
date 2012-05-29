@@ -5,7 +5,7 @@ try
   {Definition} = require 'shader-script/scope'
   
   d = (type, default_val) -> new Definition type: type, builtin: true, value: default_val
-  Program.prototype.builtins =
+  exports.builtins = Program.prototype.builtins =
     _variables:
       common:
         gl_MaxVertexAttribs: d 'int', 8

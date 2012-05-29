@@ -17,6 +17,8 @@
 
   Program = require('shader-script/glsl/program').Program;
 
+  exports.builtins || (exports.builtins = require('shader-script/builtins').builtins);
+
   lexer = new Lexer;
 
   parser.lexer = {
@@ -52,7 +54,6 @@
   };
 
   exports.compile_to_dom = function(code) {
-    exports.builtins || (exports.builtins = require('shader-script/builtins').builtins);
     if (!(code instanceof Object && code.compile)) code = exports.parse(code);
     return code.compile();
   };
@@ -77,7 +78,7 @@
         value: default_val
       });
     };
-    Program.prototype.builtins = {
+    exports.builtins = Program.prototype.builtins = {
       _variables: {
         common: {
           gl_MaxVertexAttribs: d('int', 8),
