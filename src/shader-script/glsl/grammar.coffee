@@ -72,7 +72,7 @@ grammar =
     o 'Expression TERMINATOR'
     o 'Statement'
   ]
-
+  
   Block: [
     o '{ }',                         -> new Block
     o '{ Body }',                    -> $2
