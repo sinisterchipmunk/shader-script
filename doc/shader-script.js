@@ -2828,16 +2828,20 @@
       type = this.type();
       return {
         execute: function(state) {
-          var arg, args, vector_length;
-          args = (function() {
-            var _i, _len, _results;
-            _results = [];
-            for (_i = 0, _len = compiled_args.length; _i < _len; _i++) {
-              arg = compiled_args[_i];
-              _results.push(arg.execute().value);
+          var arg, arg_value, args, v, vector_length, _i, _j, _len, _len2;
+          args = [];
+          for (_i = 0, _len = compiled_args.length; _i < _len; _i++) {
+            arg = compiled_args[_i];
+            arg_value = arg.execute().value;
+            if (arg_value.length) {
+              for (_j = 0, _len2 = arg_value.length; _j < _len2; _j++) {
+                v = arg_value[_j];
+                args.push(v);
+              }
+            } else {
+              args.push(arg_value);
             }
-            return _results;
-          })();
+          }
           switch (type) {
             case 'vec2':
             case 'ivec2':
@@ -2881,7 +2885,7 @@
         },
         toSource: function() {
           var arg;
-          return "" + (_this.type()) + "(" + (((function() {
+          return "" + (_this.type(program)) + "(" + (((function() {
             var _i, _len, _results;
             _results = [];
             for (_i = 0, _len = compiled_args.length; _i < _len; _i++) {
@@ -5300,8 +5304,11 @@ if (typeof module !== 'undefined' && require.main === module) {
     _require["shader-script/nodes/arr"] = function() {
       var exports = {};
       (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
+  var Identifier,
+    __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  Identifier = require("shader-script/glsl/nodes/identifier").Identifier;
 
   exports.Arr = (function(_super) {
 
@@ -5317,13 +5324,42 @@ if (typeof module !== 'undefined' && require.main === module) {
       return ['elements'];
     };
 
-    Arr.prototype.type = function() {
-      return 'vec' + this.elements.length.toString();
+    Arr.prototype.type = function(shader) {
+      var ele, length, variable, _i, _len, _ref, _ref2;
+      length = 0;
+      _ref = this.elements;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        ele = _ref[_i];
+        if (ele.name === 'value' && ((_ref2 = ele.children[0]) != null ? _ref2.name : void 0) === 'identifier') {
+          variable = ele.variable(shader);
+          length += (function() {
+            switch (variable.type()) {
+              case 'ivec2':
+              case 'bvec2':
+              case 'vec2':
+                return 2;
+              case 'ivec3':
+              case 'bvec3':
+              case 'vec3':
+                return 3;
+              case 'ivec4':
+              case 'bvec4':
+              case 'vec4':
+                return 4;
+              default:
+                return 1;
+            }
+          })();
+        } else {
+          length += 1;
+        }
+      }
+      return 'vec' + length.toString();
     };
 
     Arr.prototype.compile = function(shader) {
       var child;
-      return this.glsl('TypeConstructor', this.type(), (function() {
+      return this.glsl('TypeConstructor', this.type(shader), (function() {
         var _i, _len, _ref, _results;
         _ref = this.elements;
         _results = [];

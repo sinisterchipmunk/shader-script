@@ -19,7 +19,13 @@ class exports.TypeConstructor extends require('shader-script/nodes/base').Base
     type = @type()
     
     execute: (state) =>
-      args = (arg.execute().value for arg in compiled_args)
+      args = []
+      for arg in compiled_args
+        arg_value = arg.execute().value
+        if arg_value.length
+          args.push v for v in arg_value
+        else args.push arg_value
+      
       switch type
         when 'vec2', 'ivec2', 'bvec2' then vector_length = 2
         when 'vec3', 'ivec3', 'bvec3' then vector_length = 3
@@ -33,5 +39,5 @@ class exports.TypeConstructor extends require('shader-script/nodes/base').Base
       @definition type: type, value: args
       
     toSource: () =>
-      "#{@type()}(#{(arg.toSource() for arg in compiled_args).join ', '})"
+      "#{@type program}(#{(arg.toSource() for arg in compiled_args).join ', '})"
     
