@@ -143,6 +143,20 @@ grammar =
   VariableDeclaration: [
     o 'Type Identifier', -> new Variable $1, $2
     o 'Type Identifier = Expression', -> new Variable $1, $2, $4
+    o 'VariableDeclaration , Identifier', ->
+      if $1.push
+        variable = new Variable $1.lines[0].type, $3
+        $1.push variable
+      else
+        variable = new Variable $1.type, $3
+        new Block [$1, variable], scope: no
+    o 'VariableDeclaration , Identifier = Expression', ->
+      if $1.push
+        variable = new Variable $1.lines[0].type, $3, $5
+        $1.push variable
+      else
+        variable = new Variable $1.type, $3, $5
+        new Block [$1, variable], scope: no
   ]
   
   FunctionDefinition: [

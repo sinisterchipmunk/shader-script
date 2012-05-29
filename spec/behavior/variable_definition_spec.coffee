@@ -13,6 +13,13 @@ describe 'variable definition', ->
       sim = simulate vertex: "void main() { vec4 a = vec4(0, 1, 2, 3); }"
       sim.start()
       expect(sim.state.variables.a.value).toEqualish [0,1,2,3]
+      
+    it "should handle definition of multiple variables at the same time", ->
+      sim = simulate vertex: 'void main() { vec4 a, b = vec4(0, 1, 2, 3), c; }'
+      sim.start()
+      expect(sim.state.variables.a).not.toBeUndefined()
+      expect(sim.state.variables.b.value).toEqualish [0, 1, 2, 3]
+      expect(sim.state.variables.c).not.toBeUndefined()
     
   it "should allow use of the same variable name in different functions", ->
     code = glsl """

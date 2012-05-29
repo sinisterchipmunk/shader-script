@@ -32,7 +32,7 @@ class exports.Variable extends require('shader-script/nodes/base').Base
     variable.value = Number.NaN if variable.value is undefined
 
     qualifier = program.state.scope.qualifier()
-    if qualifier == 'root.block' or qualifier == 'root.block.main.block'
+    if qualifier == 'root.block' or qualifier == 'root.block.main' or qualifier == 'root.block.main.block'
       # provides convenient access to "important" variables
       program.state.variables[name] = variable
       
