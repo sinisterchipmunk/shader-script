@@ -1,6 +1,11 @@
 require 'spec_helper'
 
 describe "functions", ->
+  describe "glsl parser", ->
+    it "should handle explicit use of `void` in function params", ->
+      sim = simulate vertex: "void main(void) { }"
+      sim.start()
+  
   it "should not produce trailing terminators", ->
     code = glsl "m = () ->"
     expect(code.vertex).not.toMatch /\};/

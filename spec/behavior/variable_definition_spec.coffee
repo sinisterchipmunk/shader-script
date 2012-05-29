@@ -7,6 +7,12 @@ describe 'variable definition', ->
     code = glsl 'vertex = -> x = 1'
     expect(code.vertex).toMatch /int x/
     simulate(code).state.variables.x.type.should == 'int'
+  
+  describe "glsl parser", ->
+    it "should handle declaration and assignment in same statement", ->
+      sim = simulate vertex: "void main() { vec4 a = vec4(0, 1, 2, 3); }"
+      sim.start()
+      expect(sim.state.variables.a.value).toEqualish [0,1,2,3]
     
   it "should allow use of the same variable name in different functions", ->
     code = glsl """

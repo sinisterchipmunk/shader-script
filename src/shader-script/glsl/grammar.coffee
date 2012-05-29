@@ -142,6 +142,7 @@ grammar =
   
   VariableDeclaration: [
     o 'Type Identifier', -> new Variable $1, $2
+    o 'Type Identifier = Expression', -> new Variable $1, $2, $4
   ]
   
   FunctionDefinition: [
@@ -150,11 +151,12 @@ grammar =
   ]
   
   ArgumentDefs: [
+    o 'Type', -> if $1 == 'void' then [] else [new Variable $1, new Identifier "_unused"]
     o 'Type Identifier', -> [new Variable $1, $2]
     o 'ArgumentDefs , Type Identifier', -> $1.concat [new Variable $3, $4]
 
-    o 'ParamQualifier Type Identifier', -> [new Variable $2, $3, $1]
-    o 'ArgumentDefs , ParamQualifier Type Identifier', -> $1.concat [new Variable $4, $5, $3]
+    o 'ParamQualifier Type Identifier', -> [new Variable $2, $3, null, $1]
+    o 'ArgumentDefs , ParamQualifier Type Identifier', -> $1.concat [new Variable $4, $5, null, $3]
   ]
   
   ParamQualifier: [
