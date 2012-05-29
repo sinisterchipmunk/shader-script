@@ -79,7 +79,6 @@ exports.signatures =
       vec4: 'vec4'
       mat4: 'mat4'
       float: 'mat4'
-    
 
 exports.mat4 =
   '==': (le, re) -> le.value == re.value
@@ -101,21 +100,28 @@ exports.mat4 =
       else cw_mult le, re
 
 exports.vec4 = 
-  '==': (le, re) -> le.value == re.value
+  '==': (le, re) -> if le.value == re.value then 1 else 0
   '*': cw_mult
   '-': cw_subt
   '+': cw_add
   '/': cw_divide
 
 exports.vec3 = 
-  '==': (le, re) -> le.value == re.value
+  '==': (le, re) -> if le.value == re.value then 1 else 0
   '*': cw_mult
   '-': cw_subt
   '+': cw_add
   '/': cw_divide
 
 exports.float =
-  '==': (le, re) -> le.value == re.value
+  '==': (le, re) -> if le.value == re.value then 1 else 0
+  '*': cw_mult
+  '-': cw_subt
+  '+': cw_add
+  '/': cw_divide
+
+exports.int =
+  '==': (le, re) -> if le.value == re.value then 1 else 0
   '*': cw_mult
   '-': cw_subt
   '+': cw_add

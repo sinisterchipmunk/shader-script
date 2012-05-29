@@ -6495,7 +6495,11 @@ if (typeof module !== 'undefined' && require.main === module) {
 
   exports.vec4 = {
     '==': function(le, re) {
-      return le.value === re.value;
+      if (le.value === re.value) {
+        return 1;
+      } else {
+        return 0;
+      }
     },
     '*': cw_mult,
     '-': cw_subt,
@@ -6505,7 +6509,11 @@ if (typeof module !== 'undefined' && require.main === module) {
 
   exports.vec3 = {
     '==': function(le, re) {
-      return le.value === re.value;
+      if (le.value === re.value) {
+        return 1;
+      } else {
+        return 0;
+      }
     },
     '*': cw_mult,
     '-': cw_subt,
@@ -6515,7 +6523,25 @@ if (typeof module !== 'undefined' && require.main === module) {
 
   exports.float = {
     '==': function(le, re) {
-      return le.value === re.value;
+      if (le.value === re.value) {
+        return 1;
+      } else {
+        return 0;
+      }
+    },
+    '*': cw_mult,
+    '-': cw_subt,
+    '+': cw_add,
+    '/': cw_divide
+  };
+
+  exports.int = {
+    '==': function(le, re) {
+      if (le.value === re.value) {
+        return 1;
+      } else {
+        return 0;
+      }
     },
     '*': cw_mult,
     '-': cw_subt,
