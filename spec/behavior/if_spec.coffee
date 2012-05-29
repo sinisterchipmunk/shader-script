@@ -30,7 +30,19 @@ describe "If-conditions", ->
     code = glsl "a = 1; vertex = -> if a == 2 then a = 3"
     # console.log code.vertex
     expect(code.vertex.lastIndexOf('float a')).toBeLessThan(code.vertex.indexOf('{'))
+    
+  it "should handle an empty if", ->
+    code = glsl "a = 1; vertex = -> if a == 1 then "
+    # console.log code.vertex
+    sim = simulate vertex: code.vertex
+    sim.start()
   
+  it "should handle an empty else", ->
+    code = glsl "a = 1; vertex = -> if a == 0 then a = 2 else ; "
+    # console.log code.vertex
+    sim = simulate vertex: code.vertex
+    sim.start()
+
   it "should handle a true condition", ->
     sim = simulate glsl "vertex = ->\n  a = 1\n  if a == 1\n    a = 2"
     expect(sim.state.variables.a.value).toEqual 2

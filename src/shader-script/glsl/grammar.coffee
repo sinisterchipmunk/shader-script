@@ -117,7 +117,9 @@ grammar =
   
   If: [
     o 'IF Parenthetical { Body }', -> new If $2, $4, $1
+    o 'IF Parenthetical { }', -> new If $2, Block.wrap([]), $1
     o 'If ELSE { Body }', -> $1.addElse $4
+    o 'If ELSE { }', -> $1.addElse Block.wrap []
   ]
   
   StorageDeclaration: [
