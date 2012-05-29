@@ -261,7 +261,9 @@ exports.Lexer = class Lexer
     @seenFor = no
     prev = last @tokens, 1
     size = indent.length - 1 - indent.lastIndexOf ';'
-    noNewlines = @unfinished()
+    # Altered: we're taking GLSL source whose newlines
+    # are not treated as terminators.
+    noNewlines = true #@unfinished()
     if size - @indebt is @indent
       if noNewlines then @suppressNewlines() else @newlineToken()
       return indent.length
@@ -301,8 +303,8 @@ exports.Lexer = class Lexer
         @pair 'OUTDENT'
         @token 'OUTDENT', dent
     @outdebt -= moveOut if dent
-    @tokens.pop() while @value() is ';'
-    @token 'TERMINATOR', ';' unless @tag() is 'TERMINATOR' or noNewlines
+    # @tokens.pop() while @value() is ';'
+    # @token 'TERMINATOR', ';' unless @tag() is 'TERMINATOR' or noNewlines
     this
 
   # Matches and consumes non-meaningful whitespace. Tag the previous token

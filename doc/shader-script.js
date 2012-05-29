@@ -1145,7 +1145,7 @@
       this.seenFor = false;
       prev = last(this.tokens, 1);
       size = indent.length - 1 - indent.lastIndexOf(';');
-      noNewlines = this.unfinished();
+      noNewlines = true;
       if (size - this.indebt === this.indent) {
         if (noNewlines) {
           this.suppressNewlines();
@@ -1191,12 +1191,6 @@
         }
       }
       if (dent) this.outdebt -= moveOut;
-      while (this.value() === ';') {
-        this.tokens.pop();
-      }
-      if (!(this.tag() === 'TERMINATOR' || noNewlines)) {
-        this.token('TERMINATOR', ';');
-      }
       return this;
     };
 
@@ -1778,9 +1772,12 @@
     _require["shader-script/glsl/nodes/assign"] = function() {
       var exports = {};
       (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
+  var Program,
+    __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
     __slice = Array.prototype.slice;
+
+  Program = require("shader-script/glsl/program").Program;
 
   exports.Assign = (function(_super) {
 
@@ -1810,10 +1807,14 @@
       left = this.left.compile(program);
       return {
         execute: function() {
-          var lvalue, rvalue;
+          var builtin_variables, lvalue, rvalue, variable;
           lvalue = left.execute();
           rvalue = right.execute().value;
           if (left.filter_assignment) rvalue = left.filter_assignment(rvalue);
+          builtin_variables = Program.prototype.builtins._variables;
+          if (lvalue.name && (variable = builtin_variables.vertex[lvalue.name] || builtin_variables.fragment[lvalue.name])) {
+            program.state.variables[lvalue.name] = lvalue;
+          }
           if (left.assign) {
             left.assign(rvalue);
           } else {

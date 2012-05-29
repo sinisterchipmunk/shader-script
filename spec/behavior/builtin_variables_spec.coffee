@@ -16,6 +16,14 @@ describe 'built-in variables', ->
     sim = simulate glsl "#{shader} = -> x = #{name}"
     expect(sim.state.variables.x.value).toEqual value
     
+  describe "assigned in simulator", ->
+    sim = null
+    beforeEach -> sim = simulate fragment: "void main(void) { gl_FragColor = vec4(1,1,1,1); }"
+    
+    it "should be added to sim.state.variables", ->
+      sim.start()
+      expect(sim.state.variables.gl_FragColor.value).toEqual [1,1,1,1]
+    
   describe "vertex", ->
     beforeEach -> shader = 'vertex'
     
