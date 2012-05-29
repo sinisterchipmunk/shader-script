@@ -65,11 +65,12 @@ class exports.Preprocessor
         
     for byte in @source
       continue unless check byte
+      @result += "\n" if byte is "\n"
       switch state
         when DIRECTIVE_NAME_ACCUMULATING then directiveName += byte
         when DIRECTIVE_EXPR_ACCUMULATING then directiveExpr += byte
         else
-          @result += byte if @conditionIsTrue()
+          @result += byte if @conditionIsTrue() unless byte is "\n"
     check "\n"
     
   toString: -> @result

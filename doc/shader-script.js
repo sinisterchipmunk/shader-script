@@ -3548,6 +3548,7 @@ if (typeof module !== 'undefined' && require.main === module) {
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         byte = _ref[_i];
         if (!check(byte)) continue;
+        if (byte === "\n") this.result += "\n";
         switch (state) {
           case DIRECTIVE_NAME_ACCUMULATING:
             directiveName += byte;
@@ -3556,7 +3557,9 @@ if (typeof module !== 'undefined' && require.main === module) {
             directiveExpr += byte;
             break;
           default:
-            if (this.conditionIsTrue()) this.result += byte;
+            if (byte !== "\n" ? this.conditionIsTrue() : void 0) {
+              this.result += byte;
+            }
         }
       }
       return check("\n");

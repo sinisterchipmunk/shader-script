@@ -21,7 +21,10 @@ describe "Preprocessor", ->
         expect(proc.env.CODE).toMatch /void main\(\) \{/
         expect(proc.env.CODE).toMatch /gl_FragColor = vec4\(1\)/
         expect(proc.env.CODE).toMatch /\}/
-  
+        
+      it "should maintain line count", ->
+        expect(proc.toString().split(/\n/).length).toEqual(3)
+
   describe "ifdef false", ->
     beforeEach -> proc = new Preprocessor '#ifdef NOTHING\none\n#endif'
     it "should not produce 'one'", -> expect(proc.toString()).not.toMatch /one/
@@ -72,6 +75,7 @@ describe "Preprocessor", ->
         #define TWO2 5
       #endif
     #endif
+    one
     '''
     
     describe "true, true", ->
@@ -93,4 +97,6 @@ describe "Preprocessor", ->
       beforeEach -> proc = new Preprocessor code, {}
       it "should set ONE1 to 2 (b)", -> expect(proc.env.ONE1).toEqual '2'
       it "should set TWO2 to 5",     -> expect(proc.env.TWO2).toEqual '5'
-      
+    
+      it "should maintain line count", ->
+        expect(proc.toString().split(/\n/).length).toEqual(16)
