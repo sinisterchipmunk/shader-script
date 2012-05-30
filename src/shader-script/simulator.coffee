@@ -20,6 +20,7 @@ exports.Simulator = class Simulator
   #     fragment: "string of glsl fragment shader code"
   #
   constructor: (glsl, variables = {}) ->
+    glsl = vertex: glsl if typeof glsl is 'string'
     @state = preprocessor: glsl?.preprocessor || {}
     @vertex   = compile_program 'vertex',   @state, glsl.vertex,   @state.preprocessor if glsl.vertex
     @fragment = compile_program 'fragment', @state, glsl.fragment, @state.preprocessor if glsl.fragment

@@ -26,6 +26,14 @@ describe "If-conditions", ->
       sim = simulate glsl "vertex = -> a = 1; if a == 2 then a = 4 else a = 3"
       expect(sim.state.variables.a.value).toEqual 3
       
+  it "should handle true if with no braces in simulator", ->
+    code = fragment: "void main(void) { if (1) discard; }"
+    expect(-> simulate code).toThrow "fragment: discarded"
+      
+  it "should handle false if with no braces in simulator", ->
+    code = fragment: "void main(void) { if (0) discard; }"
+    expect(-> simulate code).not.toThrow "fragment: discarded"
+
   it "should not redefine variables in condition block", ->
     code = glsl "a = 1; vertex = -> if a == 2 then a = 3"
     # console.log code.vertex

@@ -1,6 +1,6 @@
 class exports.If extends require('shader-script/nodes/base').Base
   name: "if"
-  children: -> ['expression', 'block', 'options']
+  children: -> ['expression', 'block', 'options', 'else_block']
   
   addElse: (@else_block) -> this
   

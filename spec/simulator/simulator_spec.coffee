@@ -9,6 +9,9 @@ describe "simulator", ->
     
     # what is there to verify?
    
+  it "should execute a string parameter as a vertex program", -> 
+    expect(-> simulate "void main(void) { }").not.toThrow()
+   
   describe "with a variable defined but no main", ->
     it "should validate main exists", -> 
       expect(-> simulate vertex: 'float x;').toThrow("vertex: no main function found!")
