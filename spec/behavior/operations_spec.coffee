@@ -26,6 +26,15 @@ describe "operations", ->
       sim = simulate glsl 'vertex = -> x = int(2) == int(3)'
       expect(sim.state.variables.x.value).toEqual 0
       
+    it "int inequality (true)", ->
+      sim = simulate glsl 'vertex = -> x = int(2) != int(3)'
+      expect(sim.state.variables.x.value).toEqual 1
+      
+    it "int inequality (false)", ->
+      sim = simulate glsl 'vertex = -> x = int(2) != int(2)'
+      expect(sim.state.variables.x.value).toEqual 0
+
+      
   describe "complex", ->
     it "mat4 multiply vec4", ->
       sim = simulate (vertex: glsl('uniforms = mat4: mv\nvertex = -> x = mv * [1,2,3,4]').vertex),

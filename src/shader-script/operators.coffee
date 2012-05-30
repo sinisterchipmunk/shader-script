@@ -83,6 +83,7 @@ exports.signatures =
 
 exports.mat4 =
   '==': (le, re) -> le.value == re.value
+  '!=': (le, re) -> if le.value != re.value then 1 else 0
   '-': cw_subt
   '+': cw_add
   '/': cw_divide
@@ -102,6 +103,7 @@ exports.mat4 =
 
 exports.vec4 = 
   '==': (le, re) -> if le.value == re.value then 1 else 0
+  '!=': (le, re) -> if le.value != re.value then 1 else 0
   '*': cw_mult
   '-': cw_subt
   '+': cw_add
@@ -109,6 +111,7 @@ exports.vec4 =
 
 exports.vec3 = 
   '==': (le, re) -> if le.value == re.value then 1 else 0
+  '!=': (le, re) -> if le.value != re.value then 1 else 0
   '*': cw_mult
   '-': cw_subt
   '+': cw_add
@@ -116,6 +119,7 @@ exports.vec3 =
 
 exports.float =
   '==': (le, re) -> if le.value == re.value then 1 else 0
+  '!=': (le, re) -> if le.value != re.value then 1 else 0
   '*': cw_mult
   '-': cw_subt
   '+': cw_add
@@ -123,6 +127,7 @@ exports.float =
 
 exports.int =
   '==': (le, re) -> if le.value == re.value then 1 else 0
+  '!=': (le, re) -> if le.value != re.value then 1 else 0
   '*': cw_mult
   '-': cw_subt
   '+': cw_add

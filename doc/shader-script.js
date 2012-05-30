@@ -6620,6 +6620,13 @@ if (typeof module !== 'undefined' && require.main === module) {
     '==': function(le, re) {
       return le.value === re.value;
     },
+    '!=': function(le, re) {
+      if (le.value !== re.value) {
+        return 1;
+      } else {
+        return 0;
+      }
+    },
     '-': cw_subt,
     '+': cw_add,
     '/': cw_divide,
@@ -6650,6 +6657,13 @@ if (typeof module !== 'undefined' && require.main === module) {
         return 0;
       }
     },
+    '!=': function(le, re) {
+      if (le.value !== re.value) {
+        return 1;
+      } else {
+        return 0;
+      }
+    },
     '*': cw_mult,
     '-': cw_subt,
     '+': cw_add,
@@ -6659,6 +6673,13 @@ if (typeof module !== 'undefined' && require.main === module) {
   exports.vec3 = {
     '==': function(le, re) {
       if (le.value === re.value) {
+        return 1;
+      } else {
+        return 0;
+      }
+    },
+    '!=': function(le, re) {
+      if (le.value !== re.value) {
         return 1;
       } else {
         return 0;
@@ -6678,6 +6699,13 @@ if (typeof module !== 'undefined' && require.main === module) {
         return 0;
       }
     },
+    '!=': function(le, re) {
+      if (le.value !== re.value) {
+        return 1;
+      } else {
+        return 0;
+      }
+    },
     '*': cw_mult,
     '-': cw_subt,
     '+': cw_add,
@@ -6687,6 +6715,13 @@ if (typeof module !== 'undefined' && require.main === module) {
   exports.int = {
     '==': function(le, re) {
       if (le.value === re.value) {
+        return 1;
+      } else {
+        return 0;
+      }
+    },
+    '!=': function(le, re) {
+      if (le.value !== re.value) {
         return 1;
       } else {
         return 0;
