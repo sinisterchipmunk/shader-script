@@ -501,6 +501,29 @@
       if (register) Program.prototype.builtins[this.name] = this;
     }
 
+    Extension.prototype.autodetect_type = function(value) {
+      var base;
+      if (typeof value === 'number') {
+        return 'float';
+      } else if (value === true || value === false) {
+        return 'bool';
+      } else if (value.length) {
+        base = this.autodetect_type(value[0]);
+        switch (base) {
+          case 'float':
+            return "vec" + value.length;
+          case 'int':
+            return "ivec" + value.length;
+          case 'bool':
+            return "bvec" + value.length;
+          default:
+            throw new Error("Could not autodetect type of " + (JSON.stringify(value)) + " used as " + base);
+        }
+      } else {
+        throw new Error("Could not autodetect type of " + (JSON.stringify(value)));
+      }
+    };
+
     Extension.prototype.invoke = function() {
       var param, params;
       params = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
@@ -2014,12 +2037,15 @@
       }).call(this);
       return {
         execute: function() {
-          var _ref, _ref2;
+          var builtin, value, _ref;
           if (program.functions[name]) {
             return (_ref = program.functions[name]).invoke.apply(_ref, compiled_params);
           } else if (program.builtins[name]) {
+            builtin = program.builtins[name];
+            value = builtin.invoke.apply(builtin, compiled_params);
             return _this.definition({
-              value: (_ref2 = program.builtins[name]).invoke.apply(_ref2, compiled_params)
+              value: value,
+              type: builtin.autodetect_type(value)
             });
           } else {
             throw new Error("function '" + name + "' is not defined");

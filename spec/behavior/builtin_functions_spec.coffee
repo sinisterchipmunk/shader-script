@@ -17,6 +17,13 @@ describe "built-in functions", ->
     expect(sim.state.variables.x.type()).toEqual expected_type
     expect(sim.state.variables.x.value).toEqualish expected_value
     
+  it "should set type on return value", ->
+    sim = simulate glsl "vertex = -> f = dot([0,1,0], [1,0,0]) * 1"
+    # float f = dot(vec3(0,1,0), vec3(1,0,0)) * 1;
+    sim.start()
+    expect(sim.state.variables.f.value).toEqual 0
+    
+    
   describe 'angle and trigonometry functions, p65', ->
     # Function parameters specified as angle are assumed to be in units of radians.  In no case will any of these
     # functions result in a divide by zero error.  If the divisor of a ratio is 0, then results will be undefined.

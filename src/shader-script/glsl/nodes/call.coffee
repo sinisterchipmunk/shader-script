@@ -11,7 +11,9 @@ class exports.Call extends require('shader-script/nodes/base').Base
       if program.functions[name]
         program.functions[name].invoke compiled_params...
       else if program.builtins[name]
-        @definition value: program.builtins[name].invoke compiled_params...
+        builtin = program.builtins[name]
+        value = builtin.invoke compiled_params...
+        @definition value: value, type: builtin.autodetect_type(value)
       else
         throw new Error("function '#{name}' is not defined")
         

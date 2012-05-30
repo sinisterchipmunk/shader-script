@@ -23,6 +23,18 @@ exports.Extension = class Extension
   constructor: (@name, @type, @callback, register = true) ->
     Program.prototype.builtins[@name] = this if register
     
+  autodetect_type: (value) ->
+    if typeof value is 'number' then 'float'
+    else if value is true or value is false then 'bool'
+    else if value.length
+      base = @autodetect_type value[0]
+      switch base
+        when 'float' then "vec#{value.length}"
+        when 'int'   then "ivec#{value.length}"
+        when 'bool'  then "bvec#{value.length}"
+        else throw new Error "Could not autodetect type of #{JSON.stringify value} used as #{base}"
+    else throw new Error "Could not autodetect type of #{JSON.stringify value}"
+    
   invoke: (params...) ->
     params = (param.execute().value for param in params)
     @callback params...
