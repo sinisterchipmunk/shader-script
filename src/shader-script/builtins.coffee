@@ -65,6 +65,8 @@ try
   e 'smoothstep', null, (edge0, edge1, x) -> @component_wise edge0, edge1, x, (_edge0, _edge1, _x) ->
     t = Extension.invoke('clamp', (_x - _edge0) / (_edge1 - _edge0), 0, 1)
     t * t * (3 - 2 * t)
+    
+  e 'discard', null, -> throw new Error "discarded"
 
   # Geometric functions, pp68-69
   e 'length', 'float', (vec) ->

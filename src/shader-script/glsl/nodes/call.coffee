@@ -18,6 +18,11 @@ class exports.Call extends require('shader-script/nodes/base').Base
         throw new Error("function '#{name}' is not defined")
         
     toSource: () ->
-      joined_params = (param.toSource() for param in compiled_params).join ', '
-      "#{name}(#{joined_params})"
+      # discard is a special case because although we treat it as a function, it's
+      # actually a keyword.
+      if name is 'discard'
+        name
+      else
+        joined_params = (param.toSource() for param in compiled_params).join ', '
+        "#{name}(#{joined_params})"
       

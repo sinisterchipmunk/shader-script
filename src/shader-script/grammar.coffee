@@ -350,6 +350,7 @@ grammar =
 
   # Ordinary function invocation, or a chained series of calls.
   Invocation: [
+    o 'DISCARD',                                -> new Call new Identifier('discard'), []
     o 'Value OptFuncExist Arguments',           -> new Call $1, $3, $2
     o 'Invocation OptFuncExist Arguments',      -> new Call $1, $3, $2
     o 'SUPER',                                  -> new Call 'super', [new Splat new Literal 'arguments']

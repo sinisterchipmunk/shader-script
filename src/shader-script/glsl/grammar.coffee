@@ -196,6 +196,7 @@ grammar =
   ]
   
   FunctionCall: [
+    o 'DISCARD',                 -> new Call new Identifier('discard'), []
     o 'Identifier ArgumentList', -> new Call $1, $2
   ]
   
