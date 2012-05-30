@@ -15,7 +15,8 @@ exports.component_wise = component_wise = (args...) ->
         size = arg.length
       if arg and arg.shift then arg.shift()
       else arg
-    resultset.push callback argset...
+    result = callback argset...
+    resultset.push result
   
   if resultset.length == 1
     resultset[0]

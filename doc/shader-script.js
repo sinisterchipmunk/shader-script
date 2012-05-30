@@ -539,11 +539,7 @@
       return this.callback.apply(this, params);
     };
 
-    Extension.prototype.component_wise = function() {
-      var args, _ref;
-      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      return (_ref = require('shader-script/operators')).component_wise.apply(_ref, args);
-    };
+    Extension.prototype.component_wise = require('shader-script/operators').component_wise;
 
     Extension.invoke = function() {
       var args, name, _ref;
@@ -6419,7 +6415,7 @@ if (typeof module !== 'undefined' && require.main === module) {
     __slice = Array.prototype.slice;
 
   exports.component_wise = component_wise = function() {
-    var again, arg, args, argset, callback, i, resultset, size;
+    var again, arg, args, argset, callback, i, result, resultset, size;
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
     for (i in args) {
       if (args[i] && args[i].splice) args[i] = args[i].splice(0);
@@ -6450,7 +6446,8 @@ if (typeof module !== 'undefined' && require.main === module) {
         }
         return _results;
       })();
-      resultset.push(callback.apply(null, argset));
+      result = callback.apply(null, argset);
+      resultset.push(result);
     }
     if (resultset.length === 1) {
       return resultset[0];

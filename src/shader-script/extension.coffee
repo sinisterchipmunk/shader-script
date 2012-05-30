@@ -39,7 +39,7 @@ exports.Extension = class Extension
     params = (param.execute().value for param in params)
     @callback params...
     
-  component_wise: (args...) -> require('shader-script/operators').component_wise(args...)
+  component_wise: require('shader-script/operators').component_wise
     
   # Invokes the named extension from JS.
   @invoke: (name, args...) ->

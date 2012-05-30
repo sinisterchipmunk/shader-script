@@ -21,8 +21,12 @@ describe "built-in functions", ->
     sim = simulate glsl "vertex = -> f = dot([0,1,0], [1,0,0]) * 1"
     # float f = dot(vec3(0,1,0), vec3(1,0,0)) * 1;
     sim.start()
-    expect(sim.state.variables.f.value).toEqual 0
+    expect(sim.state.variables.f.value).toBe 0
     
+  it "should not leave values undefined", ->
+    sim = simulate fragment: "void main(void) { float x = dot(vec3(1,1,1), vec3(1,1,1)); }"
+    sim.start()
+    expect(sim.state.variables.x.value).toEqual 3
     
   describe 'angle and trigonometry functions, p65', ->
     # Function parameters specified as angle are assumed to be in units of radians.  In no case will any of these
