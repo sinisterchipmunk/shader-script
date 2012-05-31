@@ -1,6 +1,6 @@
 exports.component_wise = component_wise = (args...) ->
   # make a shallow copy of arg arrays so that they aren't modified in place
-  (args[i] = args[i].splice(0) if args[i] and args[i].splice) for i of args
+  (args[i] = args[i].slice() if args[i] and args[i].slice) for i of args
   callback = args.pop()
   
   resultset = []

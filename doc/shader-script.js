@@ -6463,7 +6463,7 @@ if (typeof module !== 'undefined' && require.main === module) {
     var again, arg, args, argset, callback, i, result, resultset, size;
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
     for (i in args) {
-      if (args[i] && args[i].splice) args[i] = args[i].splice(0);
+      if (args[i] && args[i].slice) args[i] = args[i].slice();
     }
     callback = args.pop();
     resultset = [];

@@ -1,4 +1,5 @@
 require 'spec_helper'
+{Simulator} = require 'shader-script'
 
 describe "storage qualifiers", ->
   describe "syntax", ->
@@ -15,6 +16,12 @@ describe "storage qualifiers", ->
       expect(glsl('uniforms = mat4:\n  mv,\n  p').vertex).toMatch /uniform mat4 mv, p/
   
   describe "uniforms", ->
+    it "should not taint them between runs", ->
+      sim = new Simulator fragment: "uniform vec3 v; void main(void) { -v; }"
+      value = (val for val in sim.state.variables.v.value)
+      sim.start()
+      expect(sim.state.variables.v.value).toEqualish(value)
+
     it "should declare them", ->
       script = 'uniforms =\n  vec3: position\n  mat4: [mv, p]'
       # console.log parse_tree(script)
