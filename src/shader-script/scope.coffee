@@ -34,6 +34,7 @@ exports.Scope = class Scope
   constructor: (@name = "root", @parent = null) ->
     @subscopes = {}
     @definitions = {}
+    @warn_NaN = (if @parent?.warn_NaN is true then true else false)
     @registry = new NameRegistry()
     
   # Causes calls to #define to create a variable instance, but
@@ -99,7 +100,7 @@ exports.Scope = class Scope
     
   define_within: (name, options = {}) ->
     options.name or= name
-    if def = @lookup name, true
+    if def = @lookup(name, silent: true)
       def.assign options
       return def
     else
@@ -140,16 +141,25 @@ exports.Scope = class Scope
     for id, subscope of @subscopes
       if subscope.name == scope_name then return subscope
     
-  lookup: (name, silent = false) ->
+  lookup: (name, options = {}) ->
+    throw new Error(typeof options) unless typeof options is 'object'
+    options.warn_NaN = @warn_NaN unless options.warn_NaN is true
     @delegate ->
       target = this
       while target
         if result = target.find name
+          if options.warn_NaN
+            warn = false
+            if result.value?.length then ((warn = true if isNaN(v) or v is undefined) for v in result.value)
+            else if isNaN(result.value) or result.value is undefined then warn = true
+            if warn
+              console.log "Warning: variable `#{result.name}` has NaN or undefined values"
+          
           return result
         target = target.parent
 
       return new Definition name: name if @locked
-      if silent then null
+      if options.silent then null
       else throw new Error "Variable '#{name}' is not defined in this scope"
       
   # Calls the callback in the context of the current subscope.

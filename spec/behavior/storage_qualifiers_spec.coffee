@@ -18,7 +18,7 @@ describe "storage qualifiers", ->
   describe "uniforms", ->
     it "should not taint them between runs", ->
       sim = new Simulator fragment: "uniform vec3 v; void main(void) { -v; }"
-      value = (val for val in sim.state.variables.v.value)
+      value = sim.state.variables.v.value = [0,1,0]
       sim.start()
       expect(sim.state.variables.v.value).toEqualish(value)
 

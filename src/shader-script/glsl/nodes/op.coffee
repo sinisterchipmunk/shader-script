@@ -16,8 +16,8 @@ class exports.Op extends require('shader-script/nodes/base').Base
     right = @right && @right.compile program
     
     execute: =>
-      re = right.execute() if right
-      le = left.execute()
+      re = right.execute(warn_NaN: true) if right
+      le = left.execute(warn_NaN: true)
       @definition dependent: le, value: le.perform op, re
     
     toSource: ->

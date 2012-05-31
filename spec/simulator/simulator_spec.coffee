@@ -8,6 +8,11 @@ describe "simulator", ->
     sim.start()
     
     # what is there to verify?
+    
+  it "should log warnings when performing operations on uninitialized uniforms", ->
+    spyOn console, 'log'
+    simulate vertex: glsl("uniforms = mat4: mv; vertex = -> gl_Position = mv * [1,1,1,1]").vertex
+    expect(console.log).toHaveBeenCalledWith("Warning: variable `mv` has NaN or undefined values")
    
   it "should execute a string parameter as a vertex program", -> 
     expect(-> simulate "void main(void) { }").not.toThrow()

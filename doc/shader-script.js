@@ -2294,28 +2294,32 @@
 
     Identifier.prototype.cast = function(type, program) {};
 
-    Identifier.prototype.variable = function(program) {
+    Identifier.prototype.variable = function(program, scope, lookup_options) {
       if (this.children[0] instanceof Definition) {
         return this.children[0];
       } else {
-        return program.state.scope.lookup(this.toVariableName());
+        return (scope || program.state.scope).lookup(this.toVariableName(), lookup_options);
       }
     };
 
     Identifier.prototype.type = function(program) {
-      return this.variable(program).type();
+      return this.variable(program, null, {
+        warn_NaN: false
+      }).type();
     };
 
     Identifier.prototype.compile = function(program) {
-      var variable,
+      var scope,
         _this = this;
-      variable = this.variable(program);
+      scope = program.state.scope.current();
       return {
-        execute: function() {
-          return variable;
+        execute: function(lookup_options) {
+          return _this.variable(program, scope, lookup_options);
         },
         toSource: function() {
-          return variable.name;
+          return _this.variable(program, scope, {
+            silent: true
+          }).name;
         }
       };
     };
@@ -2491,8 +2495,14 @@
       return {
         execute: function() {
           var le, re;
-          if (right) re = right.execute();
-          le = left.execute();
+          if (right) {
+            re = right.execute({
+              warn_NaN: true
+            });
+          }
+          le = left.execute({
+            warn_NaN: true
+          });
           return _this.definition({
             dependent: le,
             value: le.perform(op, re)
@@ -5497,7 +5507,9 @@ if (typeof module !== 'undefined' && require.main === module) {
         if (!this.left.is_access()) {
           if (this.right.variable) dependent = this.right.variable(shader);
           varname = left.toVariableName();
-          existing = shader.scope.lookup(varname, true);
+          existing = shader.scope.lookup(varname, {
+            silent: true
+          });
           if (existing) {
             type = existing.type();
             if (right.cast) {
@@ -7912,10 +7924,12 @@ if (typeof module !== 'undefined' && require.main === module) {
   exports.Scope = Scope = (function() {
 
     function Scope(name, parent) {
+      var _ref;
       this.name = name != null ? name : "root";
       this.parent = parent != null ? parent : null;
       this.subscopes = {};
       this.definitions = {};
+      this.warn_NaN = (((_ref = this.parent) != null ? _ref.warn_NaN : void 0) === true ? true : false);
       this.registry = new NameRegistry();
     }
 
@@ -8013,7 +8027,9 @@ if (typeof module !== 'undefined' && require.main === module) {
       var def;
       if (options == null) options = {};
       options.name || (options.name = name);
-      if (def = this.lookup(name, true)) {
+      if (def = this.lookup(name, {
+        silent: true
+      })) {
         def.assign(options);
         return def;
       } else {
@@ -8059,13 +8075,32 @@ if (typeof module !== 'undefined' && require.main === module) {
       }
     };
 
-    Scope.prototype.lookup = function(name, silent) {
-      if (silent == null) silent = false;
+    Scope.prototype.lookup = function(name, options) {
+      if (options == null) options = {};
+      if (typeof options !== 'object') throw new Error(typeof options);
+      if (options.warn_NaN !== true) options.warn_NaN = this.warn_NaN;
       return this.delegate(function() {
-        var result, target;
+        var result, target, v, warn, _i, _len, _ref, _ref2;
         target = this;
         while (target) {
-          if (result = target.find(name)) return result;
+          if (result = target.find(name)) {
+            if (options.warn_NaN) {
+              warn = false;
+              if ((_ref = result.value) != null ? _ref.length : void 0) {
+                _ref2 = result.value;
+                for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+                  v = _ref2[_i];
+                  if (isNaN(v) || v === void 0) warn = true;
+                }
+              } else if (isNaN(result.value) || result.value === void 0) {
+                warn = true;
+              }
+              if (warn) {
+                console.log("Warning: variable `" + result.name + "` has NaN or undefined values");
+              }
+            }
+            return result;
+          }
           target = target.parent;
         }
         if (this.locked) {
@@ -8073,7 +8108,7 @@ if (typeof module !== 'undefined' && require.main === module) {
             name: name
           });
         }
-        if (silent) {
+        if (options.silent) {
           return null;
         } else {
           throw new Error("Variable '" + name + "' is not defined in this scope");

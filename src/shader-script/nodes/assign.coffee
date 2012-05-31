@@ -25,7 +25,7 @@ class exports.Assign extends require("shader-script/glsl/nodes/assign").Assign
         dependent = @right.variable shader if @right.variable
         varname = left.toVariableName()
         
-        existing = shader.scope.lookup varname, true
+        existing = shader.scope.lookup varname, silent: true
         if existing
           type = existing.type()
           if right.cast
