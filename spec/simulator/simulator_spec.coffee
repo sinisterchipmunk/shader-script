@@ -9,6 +9,13 @@ describe "simulator", ->
     
     # what is there to verify?
     
+  it "should raise a coherent error when a variable that does not exist is set", ->
+    expect(-> 
+      simulate (vertex: glsl('uniforms = mat3: normal\nvertex = -> x = normal * [1,2,3]').vertex),
+                   mv: [1,0,0, 0,-1,0, 0,0,-1] # rotation PI rads about X axis
+    ).toThrow("Could not set variable `mv` to `[1,0,0,0,-1,0,0,0,-1]`: variable does not exist")
+    
+    
   it "should log warnings when performing operations on uninitialized uniforms", ->
     spyOn console, 'log'
     simulate vertex: glsl("uniforms = mat4: mv; vertex = -> gl_Position = mv * [1,1,1,1]").vertex
