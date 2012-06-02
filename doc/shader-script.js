@@ -381,24 +381,6 @@
 
       return exports;
     };
-    _require["shader-script/debug_spec"] = function() {
-      var exports = {};
-      (function() {
-
-  require('spec_helper');
-
-  describe("debug", function() {
-    return it("should handle this code", function() {
-      var code;
-      code = "precision mediump float;\n\nuniform mat4 ModelViewProjectionMatrix;\nuniform int PASS;\nuniform float MaterialAmbientIntensity;\nuniform vec4 WorldAmbientColor;\nuniform vec4 LightAmbientColor;\nuniform mat4 ModelViewMatrix;\nuniform float MaterialDiffuseIntensity;\nuniform vec4 MaterialDiffuseColor;\nuniform vec4 LightDiffuseColor;\nuniform vec3 EyeSpaceLightDirection;\nuniform mat3 NormalMatrix;\nuniform float MaterialSpecularIntensity;\nuniform float MaterialShininess;\nuniform vec4 MaterialSpecularColor;\nuniform vec4 LightSpecularColor;\n\nattribute vec4 VERTEX_POSITION;\nattribute vec4 VERTEX_COLOR;\nattribute vec3 VERTEX_NORMAL;\n\nvarying vec4 vColor;\nvarying vec3 vEyeSpaceSurfacePosition;\nvarying vec3 vEyeSpaceSurfaceNormal;\n\n\n\nvoid main0(void) {\n\n  gl_Position = ModelViewProjectionMatrix * VERTEX_POSITION;\n\n}\n\n\nvoid main1(void) {\n\n  vColor = VERTEX_COLOR;\n\n}\n\n\nvoid main2(void) {\n\n  vEyeSpaceSurfacePosition = (ModelViewMatrix * VERTEX_POSITION).xyz;\n\n}\n\n\nvoid main3(void) {\n\n  vEyeSpaceSurfaceNormal = NormalMatrix * VERTEX_NORMAL;\n\n}\n\n\nvoid main4(void) {\n\n  vEyeSpaceSurfaceNormal = NormalMatrix * VERTEX_NORMAL;\n  vEyeSpaceSurfacePosition = (ModelViewMatrix * VERTEX_POSITION).xyz;\n\n}\n\n\nvoid main(void) {\n  gl_Position = vec4(1.0, 1.0, 1.0, 1.0);\n  main0();\n  main1();\n  main2();\n  main3();\n  main4();\n}";
-      return simulate(code);
-    });
-  });
-
-}).call(this);
-
-      return exports;
-    };
     _require["shader-script/definition"] = function() {
       var exports = {};
       (function() {
@@ -6686,6 +6668,38 @@ if (typeof module !== 'undefined' && require.main === module) {
     }
   };
 
+  exports.mat3 = {
+    '==': function(le, re) {
+      return le.value === re.value;
+    },
+    '!=': function(le, re) {
+      if (le.value !== re.value) {
+        return 1;
+      } else {
+        return 0;
+      }
+    },
+    '-': cw_subt,
+    '+': cw_add,
+    '/': cw_divide,
+    '*': function(le, re) {
+      var dest, matrix, vec, x, y, z, _ref;
+      switch (re.type()) {
+        case 'vec3':
+          dest = [];
+          matrix = le.value;
+          vec = re.value;
+          _ref = [vec[0], vec[1], vec[2]], x = _ref[0], y = _ref[1], z = _ref[2];
+          dest[0] = x * matrix[0] + y * matrix[3] + z * matrix[6];
+          dest[1] = x * matrix[1] + y * matrix[4] + z * matrix[7];
+          dest[2] = x * matrix[2] + y * matrix[5] + z * matrix[8];
+          return dest;
+        default:
+          return cw_mult(le, re);
+      }
+    }
+  };
+
   exports.vec4 = {
     '==': function(le, re) {
       if (le.value === re.value) {
@@ -8285,7 +8299,11 @@ if (typeof module !== 'undefined' && require.main === module) {
       }
       for (name in variables) {
         value = variables[name];
-        this.state.variables[name].value = value;
+        if (this.state.variables[name]) {
+          this.state.variables[name].value = value;
+        } else {
+          throw new Error("Could not set variable `" + name + "` to `" + (JSON.stringify(value)) + "`: variable does not exist");
+        }
       }
       if (!(this.vertex || this.fragment)) throw new Error("No programs found!");
     }

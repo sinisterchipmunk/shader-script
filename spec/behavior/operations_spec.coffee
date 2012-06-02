@@ -41,6 +41,11 @@ describe "operations", ->
                      mv: [1,0,0,0, 0,-1,0,0, 0,0,-1,0, 0,0,0,1] # rotation PI rads about X axis
       expect(sim.state.variables.x.value).toEqual [1, -2, -3, 4]
       
+    it "mat3 multiply vec3", ->
+      sim = simulate (vertex: glsl('uniforms = mat3: normal\nvertex = -> x = normal * [1,2,3]').vertex),
+                     normal: [1,0,0, 0,-1,0, 0,0,-1] # rotation PI rads about X axis
+      expect(sim.state.variables.x.value).toEqual [1, -2, -3]
+      
     it "should handle parens accessors", ->
       sim = simulate (vertex: glsl('uniforms = mat4: mv\nvertex = -> x = (mv * [1,2,3,4]).xyz').vertex),
                      mv: [1,0,0,0, 0,-1,0,0, 0,0,-1,0, 0,0,0,1] # rotation PI rads about X axis

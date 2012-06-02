@@ -25,7 +25,10 @@ exports.Simulator = class Simulator
     @vertex   = compile_program 'vertex',   @state, glsl.vertex,   @state.preprocessor if glsl.vertex
     @fragment = compile_program 'fragment', @state, glsl.fragment, @state.preprocessor if glsl.fragment
     for name, value of variables
-      @state.variables[name].value = value
+      if @state.variables[name]
+        @state.variables[name].value = value
+      else
+        throw new Error "Could not set variable `#{name}` to `#{JSON.stringify value}`: variable does not exist"
     throw new Error("No programs found!") unless @vertex || @fragment
   
   start: (which = 'both') ->

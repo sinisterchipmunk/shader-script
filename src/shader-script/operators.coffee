@@ -101,6 +101,25 @@ exports.mat4 =
         dest
       else cw_mult le, re
 
+exports.mat3 =
+  '==': (le, re) -> le.value == re.value
+  '!=': (le, re) -> if le.value != re.value then 1 else 0
+  '-': cw_subt
+  '+': cw_add
+  '/': cw_divide
+  '*': (le, re) ->
+    switch re.type()
+      when 'vec3'
+        dest = []
+        matrix = le.value
+        vec = re.value
+        [x, y, z] = [vec[0], vec[1], vec[2]]
+        dest[0] = x * matrix[0] + y * matrix[3] + z * matrix[6];
+        dest[1] = x * matrix[1] + y * matrix[4] + z * matrix[7];
+        dest[2] = x * matrix[2] + y * matrix[5] + z * matrix[8];
+        dest
+      else cw_mult le, re
+
 exports.vec4 = 
   '==': (le, re) -> if le.value == re.value then 1 else 0
   '!=': (le, re) -> if le.value != re.value then 1 else 0
