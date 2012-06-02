@@ -98,6 +98,10 @@ exports.Scope = class Scope
   define: (name, options = {}) ->
     @delegate -> @define_within name, options
     
+  import: (variable) ->
+    @delegate -> @definitions[variable.name] = variable
+    variable
+    
   define_within: (name, options = {}) ->
     options.name or= name
     if def = @lookup(name, silent: true)

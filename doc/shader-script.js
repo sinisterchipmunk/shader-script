@@ -2823,12 +2823,16 @@
                 return;
             }
           }).call(this);
-          variable = program.state.scope.define(name, {
-            type: this.type,
-            builtin: true,
-            value: default_value
-          });
-          program.state.variables[name] = variable;
+          if (program.state.variables[name]) {
+            variable = program.state.scope["import"](program.state.variables[name]);
+          } else {
+            variable = program.state.scope.define(name, {
+              type: this.type,
+              builtin: true,
+              value: default_value
+            });
+            program.state.variables[name] = variable;
+          }
           _results.push(name);
         }
         return _results;
@@ -3064,7 +3068,11 @@
       if (variable.value === void 0) variable.value = Number.NaN;
       qualifier = program.state.scope.qualifier();
       if (qualifier === 'root.block' || qualifier === 'root.block.main' || qualifier === 'root.block.main.block') {
-        program.state.variables[name] = variable;
+        if (program.state.variables[name]) {
+          variable = program.state.scope["import"](program.state.variables[name]);
+        } else {
+          program.state.variables[name] = variable;
+        }
       }
       return {
         execute: function() {
@@ -8060,6 +8068,13 @@ if (typeof module !== 'undefined' && require.main === module) {
       return this.delegate(function() {
         return this.define_within(name, options);
       });
+    };
+
+    Scope.prototype["import"] = function(variable) {
+      this.delegate(function() {
+        return this.definitions[variable.name] = variable;
+      });
+      return variable;
     };
 
     Scope.prototype.define_within = function(name, options) {

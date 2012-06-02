@@ -34,7 +34,9 @@ class exports.Variable extends require('shader-script/nodes/base').Base
     qualifier = program.state.scope.qualifier()
     if qualifier == 'root.block' or qualifier == 'root.block.main' or qualifier == 'root.block.main.block'
       # provides convenient access to "important" variables
-      program.state.variables[name] = variable
+      # - if variable already exists, import it into the local scope, else export it
+      if program.state.variables[name] then variable = program.state.scope.import program.state.variables[name]
+      else program.state.variables[name] = variable
       
     execute: =>
       variable.value = compiled_value.execute().value if compiled_value

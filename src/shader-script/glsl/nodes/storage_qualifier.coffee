@@ -19,8 +19,10 @@ class exports.StorageQualifier extends require('shader-script/nodes/base').Base
         when 'mat2x4', 'mat4x2'        then (Number.NaN for i in [0...8])
         when 'mat3x4', 'mat4x3'        then (Number.NaN for i in [0...12])
         else undefined
-      variable = program.state.scope.define name, type: @type, builtin: yes, value: default_value
-      program.state.variables[name] = variable
+      if program.state.variables[name] then variable = program.state.scope.import program.state.variables[name]
+      else
+        variable = program.state.scope.define name, type: @type, builtin: yes, value: default_value
+        program.state.variables[name] = variable
       name
     
     toSource: => "#{@qualifier} #{@type} #{names.join(', ')}"

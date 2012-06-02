@@ -1,4 +1,5 @@
 require 'spec_helper'
+{Simulator} = require 'shader-script'
 
 describe "simulator", ->
   it "should process an empty shader", ->
@@ -8,6 +9,15 @@ describe "simulator", ->
     sim.start()
     
     # what is there to verify?
+    
+  it "should not lose uniform values between shaders", ->
+    spyOn(console, 'log').andCallThrough()
+    sim = new Simulator
+      vertex:   'uniform int PASS; void main(void) { if (PASS != 0) { } }'
+      fragment: 'uniform int PASS; void main(void) { if (PASS != 0) { } }'
+    sim.state.variables.PASS.value = 1
+    sim.start()
+    expect(console.log).not.toHaveBeenCalled()
     
   it "should raise a coherent error when a variable that does not exist is set", ->
     expect(-> 
