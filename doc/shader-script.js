@@ -381,6 +381,24 @@
 
       return exports;
     };
+    _require["shader-script/debug_spec"] = function() {
+      var exports = {};
+      (function() {
+
+  require('spec_helper');
+
+  describe("debug", function() {
+    return it("should handle this code", function() {
+      var code;
+      code = "precision mediump float;\n\nuniform mat4 ModelViewProjectionMatrix;\nuniform int PASS;\nuniform float MaterialAmbientIntensity;\nuniform vec4 WorldAmbientColor;\nuniform vec4 LightAmbientColor;\nuniform mat4 ModelViewMatrix;\nuniform float MaterialDiffuseIntensity;\nuniform vec4 MaterialDiffuseColor;\nuniform vec4 LightDiffuseColor;\nuniform vec3 EyeSpaceLightDirection;\nuniform mat3 NormalMatrix;\nuniform float MaterialSpecularIntensity;\nuniform float MaterialShininess;\nuniform vec4 MaterialSpecularColor;\nuniform vec4 LightSpecularColor;\n\nattribute vec4 VERTEX_POSITION;\nattribute vec4 VERTEX_COLOR;\nattribute vec3 VERTEX_NORMAL;\n\nvarying vec4 vColor;\nvarying vec3 vEyeSpaceSurfacePosition;\nvarying vec3 vEyeSpaceSurfaceNormal;\n\n\n\nvoid main0(void) {\n\n  gl_Position = ModelViewProjectionMatrix * VERTEX_POSITION;\n\n}\n\n\nvoid main1(void) {\n\n  vColor = VERTEX_COLOR;\n\n}\n\n\nvoid main2(void) {\n\n  vEyeSpaceSurfacePosition = (ModelViewMatrix * VERTEX_POSITION).xyz;\n\n}\n\n\nvoid main3(void) {\n\n  vEyeSpaceSurfaceNormal = NormalMatrix * VERTEX_NORMAL;\n\n}\n\n\nvoid main4(void) {\n\n  vEyeSpaceSurfaceNormal = NormalMatrix * VERTEX_NORMAL;\n  vEyeSpaceSurfacePosition = (ModelViewMatrix * VERTEX_POSITION).xyz;\n\n}\n\n\nvoid main(void) {\n  gl_Position = vec4(1.0, 1.0, 1.0, 1.0);\n  main0();\n  main1();\n  main2();\n  main3();\n  main4();\n}";
+      return simulate(code);
+    });
+  });
+
+}).call(this);
+
+      return exports;
+    };
     _require["shader-script/definition"] = function() {
       var exports = {};
       (function() {
@@ -2467,8 +2485,11 @@
     _require["shader-script/glsl/nodes/op"] = function() {
       var exports = {};
       (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
+  var operators,
+    __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  operators = require('shader-script/operators');
 
   exports.Op = (function(_super) {
 
@@ -2485,6 +2506,10 @@
     };
 
     Op.prototype.cast = function(type, program) {};
+
+    Op.prototype.type = function(program) {
+      return operators.signatures[this.left.type(program)][this.op][this.right.type(program)];
+    };
 
     Op.prototype.compile = function(program) {
       var left, op, right,
