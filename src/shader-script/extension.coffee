@@ -37,6 +37,10 @@ exports.Extension = class Extension
     
   invoke: (params...) ->
     params = (param.execute().value for param in params)
+    
+    # convert args that are typed arrays into arrays
+    (params[i] = (k for k in params[i]) if params[i] and params[i].length) for i of params
+    
     @callback params...
     
   component_wise: require('shader-script/operators').component_wise

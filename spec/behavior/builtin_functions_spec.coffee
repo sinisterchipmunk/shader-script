@@ -212,6 +212,7 @@ describe "built-in functions", ->
       
     it 'reflect', ->
       assert 'reflect [0,-1,0], [0,1,0]', 'vec3', [0,1,0]
+      assert 'reflect [0,1,0], [0,-1,0]', 'vec3', [0,-1,0]
     
     it 'refract', ->
       assert 'refract [0.707107, -0.707107], [0, 1], 0.9', 'vec2', [0.6363963, -0.7713625935017137]

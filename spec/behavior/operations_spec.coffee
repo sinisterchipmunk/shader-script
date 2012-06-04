@@ -70,6 +70,25 @@ describe "operations", ->
       sim = simulate (vertex: glsl('uniforms = mat4: mv\nvertex = -> x = (mv * [1,2,3,4]).xyz').vertex),
                      mv: [1,0,0,0, 0,-1,0,0, 0,0,-1,0, 0,0,0,1] # rotation PI rads about X axis
       expect(sim.state.variables.x.value).toEqual [1, -2, -3]
+      
+    it "should not taint variables when given Float32Array", ->
+      fcode = """
+      uniform vec3 EyeSpaceLightDirection;
+      varying vec3 vEyeSpaceSurfaceNormal;
+
+      void main(void) {
+        vec3 R;
+        vec3 N = normalize(vEyeSpaceSurfaceNormal);
+        vec3 L = EyeSpaceLightDirection;
+        R = reflect(L, N);
+      }
+      """
+      sim = new Simulator fragment: fcode
+      sim.state.variables.EyeSpaceLightDirection.value = new Float32Array [0, 0, -1]
+      sim.state.variables.vEyeSpaceSurfaceNormal.value = [0, 0, -1]
+      sim.start()
+      expect(sim.state.variables.R.value).toEqualish [0,0,1]
+      
 
     it "assign function calling mat3 multiply vec3", ->
       code = glsl """

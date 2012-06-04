@@ -1,7 +1,5 @@
 exports.component_wise = component_wise = (args...) ->
   callback = args.pop()
-  # convert args that are typed arrays into arrays
-  (args[i] = (k for k in args[i]) if args[i] and args[i].length) for i of args
   # make a shallow copy of arg arrays so that they aren't modified in place
   (args[i] = args[i].slice() if args[i] and args[i].slice) for i of args
   
@@ -98,10 +96,10 @@ exports.mat4 =
         mat = le.value
         vec = re.value
         [x, y, z, w] = [vec[0], vec[1], vec[2], vec[3]]
-        dest[0] = mat[0] * x + mat[4] * y + mat[8] * z + mat[12] * w;
-        dest[1] = mat[1] * x + mat[5] * y + mat[9] * z + mat[13] * w;
-        dest[2] = mat[2] * x + mat[6] * y + mat[10] * z + mat[14] * w;
-        dest[3] = mat[3] * x + mat[7] * y + mat[11] * z + mat[15] * w;
+        dest[0] = mat[0] * x + mat[4] * y + mat[8] * z + mat[12] * w
+        dest[1] = mat[1] * x + mat[5] * y + mat[9] * z + mat[13] * w
+        dest[2] = mat[2] * x + mat[6] * y + mat[10] * z + mat[14] * w
+        dest[3] = mat[3] * x + mat[7] * y + mat[11] * z + mat[15] * w
         dest
       else cw_mult le, re
 
@@ -118,9 +116,9 @@ exports.mat3 =
         matrix = le.value
         vec = re.value
         [x, y, z] = [vec[0], vec[1], vec[2]]
-        dest[0] = x * matrix[0] + y * matrix[3] + z * matrix[6];
-        dest[1] = x * matrix[1] + y * matrix[4] + z * matrix[7];
-        dest[2] = x * matrix[2] + y * matrix[5] + z * matrix[8];
+        dest[0] = x * matrix[0] + y * matrix[3] + z * matrix[6]
+        dest[1] = x * matrix[1] + y * matrix[4] + z * matrix[7]
+        dest[2] = x * matrix[2] + y * matrix[5] + z * matrix[8]
         dest
       else cw_mult le, re
 

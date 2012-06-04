@@ -532,7 +532,7 @@
     };
 
     Extension.prototype.invoke = function() {
-      var param, params;
+      var i, k, param, params;
       params = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       params = (function() {
         var _i, _len, _results;
@@ -543,6 +543,20 @@
         }
         return _results;
       })();
+      for (i in params) {
+        if (params[i] && params[i].length) {
+          params[i] = (function() {
+            var _i, _len, _ref, _results;
+            _ref = params[i];
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              k = _ref[_i];
+              _results.push(k);
+            }
+            return _results;
+          })();
+        }
+      }
       return this.callback.apply(this, params);
     };
 
@@ -6498,23 +6512,9 @@ if (typeof module !== 'undefined' && require.main === module) {
     __slice = Array.prototype.slice;
 
   exports.component_wise = component_wise = function() {
-    var again, arg, argi, args, argset, callback, i, k, result, resultset, size;
+    var again, arg, argi, args, argset, callback, i, result, resultset, size;
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
     callback = args.pop();
-    for (i in args) {
-      if (args[i] && args[i].length) {
-        args[i] = (function() {
-          var _i, _len, _ref, _results;
-          _ref = args[i];
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            k = _ref[_i];
-            _results.push(k);
-          }
-          return _results;
-        })();
-      }
-    }
     for (i in args) {
       if (args[i] && args[i].slice) args[i] = args[i].slice();
     }
