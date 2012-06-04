@@ -1,7 +1,7 @@
 exports.component_wise = component_wise = (args...) ->
   callback = args.pop()
   # convert args that are typed arrays into arrays
-  (args[i] = (args[i][0..-1]) if args[i] and args[i].length) for i of args
+  (args[i] = (k for k in args[i]) if args[i] and args[i].length) for i of args
   # make a shallow copy of arg arrays so that they aren't modified in place
   (args[i] = args[i].slice() if args[i] and args[i].slice) for i of args
   

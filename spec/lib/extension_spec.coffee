@@ -33,3 +33,6 @@ describe "Extension", ->
   it "should iterate given a mix with undefined values", ->
     expect(invoke 1, undefined, [2, 3]).toEqual [ [1, undefined, 2], [1, undefined, 3] ]
     
+  it "should iterate given a Float32Array and undefined", ->
+    expect(invoke 1, undefined, new Float32Array([2, 3])).toEqual [ [1, undefined, 2], [1, undefined, 3] ]
+    
