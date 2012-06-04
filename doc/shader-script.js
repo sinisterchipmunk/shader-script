@@ -418,7 +418,8 @@
         builtin: this.builtin,
         dependents: this.dependents,
         value: this.value,
-        param_qualifier: this.param_qualifier
+        param_qualifier: this.param_qualifier,
+        storage_qualifier: this.storage_qualifier
       };
     };
 
@@ -455,6 +456,9 @@
       if (options.builtin) this.builtin = options.builtin;
       this.value = options.value;
       if (options.param_qualifier) this.param_qualifier = options.param_qualifier;
+      if (options.storage_qualifier) {
+        this.storage_qualifier = options.storage_qualifier;
+      }
       if (options.type) this.set_type(options.type);
       if (options.dependents) {
         _ref = options.dependents;
@@ -2829,7 +2833,8 @@
             variable = program.state.scope.define(name, {
               type: this.type,
               builtin: true,
-              value: default_value
+              value: default_value,
+              storage_qualifier: this.qualifier
             });
             program.state.variables[name] = variable;
           }
@@ -6768,7 +6773,14 @@ if (typeof module !== 'undefined' && require.main === module) {
     '*': cw_mult,
     '-': cw_subt,
     '+': cw_add,
-    '/': cw_divide
+    '/': cw_divide,
+    '>': function(le, re) {
+      if (le.value > re.value) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
   };
 
   exports.int = {
@@ -6789,7 +6801,14 @@ if (typeof module !== 'undefined' && require.main === module) {
     '*': cw_mult,
     '-': cw_subt,
     '+': cw_add,
-    '/': cw_divide
+    '/': cw_divide,
+    '>': function(le, re) {
+      if (le.value > re.value) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
   };
 
 }).call(this);
@@ -8273,7 +8292,7 @@ if (typeof module !== 'undefined' && require.main === module) {
   Preprocessor = require('shader-script/glsl/preprocessor').Preprocessor;
 
   exports.Simulator = Simulator = (function() {
-    var assign_builtin_variables, compile_program;
+    var assign_builtin_variables, compile_program, convert_attributes;
 
     assign_builtin_variables = function(name, program) {
       var builtins, definition, _results;
@@ -8293,6 +8312,44 @@ if (typeof module !== 'undefined' && require.main === module) {
       assign_builtin_variables(type, program);
       program = Glsl.compile(new Preprocessor(source_code, preprocessor_state).toString(), program);
       return program;
+    };
+
+    convert_attributes = function(sim, program) {
+      var name, variable, _ref, _results;
+      _ref = sim.state.variables;
+      _results = [];
+      for (name in _ref) {
+        variable = _ref[name];
+        if (variable.storage_qualifier === 'attribute') {
+          if (variable.value.length) {
+            switch (variable.type()) {
+              case 'vec4':
+                if (variable.value.length % 4 !== 0) {
+                  _results.push(variable.value = [variable.value[0], variable.value[1], variable.value[2], 1]);
+                } else {
+                  _results.push(variable.value = [variable.value[0], variable.value[1], variable.value[2], variable.value[3]]);
+                }
+                break;
+              case 'vec3':
+                _results.push(variable.value = [variable.value[0], variable.value[1], variable.value[2]]);
+                break;
+              case 'vec2':
+                _results.push(variable.value = [variable.value[0], variable.value[1]]);
+                break;
+              case 'float':
+                _results.push(variable.value = variable.value[0]);
+                break;
+              default:
+                _results.push(void 0);
+            }
+          } else {
+            _results.push(void 0);
+          }
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
     };
 
     function Simulator(glsl, variables) {
@@ -8341,6 +8398,7 @@ if (typeof module !== 'undefined' && require.main === module) {
 
     Simulator.prototype.run_program = function(name, program) {
       try {
+        convert_attributes(this, program);
         return program.invoke('main');
       } catch (err) {
         err.message = "" + name + ": " + err.message;

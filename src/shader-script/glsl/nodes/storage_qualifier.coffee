@@ -21,7 +21,11 @@ class exports.StorageQualifier extends require('shader-script/nodes/base').Base
         else undefined
       if program.state.variables[name] then variable = program.state.scope.import program.state.variables[name]
       else
-        variable = program.state.scope.define name, type: @type, builtin: yes, value: default_value
+        variable = program.state.scope.define name,
+          type: @type
+          builtin: yes
+          value: default_value
+          storage_qualifier: @qualifier
         program.state.variables[name] = variable
       name
     

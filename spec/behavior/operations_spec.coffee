@@ -33,6 +33,14 @@ describe "operations", ->
     it "int inequality (false)", ->
       sim = simulate glsl 'vertex = -> x = int(2) != int(2)'
       expect(sim.state.variables.x.value).toEqual 0
+      
+    it "float greater than (true)", ->
+      sim = simulate glsl 'vertex = -> x = float(2) > float(1)'
+      expect(sim.state.variables.x.value).toEqual 1
+
+    it "float greater than (false)", ->
+      sim = simulate glsl 'vertex = -> x = float(2) > float(2)'
+      expect(sim.state.variables.x.value).toEqual 0
 
       
   describe "complex", ->

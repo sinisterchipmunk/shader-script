@@ -34,6 +34,7 @@ exports.Definition = class Definition
     dependents: @dependents
     value: @value
     param_qualifier: @param_qualifier
+    storage_qualifier: @storage_qualifier
   
   inferred_type: ->
     for dep in @dependents
@@ -59,6 +60,7 @@ exports.Definition = class Definition
     @builtin = options.builtin if options.builtin
     @value = options.value
     @param_qualifier = options.param_qualifier if options.param_qualifier
+    @storage_qualifier = options.storage_qualifier if options.storage_qualifier
     
     if options.type
       @set_type options.type

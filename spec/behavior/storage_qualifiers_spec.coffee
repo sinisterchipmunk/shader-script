@@ -58,3 +58,12 @@ describe "storage qualifiers", ->
     it "should not raise reference errors in fragment shader when used in vertex shader", ->
       script = 'attributes =\n  vec3: position\nvertex = -> pos = position\nfragment = -> gl_FragColor = vec4 1'
       expect(-> glsl script).not.toThrow()
+
+    it "should convert attributes from float arrays", ->
+      attrs = new Float32Array [0, 1, 0,  -1, 0, 0,  1, 0, 0] # triangle
+      code = glsl 'attributes = vec4: pos\nvertex = -> gl_Position = pos'
+      sim = new Simulator vertex: code.vertex
+      sim.state.variables.pos.value = attrs
+      sim.start()
+      expect(sim.state.variables.pos.value).toEqualish [0, 1, 0, 1]
+      

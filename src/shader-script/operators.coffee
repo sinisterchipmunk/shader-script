@@ -143,6 +143,7 @@ exports.float =
   '-': cw_subt
   '+': cw_add
   '/': cw_divide
+  '>': (le, re) -> if le.value > re.value then 1 else 0
 
 exports.int =
   '==': (le, re) -> if le.value == re.value then 1 else 0
@@ -151,3 +152,4 @@ exports.int =
   '-': cw_subt
   '+': cw_add
   '/': cw_divide
+  '>': (le, re) -> if le.value > re.value then 1 else 0
