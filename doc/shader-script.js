@@ -1814,6 +1814,9 @@
           var result, source_value;
           source_value = source.execute().value;
           result = source_value.slice(0);
+          if (source_value.length === void 0) {
+            throw new Error("Object " + (JSON.stringify(source_value)) + " has no property `length`");
+          }
           this.iterate_components(source_value.length, true, function(index) {
             return result[index] = value[index];
           });
@@ -1832,6 +1835,9 @@
             variable.value = source_value[this.component_index(accessor)];
           } else {
             variable.value = [];
+            if (source_value.length === void 0) {
+              throw new Error("Object " + (JSON.stringify(source_value)) + ": no property `length`");
+            }
             this.iterate_components(source_value.length, false, function(index) {
               return variable.value.push(source_value[index]);
             });

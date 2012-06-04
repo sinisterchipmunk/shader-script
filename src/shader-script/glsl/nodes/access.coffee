@@ -66,6 +66,7 @@ class exports.Access extends require('shader-script/nodes/base').Base
     filter_assignment: (value) ->
       source_value = source.execute().value
       result = source_value.slice 0
+      if source_value.length is undefined then throw new Error "Object #{JSON.stringify source_value} has no property `length`"
       @iterate_components source_value.length, true, (index) -> result[index] = value[index]
       result
       
@@ -80,6 +81,7 @@ class exports.Access extends require('shader-script/nodes/base').Base
         variable.value = source_value[@component_index accessor]
       else
         variable.value = []
+        if source_value.length is undefined then throw new Error "Object #{JSON.stringify source_value}: no property `length`"
         @iterate_components source_value.length, false, (index) -> variable.value.push source_value[index]
       variable
       
