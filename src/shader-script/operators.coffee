@@ -1,18 +1,22 @@
 exports.component_wise = component_wise = (args...) ->
+  callback = args.pop()
+  # convert args that are typed arrays into arrays
+  (args[i] = (args[i][0..-1]) if args[i] and args[i].length) for i of args
   # make a shallow copy of arg arrays so that they aren't modified in place
   (args[i] = args[i].slice() if args[i] and args[i].slice) for i of args
-  callback = args.pop()
   
   resultset = []
   again = true
   while again
     size = null
     again = false
-    argset = for arg in args
+    argset = for argi in [0...args.length]
+      arg = args[argi]
       if arg and arg.length
         if arg.length > 1 then again = true
         if size and arg.length != size then throw new Error "All vectors must be the same size"
         size = arg.length
+        args[argi] = arg[1..-1]
       if arg and arg.shift then arg.shift()
       else arg
     result = callback argset...

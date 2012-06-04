@@ -1,6 +1,18 @@
 require 'spec_helper'
+{Simulator} = require 'shader-script'
 
 describe "operations", ->
+  describe "negation", ->
+    it "should handle typed arrays", ->
+      fcode = """
+      uniform vec3 EyeSpaceLightDirection;
+      void main(void) { vec3 L = -EyeSpaceLightDirection; }
+      """
+      sim = new Simulator fragment: fcode
+      sim.state.variables.EyeSpaceLightDirection.value = new Float32Array [0, 0, -1]
+      sim.start()
+      expect(sim.state.variables.L.value).toEqualish [0, 0, 1]
+  
   describe "simple", ->
     it "addition", ->
       sim = simulate glsl 'vertex = -> x = 1 + 1'
