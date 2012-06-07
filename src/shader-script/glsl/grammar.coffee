@@ -222,6 +222,7 @@ grammar =
   
   Literal: [
     o 'NUMBER', -> new Literal $1
+    o 'BOOLVAL', -> new Literal $1
   ]
   
   TypeConstructor: [

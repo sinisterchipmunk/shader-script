@@ -1,4 +1,5 @@
 require 'spec_helper'
+{Simulator} = require 'shader-script'
 
 describe 'variable definition', ->
   # all numbers are now inferred as floats. If you want ints, create them
@@ -20,6 +21,11 @@ describe 'variable definition', ->
       expect(sim.state.variables.a).not.toBeUndefined()
       expect(sim.state.variables.b.value).toEqualish [0, 1, 2, 3]
       expect(sim.state.variables.c).not.toBeUndefined()
+      
+    it "should handle definition of a single variable at a time", ->
+      fcode = 'bool a = false; void main(void) { }'
+      sim = new Simulator fragment: fcode
+      expect(sim.state.variables.a.value).toBe false
     
   it "should allow use of the same variable name in different functions", ->
     code = glsl """
