@@ -14,6 +14,10 @@ describe "operations", ->
       expect(sim.state.variables.L.value).toEqualish [0, 0, 1]
   
   describe "simple", ->
+    it 'vec2 plus', ->
+      sim = simulate glsl 'vertex = -> x = vec2(1, 2) + 0.5'
+      expect(sim.state.variables.x.value).toEqualish [1.5, 2.5]
+    
     it "addition", ->
       sim = simulate glsl 'vertex = -> x = 1 + 1'
       expect(sim.state.variables.x.value).toEqual 2

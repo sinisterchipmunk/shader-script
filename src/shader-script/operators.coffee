@@ -44,6 +44,19 @@ cw_divide=(le, re) -> component_wise le.value, re.value, (l, r) -> l / r
 # If an lval doesn't exist, no operations can be performed with it.
 #
 exports.signatures =
+  vec2:
+    '-':
+      vec2: 'vec2'
+      float: 'vec2'
+    '+':
+      vec2: 'vec2'
+      float: 'vec2'
+    '/':
+      vec2: 'vec2'
+      float: 'vec2'
+    '*':
+      vec2: 'vec2'
+      float: 'vec2'
   vec3:
     '==': vec3: 'vec3'
     '-': vec3: 'vec3'
@@ -133,6 +146,14 @@ exports.vec4 =
   '/': cw_divide
 
 exports.vec3 = 
+  '==': (le, re) -> if le.value == re.value then 1 else 0
+  '!=': (le, re) -> if le.value != re.value then 1 else 0
+  '*': cw_mult
+  '-': cw_subt
+  '+': cw_add
+  '/': cw_divide
+  
+exports.vec2 =
   '==': (le, re) -> if le.value == re.value then 1 else 0
   '!=': (le, re) -> if le.value != re.value then 1 else 0
   '*': cw_mult
