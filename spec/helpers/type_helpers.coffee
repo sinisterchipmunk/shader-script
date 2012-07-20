@@ -2,6 +2,9 @@ beforeEach ->
   EPSILON = 0.000001
   
   @addMatchers
+    toBeFalse: -> @actual is false
+    toBeTrue: -> @actual is true
+
     toEqualish: (expected) ->
       if @actual.length || expected.length
         return false if @actual.length != expected.length

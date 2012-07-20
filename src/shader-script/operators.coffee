@@ -98,6 +98,9 @@ exports.signatures =
       mat4: 'mat4'
       float: 'mat4'
 
+exports.bool =
+  '!': (le) -> !le
+
 exports.mat4 =
   '==': (le, re) -> le.value == re.value
   '!=': (le, re) -> if le.value != re.value then 1 else 0

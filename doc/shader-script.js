@@ -6709,6 +6709,12 @@ if (typeof module !== 'undefined' && require.main === module) {
     }
   };
 
+  exports.bool = {
+    '!': function(le) {
+      return !le;
+    }
+  };
+
   exports.mat4 = {
     '==': function(le, re) {
       return le.value === re.value;

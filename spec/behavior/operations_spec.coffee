@@ -12,6 +12,11 @@ describe "operations", ->
       sim.state.variables.EyeSpaceLightDirection.value = new Float32Array [0, 0, -1]
       sim.start()
       expect(sim.state.variables.L.value).toEqualish [0, 0, 1]
+
+  describe 'boolean', ->
+    it 'negation', ->
+      sim = simulate glsl 'vertex = -> x = !true'
+      expect(sim.state.variables.x.value).toBeFalse()
   
   describe "simple", ->
     it 'vec2 plus', ->
