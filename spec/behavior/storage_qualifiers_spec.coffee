@@ -3,6 +3,18 @@ require 'spec_helper'
 
 describe "storage qualifiers", ->
   describe "syntax", ->
+    it "should allow definition of arrays", ->
+      expect(glsl('uniforms = mat4: shadows[3]').vertex).toMatch /uniform mat4 shadows\[3\];/
+    
+    it "should allow definition of arrays within brackets", ->
+      expect(glsl('uniforms = mat4: [ shadows[3] ]').vertex).toMatch /uniform mat4 shadows\[3\];/
+      
+    it "should allow definition of arrays spanning multiple lines without comma", ->
+      expect(glsl('uniforms = mat4:\n  mv[3]\n  p[4]').vertex).toMatch /uniform mat4 mv\[3\], p\[4\];/
+    
+    it "should allow definition of arrays spanning multiple lines with comma", ->
+      expect(glsl('uniforms = mat4:\n  mv[3],\n  p[4]').vertex).toMatch /uniform mat4 mv\[3\], p\[4\];/
+
     it "should allow brackets", ->
       expect(glsl('uniforms = mat4: [mv, p]').vertex).toMatch /uniform mat4 mv, p/
 
@@ -14,6 +26,16 @@ describe "storage qualifiers", ->
       
     it "should allow presence of comma spanning multiple lines", ->
       expect(glsl('uniforms = mat4:\n  mv,\n  p').vertex).toMatch /uniform mat4 mv, p/
+      
+  describe "arrays in simulator", ->
+    it "should handle them independently", ->
+      code = "uniform vec3 v[2]; void main(void) { vec3 x = v[0] + v[1]; }"
+      console.log parse_glsl_tree code
+      sim = new Simulator fragment: code
+      sim.state.variables.v[0].value = [0, 1, 0]
+      sim.state.variables.v[1].value = [2, 4, 6]
+      sim.start()
+      expect(sim.state.variables.x.value).toEqualish [2, 5, 6]
   
   describe "uniforms", ->
     it "should not taint them between runs", ->
