@@ -29,6 +29,11 @@ try
   
   e = (args...) -> new Extension args...
 
+  e 'all', null, (x) ->
+    result = true
+    @component_wise x, (y) -> result and= y
+    result
+
   # Trigonometric functions, p65
   e 'radians', null, (x) -> @component_wise x, (y) -> y * Math.PI / 180
   e 'degrees', null, (x) -> @component_wise x, (y) -> y / Math.PI * 180

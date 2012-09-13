@@ -112,6 +112,14 @@
         return typeof result === "object" ? result : child;
       })(Extension, args, function() {});
     };
+    e('all', null, function(x) {
+      var result;
+      result = true;
+      this.component_wise(x, function(y) {
+        return result && (result = y);
+      });
+      return result;
+    });
     e('radians', null, function(x) {
       return this.component_wise(x, function(y) {
         return y * Math.PI / 180;

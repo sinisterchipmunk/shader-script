@@ -16,6 +16,16 @@ describe "built-in functions", ->
     sim = exec operation
     expect(sim.state.variables.x.type()).toEqual expected_type
     expect(sim.state.variables.x.value).toEqualish expected_value
+
+  it "should test booleans true with #all", ->
+    sim = simulate glsl "vertex = -> f = all bvec3 true, true, true"
+    sim.start()
+    expect(sim.state.variables.f.value).toBeTrue()
+    
+  it "should test booleans false with #all", ->
+    sim = simulate glsl "vertex = -> f = all bvec3 true, false, true"
+    sim.start()
+    expect(sim.state.variables.f.value).not.toBeTrue()
     
   it "should set type on return value", ->
     sim = simulate glsl "vertex = -> f = dot([0,1,0], [1,0,0]) * 1"
