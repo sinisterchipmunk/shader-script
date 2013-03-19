@@ -18,6 +18,7 @@ namespace :build do
   task :browser do
     require 'shader-script'
     ShaderScript.build_source_to 'doc/shader-script.js'
+    ShaderScript.build_source_to 'lib/assets/javascripts/shader-script.js'
   end
   
   desc "build the package.json file for releasing to npm"

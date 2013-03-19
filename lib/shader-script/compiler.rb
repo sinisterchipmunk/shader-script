@@ -15,7 +15,7 @@ module ShaderScript::Compiler
         @context ||= ExecJS.compile(content)
       end
       
-      def render(path, base_path = @base_path || File.expand_path("../assets/javascripts", File.dirname(__FILE__)))
+      def render(path, base_path = @base_path || File.expand_path("../../build", File.dirname(__FILE__)))
         av = ActionView::Base.new(base_path)
         av.extend self
         av.render :template => path, :handlers => [:erb], :formats => [:js]
@@ -24,8 +24,8 @@ module ShaderScript::Compiler
       def shader_build_env
         @shader_env ||= begin
           env = Sprockets::Environment.new
-          env.append_path File.expand_path("../assets/javascripts/shader-script/src", File.dirname(__FILE__))
-          env.append_path File.expand_path("../../vendor/assets/javascripts", File.dirname(__FILE__))
+          env.append_path File.expand_path("../../build/src", File.dirname(__FILE__))
+          env.append_path File.expand_path("../../build/vendor", File.dirname(__FILE__))
           env
         end
       end

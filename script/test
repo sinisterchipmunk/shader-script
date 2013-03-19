@@ -4,5 +4,5 @@ SHADER_PATH=$(dirname "${BASH_SOURCE[0]}")/..
 
 # build was successful
 PATH=$PATH:$SHADER_PATH/node_modules/jasmine-node/bin    \
-NODE_PATH=$NODE_PATH:$SHADER_PATH/lib/assets/javascripts/shader-script/src:$SHADER_PATH/spec \
+NODE_PATH=$NODE_PATH:$SHADER_PATH/build/src:$SHADER_PATH/spec \
 jasmine-node --coffee spec $*

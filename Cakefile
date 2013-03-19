@@ -13,15 +13,15 @@ run = (cb, cmd, args...) ->
 
 
 task 'build', 'build the language from source', build = (cb) ->
-  run cb, 'coffee', '-c', '-o', 'lib/assets/javascripts/shader-script/src', 'src'
+  run cb, 'coffee', '-c', '-o', 'build/src', 'src'
   
 task 'build:parser', 'rebuild the Jison parser', build_parser = (cb) ->
   extend global, require('util')
   require 'jison'
   shader_parser = require('./src/shader-script/grammar').parser
   glsl_parser = require('./src/shader-script/glsl/grammar').parser
-  fs.writeFile 'lib/assets/javascripts/shader-script/src/shader-script/parser.js',      shader_parser.generate()
-  fs.writeFile 'lib/assets/javascripts/shader-script/src/shader-script/glsl/parser.js', glsl_parser.generate()
+  fs.writeFile 'build/src/shader-script/parser.js',      shader_parser.generate()
+  fs.writeFile 'build/src/shader-script/glsl/parser.js', glsl_parser.generate()
   cb() if typeof cb is 'function'
 
 task 'test', 'run the tests', test = ->
